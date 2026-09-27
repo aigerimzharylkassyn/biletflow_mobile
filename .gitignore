@@ -1,0 +1,28 @@
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+ios/Pods/
+ios/.symlinks/
+android/.gradle/
+*.iml
+.idea/
+.vscode/
+lib/l10n/gen/
+
+# OS metadata
+.DS_Store
+
+# Local secrets (keep placeholder-only examples versioned)
+.env
+.env.*
+!.env.example
+
+# Signing credentials
+*.keystore
+*.jks
+*.p12
+*.p8
+*.mobileprovision
+key.properties

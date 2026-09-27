@@ -1,0 +1,161 @@
+{
+  "@@locale": "kk",
+
+  "appName": "BiletFlow",
+
+  "commonOk": "Jaray",
+  "commonCancel": "Bas tartu",
+  "commonSave": "Saqtau",
+  "commonRetry": "Qaitalap koru",
+  "commonSeeAll": "Barlyğyn koru",
+  "commonSearch": "Izdeu",
+  "commonLoading": "Zhuktelude...",
+  "commonErrorGeneric": "Bir qate ketti",
+  "commonComingSoon": "Zhaqynda qosylady",
+
+  "authWelcomeTitle": "BiletFlow-ğa qosh keldiñiz",
+  "authWelcomeSubtitle": "Is-sharalardy izdep, biletterdi alu üshin kiriñiz",
+  "authEmailLabel": "E-mail",
+  "authEmailHint": "E-maildi engiziñiz",
+  "authPasswordLabel": "Qupiya söz",
+  "authPasswordHint": "Qupiya sözdi engiziñiz",
+  "authLoginButton": "Kiru",
+  "authForgotPassword": "Qupiya sözdi umyttyñyz ba?",
+  "authForgotPasswordSent": "Bul test rezhimi: pochtağa hesh nárse zhiberilmeidi.",
+  "authNoAccount": "Akkauntyñyz zhoq pa?",
+  "authRegisterButton": "Tirkelu",
+  "authRegisterTitle": "Akkaunt ashu",
+  "authNameLabel": "Aty-zhöni",
+  "authNameHint": "Aty-zhönizdi engiziñiz",
+  "authConfirmPasswordLabel": "Qupiya sözdi qaitalañyz",
+  "authConfirmPasswordHint": "Qupiya sözdi qaita engiziñiz",
+  "authAlreadyHaveAccount": "Akkauntyñyz bar ma?",
+  "authValidationEmailRequired": "E-maildi engiziñiz",
+  "authValidationEmailInvalid": "Durys e-mail engiziñiz",
+  "authValidationPasswordRequired": "Qupiya sözdi engiziñiz",
+  "authValidationPasswordShort": "Qupiya söz keminde 6 tañbadan turuy kerek",
+  "authValidationNameRequired": "Atyñyzdy engiziñiz",
+  "authValidationPasswordMismatch": "Qupiya sözder saikes kelmeidi",
+  "authLoginErrorInvalid": "E-mail nemese qupiya söz qate",
+  "authMockCredentialsHint": "Synap köriñiz: attendee@example.com / organizer@example.com / admin@example.com (kez kelgen qupiya söz)",
+
+  "languageTitle": "Til",
+
+  "navHome": "Basty bet",
+  "navEvents": "Is-sharalar",
+  "navMyTickets": "Biletterim",
+  "navProfile": "Profil",
+  "navDashboard": "Basqaru paneli",
+  "navCheckin": "Check-in",
+  "navUsers": "Paidalanushylar",
+
+  "homeHello": "Sälem, {name}!",
+  "@homeHello": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "homeSearchHint": "Is-sharalardy izdeu",
+  "homeFeaturedEvents": "Tañdauly is-sharalar",
+  "homeUpcomingEvents": "Zhaqyndağy is-sharalar",
+  "homeCategories": "Sanattar",
+  "homeNoEvents": "Is-sharalar tabylmady",
+
+  "eventDate": "Küni",
+  "eventTime": "Uaqyty",
+  "eventLocation": "Ornalasqan zheri",
+  "eventPrice": "Bağasy",
+  "eventFree": "Tegin",
+  "eventDescription": "Sipattamasy",
+  "eventOrganizer": "Uiymdastyrushy",
+  "eventTicketInfo": "Bilet aqparaty",
+  "eventGetTicket": "Bilet alu",
+  "eventBuyTicket": "Biletti satyp alu",
+  "eventTicketConfirmedTitle": "Bilet rastaldy!",
+  "eventTicketConfirmedBody": "Biletiñiz \"Biletterim\" bölimine qosyldy.",
+  "eventViewTicket": "Biletti köru",
+
+  "categoryAll": "Barlyğy",
+  "categoryMusic": "Muzyka",
+  "categorySport": "Sport",
+  "categoryBusiness": "Biznes",
+  "categoryArt": "Öner men madeniet",
+  "categoryFood": "Tamaq pen susyn",
+
+  "ticketsTitle": "Biletterim",
+  "ticketsTabUpcoming": "Aldağy",
+  "ticketsTabPast": "Ötken",
+  "ticketsNoneUpcoming": "Aldağy biletteriñiz zhoq",
+  "ticketsNonePast": "Ötken biletteriñiz zhoq",
+  "ticketsCode": "Bilet kody",
+
+  "profileEdit": "Profildi özgertu",
+  "profileNotifications": "Bildirimder",
+  "profileFaq": "Zhii qoiylatyn suraqtar",
+  "profileContactUs": "Bizben bailanys",
+  "profileSignOut": "Shyğu",
+  "profileTerms": "Paidalanu erezheleri",
+  "profilePrivacy": "Qupiyalyq sayasaty",
+  "profileSignOutConfirmTitle": "Shyğasyz ba?",
+  "profileSignOutConfirmBody": "BiletFlow-dan shyğuğa senimdisiz be?",
+
+  "organizerWelcome": "Qosh keldiñiz, {name}!",
+  "@organizerWelcome": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "organizerMyEvents": "Meniñ is-sharalarym",
+  "organizerCreateEvent": "Is-shara quru",
+  "organizerTicketSales": "Bilet satylymy",
+  "organizerAttendees": "Qatysushylar",
+  "organizerRevenue": "Tabys",
+  "organizerCheckinTitle": "Check-in",
+  "organizerScanInstruction": "Kameranı bilet QR kodyna bağyttañyz",
+  "organizerEnterCodeManually": "Kodty qolmen engizu",
+  "organizerCheckinSuccess": "Tirkeldi: {name}",
+  "@organizerCheckinSuccess": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "organizerViewAttendees": "Qatysushylardy köru",
+  "organizerCreateEventTitle": "Zhaña is-shara quru",
+  "organizerEventTitleLabel": "Is-shara atauy",
+  "organizerEventTitleHint": "Is-shara atauyn engiziñiz",
+  "organizerVenueLabel": "Ötetin ornyi",
+  "organizerVenueHint": "Ötetin zherdi engiziñiz",
+  "organizerPriceLabel": "Bilet bağasy",
+  "organizerCategoryLabel": "Sanat",
+  "organizerDateLabel": "Is-shara küni",
+  "organizerPublish": "Zharia etu",
+  "organizerPublished": "Is-shara sätti zharialandy",
+  "organizerSoldOf": "{sold} / {total} satyldy",
+  "@organizerSoldOf": {
+    "placeholders": {
+      "sold": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+
+  "adminWelcome": "Qosh keldiñiz, {name}",
+  "@adminWelcome": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "adminOverview": "Zhalpy sholu",
+  "adminTotalUsers": "Barlyq paidalanushylar",
+  "adminTotalEvents": "Barlyq is-sharalar",
+  "adminTicketsSold": "Satylğan biletter",
+  "adminReports": "Esepter",
+  "adminViewReports": "Esepterdi köru",
+  "adminRoleAttendee": "Qatysushy",
+  "adminRoleOrganizer": "Uiymdastyrushy",
+  "adminRoleAdmin": "Administrator",
+  "adminManageUsers": "Paidalanushylardy basqaru",
+  "adminManageEvents": "Is-sharalardy baqylau",
+  "adminPlatformOverview": "Platforma sholuy",
+  "adminSuspendUser": "Bloktau",
+  "adminActivateUser": "Belsendiru"
+}
