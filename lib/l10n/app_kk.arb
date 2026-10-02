@@ -188,5 +188,6 @@
   "applicationApprove": "Maqúldaý",
   "applicationEmpty": "Qaralatyn ótinimder joq",
   "applicationRetry": "Jańartý",
-  "applicationInvalid": "Bul óris uzyndyǵyn tekserińiz."
+  "applicationInvalid": "Bul óris uzyndyǵyn tekserińiz.",
+  "ticketQrHelp": "Kirý kezinde osy QR-kodty uıymdastyrýshyǵa kórsetińiz."
 }

@@ -19,6 +19,7 @@ dependencies:
   google_fonts: ^6.2.1
   cupertino_icons: ^1.0.8
   mobile_scanner: ^7.4.2
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

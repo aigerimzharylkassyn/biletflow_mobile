@@ -2,12 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:biletflow_mobile/features/organizer/checkin_screen.dart';
 import 'package:biletflow_mobile/l10n/gen/app_localizations.dart';
 import 'package:biletflow_mobile/models/event.dart';
+import 'package:biletflow_mobile/models/ticket.dart';
 import 'package:biletflow_mobile/services/api_client.dart';
 import 'package:biletflow_mobile/services/auth_service.dart';
 import 'package:biletflow_mobile/services/data_service.dart';
+import 'package:biletflow_mobile/shared/widgets/ticket_card.dart';
 
 final event = AppEvent(
     id: 'event-id',
@@ -44,6 +47,36 @@ Widget app(Widget child) => MaterialApp(
     home: child);
 
 void main() {
+  testWidgets(
+      'Ticket preview and full-size QR use the exact server-issued credential',
+      (tester) async {
+    const credential = 'ticket.signed-backend-admission-credential';
+    final ticket = AppTicket(
+        id: 'ticket-id-123',
+        event: event,
+        ticketCode: credential,
+        status: TicketStatus.upcoming,
+        holderName: 'Attendee');
+    await tester.pumpWidget(app(Scaffold(body: TicketCard(ticket: ticket))));
+    expect(find.byType(QrImageView), findsOneWidget);
+    await tester.tap(find.text('Test Concert'));
+    await tester.pumpAndSettle();
+    expect(find.byType(QrImageView), findsNWidgets(2));
+    final expected = await tester.runAsync(() =>
+        QrPainter(data: credential, version: QrVersions.auto, gapless: true)
+            .toImageData(260));
+    final qrPainters = tester
+        .widgetList<CustomPaint>(find.byType(CustomPaint))
+        .map((widget) => widget.painter)
+        .whereType<QrPainter>();
+    expect(qrPainters.length, 2);
+    for (final painter in qrPainters) {
+      final rendered = await tester.runAsync(() => painter.toImageData(260));
+      expect(rendered!.buffer.asUint8List(), expected!.buffer.asUint8List());
+    }
+    expect(find.text('Show this QR code to the organizer at the entrance.'),
+        findsOneWidget);
+  });
   testWidgets(
       'Admission is sent once to the selected event and displays backend success',
       (tester) async {

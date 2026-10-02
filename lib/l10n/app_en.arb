@@ -162,5 +162,6 @@
   "applicationApprove": "Approve",
   "applicationEmpty": "No pending applications",
   "applicationRetry": "Refresh",
-  "applicationInvalid": "Please check the length of this field."
+  "applicationInvalid": "Please check the length of this field.",
+  "ticketQrHelp": "Show this QR code to the organizer at the entrance."
 }

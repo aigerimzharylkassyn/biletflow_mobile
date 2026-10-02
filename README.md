@@ -69,7 +69,7 @@ organizer role; applicants refresh their status to open the organizer dashboard.
 - Attendees: browse events, select ticket types, check out with simulated payment,
   and view owned tickets with QR images.
 - Organizers: create events, view registrations and revenue, and check in attendees
-  by entering their full signed ticket credential.
+  by scanning their ticket QR code or entering their signed credential.
 - Check-in staff: view assigned events and admit attendees.
 - Administrators: view users and events, and suspend users.
 
@@ -119,7 +119,9 @@ FastAPI server; exercise the app against your backend to validate the full flows
 
 - Payment completion is simulated; real payment processing is not integrated.
 - Paid sales require organizer verification and paid-sales activation on the backend.
-- Camera scanning is not implemented; check-in uses manual credential entry.
+- Camera scanning and manual credential entry are available for check-in.
+- Ticket QR codes are rendered locally from server-issued credentials; no extra
+  image request is needed. Camera scanning should be tested on a physical phone.
 - Event creation currently uses 18:00–22:00 and a capacity of 100.
 - Profile editing, notification settings, FAQ, and contact links show Coming Soon.
 - Suspended accounts cannot be reactivated through the app because the API has no

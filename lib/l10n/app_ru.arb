@@ -162,5 +162,6 @@
   "applicationApprove": "Одобрить",
   "applicationEmpty": "Нет заявок на рассмотрении",
   "applicationRetry": "Обновить",
-  "applicationInvalid": "Проверьте длину этого поля."
+  "applicationInvalid": "Проверьте длину этого поля.",
+  "ticketQrHelp": "Покажите этот QR-код организатору на входе."
 }
