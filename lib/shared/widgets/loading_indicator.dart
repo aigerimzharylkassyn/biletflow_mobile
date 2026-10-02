@@ -12,7 +12,8 @@ class AppLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return SingleChildScrollView(
+        child: Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -24,6 +25,6 @@ class AppLoadingIndicator extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 }

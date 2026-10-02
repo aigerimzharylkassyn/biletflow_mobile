@@ -39,7 +39,10 @@ class EventCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadius.card),
             boxShadow: const [
-              BoxShadow(color: Color(0x1F1D1D1D), blurRadius: 4, offset: Offset(0, 0)),
+              BoxShadow(
+                  color: Color(0x1F1D1D1D),
+                  blurRadius: 4,
+                  offset: Offset(0, 0)),
             ],
           ),
           child: Row(
@@ -60,17 +63,13 @@ class EventCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            dateLabel,
-                            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
-                          ),
-                        ),
-                        if (trailingBadge != null) trailingBadge!,
-                      ],
-                    ),
+                    Text(dateLabel,
+                        style: const TextStyle(
+                            fontSize: 13, color: AppColors.textSecondary)),
+                    if (trailingBadge != null)
+                      Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: trailingBadge!),
                     const SizedBox(height: 2),
                     Text(
                       event.title,
@@ -85,25 +84,30 @@ class EventCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.access_time_rounded, size: 13, color: AppColors.textSecondary),
+                        const Icon(Icons.access_time_rounded,
+                            size: 13, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
-                        Text(
+                        Expanded(
+                            child: Text(
                           '${event.startTime} - ${event.endTime}',
-                          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                        ),
+                          style: const TextStyle(
+                              fontSize: 12, color: AppColors.textSecondary),
+                        )),
                       ],
                     ),
                     const SizedBox(height: 3),
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined, size: 13, color: AppColors.textSecondary),
+                        const Icon(Icons.location_on_outlined,
+                            size: 13, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             '${event.venue}, ${event.city}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                            style: const TextStyle(
+                                fontSize: 12, color: AppColors.textSecondary),
                           ),
                         ),
                       ],
