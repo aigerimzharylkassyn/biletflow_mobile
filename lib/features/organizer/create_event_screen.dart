@@ -182,7 +182,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       children: [
                         const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.textSecondary),
                         const SizedBox(width: 10),
-                        Text(DateFormat('EEE, d MMM yyyy').format(_date), style: const TextStyle(fontSize: 14)),
+                        Expanded(child: Text(DateFormat('EEE, d MMM yyyy').format(_date), style: const TextStyle(fontSize: 14))),
                       ],
                     ),
                   ),

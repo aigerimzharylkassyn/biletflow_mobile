@@ -7,6 +7,7 @@ import '../../services/auth_service.dart';
 import '../../services/data_service.dart';
 import '../../shared/widgets/outlined_app_button.dart';
 import '../../shared/widgets/stat_card.dart';
+import '../../shared/widgets/responsive_cards.dart';
 import 'admin_reports_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
@@ -19,19 +20,19 @@ class AdminDashboardScreen extends StatelessWidget {
     final data = context.watch<DataService>();
 
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false, title: Text(l10n.adminWelcome(user?.name.split(' ').first ?? ''))),
+      appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(l10n.adminWelcome(user?.name.split(' ').first ?? ''))),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Text(l10n.adminOverview, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+          Text(l10n.adminOverview,
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary)),
           const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.5,
+          ResponsiveCards(
             children: [
               StatCard(
                 label: l10n.adminTotalUsers,

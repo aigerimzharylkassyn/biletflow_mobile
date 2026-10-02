@@ -24,6 +24,7 @@ class TicketCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadius.card),
       child: InkWell(
         onTap: onTap ?? () => showDialog<void>(context: context, builder: (_) => AlertDialog(
+          scrollable: true,
           title: Text(ticket.event.title),
           content: SizedBox(width: 300, child: Column(mainAxisSize: MainAxisSize.min, children: [
             Image.network('${ApiClient.baseUrl}/tickets/${ticket.id}/qr', headers: context.read<AuthService>().api.headers,

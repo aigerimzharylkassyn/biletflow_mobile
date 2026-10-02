@@ -9,6 +9,7 @@ import '../../models/event.dart';
 import '../../shared/widgets/outlined_app_button.dart';
 import '../../shared/widgets/primary_button.dart';
 import '../../shared/widgets/stat_card.dart';
+import '../../shared/widgets/responsive_cards.dart';
 import 'checkin_screen.dart';
 
 class EventOverviewScreen extends StatelessWidget {
@@ -25,30 +26,27 @@ class EventOverviewScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Text(dateLabel, style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
+          Text(dateLabel,
+              style: const TextStyle(
+                  fontSize: 14, color: AppColors.textSecondary)),
           const SizedBox(height: 4),
-          Text('${event.venue}, ${event.city}', style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
+          Text('${event.venue}, ${event.city}',
+              style: const TextStyle(
+                  fontSize: 14, color: AppColors.textSecondary)),
           const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: StatCard(
-                  label: l10n.organizerTicketSales,
-                  value: l10n.organizerSoldOf(event.ticketsSold, event.ticketsTotal),
-                  icon: Icons.confirmation_number_rounded,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: StatCard(
-                  label: l10n.organizerRevenue,
-                  value: '${context.watch<DataService>().eventRevenue(event.id).toStringAsFixed(0)} ₸',
-                  icon: Icons.payments_rounded,
-                  color: const Color(0xFFE0A23B),
-                ),
-              ),
-            ],
-          ),
+          ResponsiveCards(children: [
+            StatCard(
+                label: l10n.organizerTicketSales,
+                value:
+                    l10n.organizerSoldOf(event.ticketsSold, event.ticketsTotal),
+                icon: Icons.confirmation_number_rounded),
+            StatCard(
+                label: l10n.organizerRevenue,
+                value:
+                    '${context.watch<DataService>().eventRevenue(event.id).toStringAsFixed(0)} ₸',
+                icon: Icons.payments_rounded,
+                color: const Color(0xFF3E6AE1)),
+          ]),
           const SizedBox(height: 24),
           PrimaryButton(
             label: l10n.organizerCheckinTitle,
@@ -73,7 +71,8 @@ class EventOverviewScreen extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (sheetContext) {
         return SafeArea(
           child: ListView(
@@ -83,13 +82,18 @@ class EventOverviewScreen extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                 child: Text(
                   sheetContext.l10n.organizerViewAttendees,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary),
                 ),
               ),
-              if (orders.isEmpty) const ListTile(title: Text("No confirmed registrations yet")),
+              if (orders.isEmpty)
+                const ListTile(title: Text("No confirmed registrations yet")),
               for (final order in orders)
                 ListTile(
-                  leading: const Icon(Icons.person_outline_rounded, color: AppColors.textSecondary),
+                  leading: const Icon(Icons.person_outline_rounded,
+                      color: AppColors.textSecondary),
                   title: Text(order['attendee_name']),
                 ),
               const SizedBox(height: 8),

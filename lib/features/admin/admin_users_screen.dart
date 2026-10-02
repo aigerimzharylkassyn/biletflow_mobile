@@ -24,28 +24,55 @@ class AdminUsersScreen extends StatelessWidget {
     final data = context.watch<DataService>();
 
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false, title: Text(l10n.adminManageUsers)),
+      appBar: AppBar(
+          automaticallyImplyLeading: false, title: Text(l10n.adminManageUsers)),
       body: ListView.separated(
         padding: const EdgeInsets.symmetric(vertical: 8),
         itemCount: data.adminUsers.length,
         separatorBuilder: (_, __) => const Divider(height: 1),
         itemBuilder: (context, index) {
           final row = data.adminUsers[index];
-          return ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-            leading: AppAvatar(initials: row.user.initials, size: 40),
-            title: Text(row.user.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-            subtitle: Text('${row.user.email} · ${_roleLabel(l10n, row.user.role)}'),
-            trailing: TextButton(
-              onPressed: row.active ? () async {
-                try { await context.read<DataService>().toggleUserActive(row.user.id); }
-                catch (error) { if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString()))); }
-              } : null,
-              child: Text(
-                row.active ? l10n.adminSuspendUser : l10n.adminActivateUser,
-                style: TextStyle(color: row.active ? AppColors.error : AppColors.success, fontSize: 13),
-              ),
-            ),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                AppAvatar(initials: row.user.initials, size: 40),
+                const SizedBox(width: 12),
+                Expanded(
+                    child: Text(row.user.name,
+                        style: const TextStyle(fontWeight: FontWeight.w600)))
+              ]),
+              const SizedBox(height: 8),
+              Text('${row.user.email} · ${_roleLabel(l10n, row.user.role)}'),
+              Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: row.active
+                        ? () async {
+                            try {
+                              await context
+                                  .read<DataService>()
+                                  .toggleUserActive(row.user.id);
+                            } catch (error) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(error.toString())));
+                              }
+                            }
+                          }
+                        : null,
+                    child: Text(
+                        row.active
+                            ? l10n.adminSuspendUser
+                            : l10n.adminActivateUser,
+                        style: TextStyle(
+                            color: row.active
+                                ? AppColors.error
+                                : AppColors.success,
+                            fontSize: 13)),
+                  )),
+            ]),
           );
         },
       ),

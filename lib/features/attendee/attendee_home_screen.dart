@@ -10,6 +10,7 @@ import '../../services/data_service.dart';
 import '../../shared/widgets/app_avatar.dart';
 import '../../shared/widgets/category_chip.dart';
 import '../../shared/widgets/event_card.dart';
+import '../../shared/widgets/responsive_cards.dart';
 import '../profile/profile_screen.dart';
 import 'attendee_events_screen.dart';
 import 'event_details_screen.dart';
@@ -49,22 +50,20 @@ class AttendeeHomeScreen extends StatelessWidget {
           const SizedBox(height: 24),
           _SectionHeader(title: l10n.homeCategories),
           const SizedBox(height: 12),
-          SizedBox(
-            height: 40,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                for (final entry in _categoryEntries(l10n))
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: CategoryChip(
-                      label: entry.value,
-                      selected: false,
-                      onTap: () => _openEvents(context, category: entry.key),
-                    ),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final entry in _categoryEntries(l10n))
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: CategoryChip(
+                    label: entry.value,
+                    selected: false,
+                    onTap: () => _openEvents(context, category: entry.key),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
           const SizedBox(height: 24),
           _SectionHeader(
@@ -72,20 +71,13 @@ class AttendeeHomeScreen extends StatelessWidget {
             onSeeAll: () => _openEvents(context),
           ),
           const SizedBox(height: 12),
-          SizedBox(
-            height: 122,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: featured.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                final event = featured[index];
-                return SizedBox(
-                  width: 300,
-                  child: EventCard(event: event, onTap: () => _openDetails(context, event)),
-                );
-              },
-            ),
+          ResponsiveCards(
+            minimumWidth: 300,
+            children: [
+              for (final event in featured)
+                EventCard(
+                    event: event, onTap: () => _openDetails(context, event)),
+            ],
           ),
           const SizedBox(height: 24),
           _SectionHeader(
@@ -110,7 +102,9 @@ class AttendeeHomeScreen extends StatelessWidget {
     );
   }
 
-  List<MapEntry<EventCategory?, String>> _categoryEntries(AppLocalizations l10n) => [
+  List<MapEntry<EventCategory?, String>> _categoryEntries(
+          AppLocalizations l10n) =>
+      [
         MapEntry(null, l10n.categoryAll),
         MapEntry(EventCategory.music, l10n.categoryMusic),
         MapEntry(EventCategory.sport, l10n.categorySport),
@@ -121,7 +115,8 @@ class AttendeeHomeScreen extends StatelessWidget {
 
   void _openEvents(BuildContext context, {EventCategory? category}) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => AttendeeEventsScreen(initialCategory: category)),
+      MaterialPageRoute(
+          builder: (_) => AttendeeEventsScreen(initialCategory: category)),
     );
   }
 
@@ -150,9 +145,13 @@ class _SearchBar extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.search_rounded, color: AppColors.textTertiary, size: 20),
+            const Icon(Icons.search_rounded,
+                color: AppColors.textTertiary, size: 20),
             const SizedBox(width: 10),
-            Text(context.l10n.homeSearchHint, style: const TextStyle(color: AppColors.inputHint, fontSize: 14)),
+            Expanded(
+                child: Text(context.l10n.homeSearchHint,
+                    style: const TextStyle(
+                        color: AppColors.inputHint, fontSize: 14))),
           ],
         ),
       ),
@@ -167,12 +166,19 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 12,
       children: [
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+        Text(title,
+            style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary)),
         if (onSeeAll != null)
-          TextButton(onPressed: onSeeAll, child: Text(context.l10n.commonSeeAll)),
+          TextButton(
+              onPressed: onSeeAll, child: Text(context.l10n.commonSeeAll)),
       ],
     );
   }

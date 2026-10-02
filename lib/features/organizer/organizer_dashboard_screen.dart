@@ -8,6 +8,7 @@ import '../../services/data_service.dart';
 import '../../shared/widgets/event_card.dart';
 import '../../shared/widgets/primary_button.dart';
 import '../../shared/widgets/stat_card.dart';
+import '../../shared/widgets/responsive_cards.dart';
 import 'create_event_screen.dart';
 import 'event_overview_screen.dart';
 
@@ -25,7 +26,10 @@ class OrganizerDashboardScreen extends StatelessWidget {
     final revenue = data.totalRevenue;
 
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false, title: Text(l10n.organizerWelcome(user?.name.split(' ').first ?? ''))),
+      appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title:
+              Text(l10n.organizerWelcome(user?.name.split(' ').first ?? ''))),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -37,13 +41,7 @@ class OrganizerDashboardScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.5,
+          ResponsiveCards(
             children: [
               StatCard(
                 label: l10n.organizerTicketSales,
@@ -72,17 +70,22 @@ class OrganizerDashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(l10n.organizerMyEvents,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary)),
           const SizedBox(height: 12),
           for (final event in myEvents) ...[
             EventCard(
               event: event,
               trailingBadge: Text(
                 l10n.organizerSoldOf(event.ticketsSold, event.ticketsTotal),
-                style: const TextStyle(fontSize: 11, color: AppColors.textTertiary),
+                style: const TextStyle(
+                    fontSize: 11, color: AppColors.textTertiary),
               ),
               onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => EventOverviewScreen(event: event)),
+                MaterialPageRoute(
+                    builder: (_) => EventOverviewScreen(event: event)),
               ),
             ),
             const SizedBox(height: 12),

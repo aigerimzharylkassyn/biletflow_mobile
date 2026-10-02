@@ -136,8 +136,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
                 PrimaryButton(label: l10n.authLoginButton, onPressed: _submit, isLoading: isLoading),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(l10n.authNoAccount, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
                     TextButton(

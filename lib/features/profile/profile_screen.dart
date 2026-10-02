@@ -81,8 +81,9 @@ class ProfileScreen extends StatelessWidget {
             onTap: () => _confirmSignOut(context),
           ),
           const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               TextButton(onPressed: () => _showComingSoon(context), child: Text(l10n.profileTerms)),
               const Text('|', style: TextStyle(color: AppColors.textTertiary)),
@@ -105,6 +106,7 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        scrollable: true,
         title: Text(l10n.profileSignOutConfirmTitle),
         content: Text(l10n.profileSignOutConfirmBody),
         actions: [

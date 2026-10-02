@@ -103,8 +103,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 28),
                 PrimaryButton(label: l10n.authRegisterButton, onPressed: _submit, isLoading: isLoading),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(l10n.authAlreadyHaveAccount, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
                     TextButton(

@@ -39,6 +39,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       final order = await data.checkout(widget.event, type['id']);
       if (!mounted) return;
       final confirm = await showDialog<bool>(context: context, builder: (dialogContext) => AlertDialog(
+          scrollable: true,
         title: const Text('Confirm reservation'),
         content: Text('Total: ${(order['total_minor'] as num) / 100} ₸\nIncludes fees. Payment is simulated; no card will be charged.'),
         actions: [
@@ -59,6 +60,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+          scrollable: true,
         icon: const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 40),
         title: Text(l10n.eventTicketConfirmedTitle, textAlign: TextAlign.center),
         content: Text(l10n.eventTicketConfirmedBody, textAlign: TextAlign.center),
