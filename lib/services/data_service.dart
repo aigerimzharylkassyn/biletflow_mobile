@@ -146,6 +146,11 @@ class DataService extends ChangeNotifier {
     await api.request('POST', '/admin/users/$userId/suspend');
     await refresh();
   }
+  Future<void> assignStaff(String eventId, String email) async {
+    final query = Uri(queryParameters: {'email': email.trim().toLowerCase()}).query;
+    await api.request('POST', '/events/$eventId/staff?$query');
+  }
+
   Future<String> admit(String eventId, String credential) async {
     final result = await api.request('POST', '/check-in/events/$eventId/admit?qr_payload=${Uri.encodeQueryComponent(credential)}');
     return result['attendee_name'];

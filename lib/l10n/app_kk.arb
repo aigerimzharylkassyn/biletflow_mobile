@@ -158,5 +158,21 @@
   "adminManageEvents": "Is-sharalardy baqylau",
   "adminPlatformOverview": "Platforma sholuy",
   "adminSuspendUser": "Bloktau",
-  "adminActivateUser": "Belsendiru"
+  "adminActivateUser": "Belsendiru",
+  "checkinScan": "Bılet QR-kodyn skanerleý",
+  "checkinSelectEvent": "Skanerleý aldynda is-sharany tańdańyz.",
+  "checkinManualHelp": "Skanerleý qoljetimsiz bolsa, kirý kodyn engizýge bolady.",
+  "checkinCredential": "Kirý kody",
+  "checkinSubmit": "Kirýdi belgileý",
+  "checkinBusy": "Bılet tekserilýde…",
+  "checkinInvalid": "Bul BiletFlow bıletiniń QR-kody emes.",
+  "checkinCameraError": "Kamera qoljetimsiz. Qurylǵy baptaýlarynda kameraǵa ruqsat berińiz nemese kodty qolmen engizińiz.",
+  "checkinAccepted": "Bılet qabyldandy",
+  "checkinRejected": "Bılet qabyldanbady",
+  "checkinNext": "Kelesi qatysýshy",
+  "organizerAssignStaff": "Qyzmetker taǵaıyndaý",
+  "staffAssignmentHelp": "Tirkelgen paıdalanýshynyń elektrondyq poshtasyn engizińiz. Ol osy is-sharaǵa qatysýshylardy kirgize alady.",
+  "staffAssignmentEmail": "Qyzmetkerdiń elektrondyq poshtasy",
+  "staffAssignmentInvalidEmail": "Durys elektrondyq poshta mekenjaıyn engizińiz.",
+  "staffAssignmentSuccess": "Qyzmetker taǵaıyndaldy. Qyzmetker betin ashý úshin akkaýnttan shyǵyp, qaıta kirýdi surańyz."
 }

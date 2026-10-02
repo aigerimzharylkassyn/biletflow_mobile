@@ -132,5 +132,21 @@
   "adminManageEvents": "Мониторинг мероприятий",
   "adminPlatformOverview": "Обзор платформы",
   "adminSuspendUser": "Заблокировать",
-  "adminActivateUser": "Активировать"
+  "adminActivateUser": "Активировать",
+  "checkinScan": "Сканировать QR билета",
+  "checkinSelectEvent": "Выберите мероприятие перед сканированием.",
+  "checkinManualHelp": "Если сканирование недоступно, вставьте код допуска.",
+  "checkinCredential": "Код допуска",
+  "checkinSubmit": "Отметить вход",
+  "checkinBusy": "Проверка билета…",
+  "checkinInvalid": "Это не QR-код билета BiletFlow.",
+  "checkinCameraError": "Камера недоступна. Разрешите доступ в настройках устройства или введите код вручную.",
+  "checkinAccepted": "Билет принят",
+  "checkinRejected": "Билет не принят",
+  "checkinNext": "Следующий участник",
+  "organizerAssignStaff": "Назначить сотрудника",
+  "staffAssignmentHelp": "Введите почту зарегистрированного пользователя. Он получит доступ к регистрации посетителей этого мероприятия.",
+  "staffAssignmentEmail": "Почта сотрудника",
+  "staffAssignmentInvalidEmail": "Введите корректный адрес электронной почты.",
+  "staffAssignmentSuccess": "Сотрудник назначен. Попросите его выйти и войти снова, чтобы открыть страницу сотрудника."
 }

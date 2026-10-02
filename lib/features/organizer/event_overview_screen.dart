@@ -11,6 +11,7 @@ import '../../shared/widgets/primary_button.dart';
 import '../../shared/widgets/stat_card.dart';
 import '../../shared/widgets/responsive_cards.dart';
 import 'checkin_screen.dart';
+import 'assign_staff_dialog.dart';
 
 class EventOverviewScreen extends StatelessWidget {
   final AppEvent event;
@@ -53,6 +54,17 @@ class EventOverviewScreen extends StatelessWidget {
             icon: Icons.qr_code_scanner_rounded,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => CheckinScreen(event: event)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          OutlinedAppButton(
+            label: l10n.organizerAssignStaff,
+            icon: Icons.person_add_alt_outlined,
+            onPressed: () => showDialog<void>(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => AssignStaffDialog(
+                  event: event, data: context.read<DataService>()),
             ),
           ),
           const SizedBox(height: 12),

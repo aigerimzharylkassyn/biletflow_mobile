@@ -1,3 +1,5 @@
+import 'package:biletflow_mobile/features/organizer/assign_staff_dialog.dart';
+import 'package:biletflow_mobile/features/staff/staff_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -106,6 +108,8 @@ void main() {
     'organizer events': () => const OrganizerEventsScreen(),
     'create event': () => const CreateEventScreen(),
     'event overview': () => EventOverviewScreen(event: event),
+    'staff shell': () => const StaffShell(),
+    'assign staff': () => AssignStaffDialog(event: event, data: LayoutData(LayoutAuth())),
     'check-in': () => CheckinScreen(event: event),
     'admin dashboard': () => const AdminDashboardScreen(),
     'admin events': () => const AdminEventsScreen(),

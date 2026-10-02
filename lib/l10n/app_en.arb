@@ -132,5 +132,21 @@
   "adminManageEvents": "Monitor Events",
   "adminPlatformOverview": "Platform overview",
   "adminSuspendUser": "Suspend",
-  "adminActivateUser": "Activate"
+  "adminActivateUser": "Activate",
+  "checkinScan": "Scan ticket QR",
+  "checkinSelectEvent": "Select an event before scanning.",
+  "checkinManualHelp": "You can also paste the admission credential if scanning is unavailable.",
+  "checkinCredential": "Admission credential",
+  "checkinSubmit": "Check in",
+  "checkinBusy": "Checking ticket…",
+  "checkinInvalid": "This is not a BiletFlow ticket QR code.",
+  "checkinCameraError": "Camera unavailable. Allow camera access in device settings, or enter the credential manually.",
+  "checkinAccepted": "Ticket accepted",
+  "checkinRejected": "Ticket not accepted",
+  "checkinNext": "Next attendee",
+  "organizerAssignStaff": "Assign staff",
+  "staffAssignmentHelp": "Enter the email of an existing registered user. They will receive check-in access to this event.",
+  "staffAssignmentEmail": "Staff email",
+  "staffAssignmentInvalidEmail": "Enter a valid email address.",
+  "staffAssignmentSuccess": "Staff assigned. Ask them to sign out and sign in again to open their staff page."
 }
