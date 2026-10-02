@@ -50,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final route = switch (role) {
       UserRole.attendee => '/attendee',
       UserRole.organizer => '/organizer',
+      UserRole.staff => '/staff',
       UserRole.admin => '/admin',
     };
     Navigator.of(context).pushNamedAndRemoveUntil(route, (r) => false);

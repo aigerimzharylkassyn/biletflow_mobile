@@ -50,7 +50,10 @@ class DataService extends ChangeNotifier {
     isLoading = true; errorMessage = null; notifyListeners();
     try {
       final path = switch(user.role) {
-        UserRole.admin => '/admin/events', UserRole.organizer => '/organizer/events', _ => '/events',
+        UserRole.admin => '/admin/events',
+        UserRole.organizer => '/organizer/events',
+        UserRole.staff => '/check-in/events',
+        UserRole.attendee => '/events',
       };
       final rows = (await api.request('GET', path) as List).cast<Map<String, dynamic>>();
       final events = rows.map(AppEvent.fromJson).toList();
@@ -74,7 +77,7 @@ class DataService extends ChangeNotifier {
         }
       }
       // Calculate revenue from settled orders, including fees and discounts.
-      if (user.role != UserRole.attendee) {
+      if (user.role == UserRole.organizer || user.role == UserRole.admin) {
         for (final event in events) {
           final orders = await api.request('GET', '/events/${event.id}/orders') as List;
           eventOrders[event.id] = orders.where((o) => o['status'] == 'confirmed').map((o) => Map<String, dynamic>.from(o)).toList();

@@ -24,7 +24,9 @@ Start the separately configured backend before using the app. From the backend
 project directory, with its dependencies and database configured:
 
 ```sh
-.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+uv sync --all-extras --python 3.13
+uv run python -m app.dev_seed   # optional, creates rich demo data for every role
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 The app's default API addresses are:
@@ -35,10 +37,10 @@ The app's default API addresses are:
 | iOS Simulator | `http://127.0.0.1:8000/api/v1` |
 
 For a physical phone, connect it to the same Wi-Fi as the backend computer and
-replace `YOUR_MAC_LAN_IP` with that computer's LAN IP:
+replace `YOUR_COMPUTER_LAN_IP` with that computer's LAN IP:
 
 ```sh
-flutter run --dart-define=API_BASE_URL=http://YOUR_MAC_LAN_IP:8000/api/v1
+flutter run --dart-define=API_BASE_URL=http://YOUR_COMPUTER_LAN_IP:8000/api/v1
 ```
 
 For a hosted backend, set `API_BASE_URL` to its HTTPS address, including `/api/v1`,
@@ -48,9 +50,12 @@ See [Backend connection](BACKEND_CONNECTION.md) for further integration details.
 ## Accounts and roles
 
 Register a real attendee account with a password of at least eight characters,
-or sign in with an existing backend account. The old mock accounts are no longer
-used. Organizer and administrator roles must be provisioned on the backend.
-There are no automatically seeded demo accounts or events.
+or sign in with an existing backend account. Organizer and administrator roles
+must be provisioned on the backend. For local checks, the optional backend seed
+also creates events, users, registrations, revenue, and attendee tickets. It
+creates `attendee.demo@example.com`, `organizer.demo@example.com`,
+`staff.demo@example.com`, and `admin.demo@example.com`; each uses
+`DemoPass123!`.
 
 Sessions are held in memory. Sign in again after restarting the app or when the
 token expires.
@@ -61,7 +66,20 @@ token expires.
   and view owned tickets with QR images.
 - Organizers: create events, view registrations and revenue, and check in attendees
   by entering their full signed ticket credential.
+- Check-in staff: view assigned events and admit attendees.
 - Administrators: view users and events, and suspend users.
+
+## Android Studio
+
+Open this `biletflow_mobile` directory (not only its `android` subdirectory) in
+Android Studio with the Flutter and Dart plugins enabled. Run `flutter pub get`,
+select an Android emulator, and run `lib/main.dart`. The standard Android emulator
+uses the default `10.0.2.2` alias to reach the backend on the development computer.
+Do not replace it with `localhost`, which points back to the emulator itself.
+
+The debug manifest permits local HTTP for development. Confirm the server first at
+`http://127.0.0.1:8000/api/v1/health`; hosted/release builds should use an HTTPS
+`API_BASE_URL`.
 
 ## Languages
 

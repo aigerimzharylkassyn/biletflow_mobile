@@ -152,6 +152,7 @@
   "adminViewReports": "Esepterdi köru",
   "adminRoleAttendee": "Qatysushy",
   "adminRoleOrganizer": "Uiymdastyrushy",
+  "adminRoleStaff": "Is-shara qyzmetkeri",
   "adminRoleAdmin": "Administrator",
   "adminManageUsers": "Paidalanushylardy basqaru",
   "adminManageEvents": "Is-sharalardy baqylau",

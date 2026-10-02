@@ -14,6 +14,7 @@ class AdminUsersScreen extends StatelessWidget {
   String _roleLabel(AppLocalizations l10n, UserRole role) => switch (role) {
         UserRole.attendee => l10n.adminRoleAttendee,
         UserRole.organizer => l10n.adminRoleOrganizer,
+        UserRole.staff => l10n.adminRoleStaff,
         UserRole.admin => l10n.adminRoleAdmin,
       };
 

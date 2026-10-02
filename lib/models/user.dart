@@ -1,4 +1,4 @@
-enum UserRole { attendee, organizer, admin }
+enum UserRole { attendee, organizer, staff, admin }
 
 class AppUser {
   final String id;
@@ -19,7 +19,9 @@ class AppUser {
       name: json['full_name'] as String? ?? json['email'] as String,
       email: json['email'] as String,
       role: roles.contains('platform_admin') ? UserRole.admin
-          : roles.contains('organizer') ? UserRole.organizer : UserRole.attendee);
+          : roles.contains('organizer') ? UserRole.organizer
+          : roles.contains('event_admin') ? UserRole.staff
+          : UserRole.attendee);
   }
 
   /// Initials shown in the avatar circle, e.g. "Dylan Thomas" -> "DT".

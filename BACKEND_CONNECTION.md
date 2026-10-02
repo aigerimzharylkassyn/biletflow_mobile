@@ -16,11 +16,11 @@ flutter run
 Defaults: iOS Simulator uses `http://127.0.0.1:8000/api/v1`; Android Emulator uses
 `http://10.0.2.2:8000/api/v1`.
 
-For a physical phone, connect it to the same Wi-Fi as the Mac. Start the backend with
-`.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000`, and set the Mac's LAN IP:
+For a physical phone, connect it to the same Wi-Fi as the backend computer. Start the backend with
+`uv run uvicorn app.main:app --host 0.0.0.0 --port 8000`, and set the computer's LAN IP:
 
 ```sh
-flutter run --dart-define=API_BASE_URL=http://YOUR_MAC_LAN_IP:8000/api/v1
+flutter run --dart-define=API_BASE_URL=http://YOUR_COMPUTER_LAN_IP:8000/api/v1
 ```
 
 Local HTTP is intended for development. Use an HTTPS backend for release builds.
@@ -36,6 +36,11 @@ Paid ticket sales require organizer verification and paid-sales activation throu
 Check-in accepts the full signed credential shown in ticket details; camera scanning is not
 implemented. Profile edit, notification settings, FAQ and contact links retain their existing
 Coming Soon behavior. The API has no user-reactivation endpoint, so suspended-user buttons are disabled.
-The backend starts empty; no demo accounts or events are automatically inserted.
+The backend starts empty. For an end-to-end local check, run
+`uv run python -m app.dev_seed` once. It idempotently creates multiple events,
+venues, ticket types, attendees, registrations, revenue, ticket history, and all
+four application roles. The command prints the primary account addresses and all
+use `DemoPass123!`. The app maps assigned `event_admin` users to its staff-only
+Check-in and Profile navigation.
 
 Validation: `dart analyze lib test` and `flutter test`.

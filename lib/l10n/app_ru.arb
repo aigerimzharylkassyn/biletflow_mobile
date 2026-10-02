@@ -126,6 +126,7 @@
   "adminViewReports": "Смотреть отчёты",
   "adminRoleAttendee": "Посетитель",
   "adminRoleOrganizer": "Организатор",
+  "adminRoleStaff": "Персонал мероприятия",
   "adminRoleAdmin": "Администратор",
   "adminManageUsers": "Управление пользователями",
   "adminManageEvents": "Мониторинг мероприятий",

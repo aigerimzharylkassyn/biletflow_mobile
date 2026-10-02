@@ -6,6 +6,7 @@ import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/organizer/organizer_shell.dart';
 import '../features/splash/splash_screen.dart';
+import '../features/staff/staff_shell.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -15,6 +16,7 @@ class AppRoutes {
   static const register = '/register';
   static const attendee = '/attendee';
   static const organizer = '/organizer';
+  static const staff = '/staff';
   static const admin = '/admin';
 
   static Map<String, WidgetBuilder> get table => {
@@ -23,6 +25,7 @@ class AppRoutes {
         register: (_) => const RegisterScreen(),
         attendee: (_) => const AttendeeShell(),
         organizer: (_) => const OrganizerShell(),
+        staff: (_) => const StaffShell(),
         admin: (_) => const AdminShell(),
       };
 }

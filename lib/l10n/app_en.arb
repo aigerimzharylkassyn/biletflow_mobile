@@ -126,6 +126,7 @@
   "adminViewReports": "View reports",
   "adminRoleAttendee": "Attendee",
   "adminRoleOrganizer": "Organizer",
+  "adminRoleStaff": "Event staff",
   "adminRoleAdmin": "Admin",
   "adminManageUsers": "Manage Users",
   "adminManageEvents": "Monitor Events",
