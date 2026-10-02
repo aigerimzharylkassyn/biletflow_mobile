@@ -44,6 +44,12 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
     }
   }
+  Future<void> refreshUser() async {
+    final data = await api.request('GET', '/users/me');
+    _currentUser = AppUser.fromJson(Map<String, dynamic>.from(data));
+    notifyListeners();
+  }
+
   void logout() {
     api.token = null;
     _currentUser = null;

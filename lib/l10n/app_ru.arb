@@ -148,5 +148,19 @@
   "staffAssignmentHelp": "Введите почту зарегистрированного пользователя. Он получит доступ к регистрации посетителей этого мероприятия.",
   "staffAssignmentEmail": "Почта сотрудника",
   "staffAssignmentInvalidEmail": "Введите корректный адрес электронной почты.",
-  "staffAssignmentSuccess": "Сотрудник назначен. Попросите его выйти и войти снова, чтобы открыть страницу сотрудника."
+  "staffAssignmentSuccess": "Сотрудник назначен. Попросите его выйти и войти снова, чтобы открыть страницу сотрудника.",
+  "becomeOrganizer": "Стать организатором",
+  "organizerApplications": "Заявки организаторов",
+  "applicationContact": "Контактное лицо",
+  "applicationOrganization": "Название организации",
+  "applicationPhone": "Контактный телефон",
+  "applicationDescription": "Расскажите о мероприятиях, которые планируете проводить",
+  "applicationSubmit": "Отправить заявку",
+  "applicationPending": "Ваша заявка ожидает одобрения администратора.",
+  "applicationApproved": "Ваша заявка одобрена. Откройте кабинет организатора.",
+  "applicationOpen": "Открыть кабинет организатора",
+  "applicationApprove": "Одобрить",
+  "applicationEmpty": "Нет заявок на рассмотрении",
+  "applicationRetry": "Обновить",
+  "applicationInvalid": "Проверьте длину этого поля."
 }

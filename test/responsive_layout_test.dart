@@ -1,3 +1,5 @@
+import 'package:biletflow_mobile/features/profile/organizer_application_screen.dart';
+import 'package:biletflow_mobile/features/admin/organizer_applications_screen.dart';
 import 'package:biletflow_mobile/features/organizer/assign_staff_dialog.dart';
 import 'package:biletflow_mobile/features/staff/staff_shell.dart';
 import 'package:flutter/material.dart';
@@ -116,6 +118,8 @@ void main() {
     'admin users': () => const AdminUsersScreen(),
     'admin reports': () => const AdminReportsScreen(),
     'profile': () => const ProfileScreen(),
+    'application form': () => const OrganizerApplicationScreen(),
+    'admin applications': () => const OrganizerApplicationsScreen(),
   };
   for (final locale in ['en', 'ru', 'kk']) {
     for (final config in [

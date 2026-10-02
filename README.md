@@ -60,6 +60,10 @@ creates `attendee.demo@example.com`, `organizer.demo@example.com`,
 Sessions are held in memory. Sign in again after restarting the app or when the
 token expires.
 
+Attendees can apply through Profile → Become an organizer. Administrators review
+pending requests through Dashboard → Organizer applications. Approval grants the
+organizer role; applicants refresh their status to open the organizer dashboard.
+
 ## Features
 
 - Attendees: browse events, select ticket types, check out with simulated payment,

@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../app/theme.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../services/auth_service.dart';
+import '../../models/user.dart';
+import 'organizer_application_screen.dart';
 import '../../shared/widgets/app_avatar.dart';
 import '../../shared/widgets/language_selector.dart';
 
@@ -47,6 +49,16 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
+          if (user?.role == UserRole.attendee) ...[
+            _ProfileRow(
+              icon: Icons.event_available_outlined,
+              label: l10n.becomeOrganizer,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => const OrganizerApplicationScreen(),
+              )),
+            ),
+            const Divider(),
+          ],
           _ProfileRow(
             icon: Icons.edit_outlined,
             label: l10n.profileEdit,

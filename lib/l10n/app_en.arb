@@ -148,5 +148,19 @@
   "staffAssignmentHelp": "Enter the email of an existing registered user. They will receive check-in access to this event.",
   "staffAssignmentEmail": "Staff email",
   "staffAssignmentInvalidEmail": "Enter a valid email address.",
-  "staffAssignmentSuccess": "Staff assigned. Ask them to sign out and sign in again to open their staff page."
+  "staffAssignmentSuccess": "Staff assigned. Ask them to sign out and sign in again to open their staff page.",
+  "becomeOrganizer": "Become an organizer",
+  "organizerApplications": "Organizer applications",
+  "applicationContact": "Contact name",
+  "applicationOrganization": "Organization name",
+  "applicationPhone": "Contact phone",
+  "applicationDescription": "Tell us about the events you plan to organize",
+  "applicationSubmit": "Submit application",
+  "applicationPending": "Your application is awaiting admin approval.",
+  "applicationApproved": "Your application was approved. Open your organizer dashboard.",
+  "applicationOpen": "Open organizer dashboard",
+  "applicationApprove": "Approve",
+  "applicationEmpty": "No pending applications",
+  "applicationRetry": "Refresh",
+  "applicationInvalid": "Please check the length of this field."
 }

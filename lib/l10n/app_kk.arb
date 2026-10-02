@@ -174,5 +174,19 @@
   "staffAssignmentHelp": "Tirkelgen paıdalanýshynyń elektrondyq poshtasyn engizińiz. Ol osy is-sharaǵa qatysýshylardy kirgize alady.",
   "staffAssignmentEmail": "Qyzmetkerdiń elektrondyq poshtasy",
   "staffAssignmentInvalidEmail": "Durys elektrondyq poshta mekenjaıyn engizińiz.",
-  "staffAssignmentSuccess": "Qyzmetker taǵaıyndaldy. Qyzmetker betin ashý úshin akkaýnttan shyǵyp, qaıta kirýdi surańyz."
+  "staffAssignmentSuccess": "Qyzmetker taǵaıyndaldy. Qyzmetker betin ashý úshin akkaýnttan shyǵyp, qaıta kirýdi surańyz.",
+  "becomeOrganizer": "Uıymdastyrushy bolu",
+  "organizerApplications": "Uıymdastyrushy ótinimderi",
+  "applicationContact": "Baılanys aty",
+  "applicationOrganization": "Uıym ataýy",
+  "applicationPhone": "Baılanys telefony",
+  "applicationDescription": "Ótkizýdi josparlaǵan is-sharalaryńyz týraly aıtyńyz",
+  "applicationSubmit": "Ótinim jiberý",
+  "applicationPending": "Ótinimińiz ákimshiniń maqúldaýyn kútýde.",
+  "applicationApproved": "Ótinimińiz maqúldandy. Uıymdastyrushy kabinetin ashyńyz.",
+  "applicationOpen": "Uıymdastyrushy kabinetin ashý",
+  "applicationApprove": "Maqúldaý",
+  "applicationEmpty": "Qaralatyn ótinimder joq",
+  "applicationRetry": "Jańartý",
+  "applicationInvalid": "Bul óris uzyndyǵyn tekserińiz."
 }
