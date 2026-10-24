@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../services/auth_service.dart';
+import '../../models/user.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -208,31 +209,55 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 class HelpScreen extends StatelessWidget {
   const HelpScreen({super.key, this.policy});
   final String? policy;
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
+    final role =
+        policy == null ? context.watch<AuthService>().currentUser?.role : null;
+    final questions = switch (role) {
+      UserRole.attendee => [
+          (l.faqAttendeeBooking, l.faqAttendeeBookingBody),
+          (l.faqTickets, l.faqTicketsBody),
+          (l.faqCheckin, l.faqCheckinBody),
+          (l.refundPolicy, l.faqRefundBody),
+          (l.faqAttendeePayment, l.faqAttendeePaymentBody),
+          (l.becomeOrganizer, l.faqAttendeeOrganizerBody),
+        ],
+      UserRole.organizer => [
+          (l.faqOrganizerPublish, l.faqOrganizerPublishBody),
+          (l.faqOrganizerPaid, l.faqOrganizerPaidBody),
+          (l.faqOrganizerStaff, l.faqOrganizerStaffBody),
+          (l.faqOrganizerCheckin, l.faqOrganizerCheckinBody),
+          (l.faqOrganizerSales, l.faqOrganizerSalesBody),
+          (l.faqOrganizerSupport, l.faqOrganizerSupportBody),
+        ],
+      _ => <(String, String)>[],
+    };
+    final title = policy ??
+        switch (role) {
+          UserRole.attendee => l.faqAttendeeTitle,
+          UserRole.organizer => l.faqOrganizerTitle,
+          _ => l.profileFaq,
+        };
     return Scaffold(
-        appBar: AppBar(title: Text(policy ?? l.profileFaq)),
-        body: ListView(padding: const EdgeInsets.all(20), children: [
-          if (policy != null)
-            Text(l.policyUnavailable)
-          else ...[
-            ExpansionTile(title: Text(l.faqTickets), children: [
-              Padding(
+      appBar: AppBar(title: Text(title)),
+      body: ListView(padding: const EdgeInsets.all(20), children: [
+        if (policy != null)
+          Text(l.policyUnavailable)
+        else
+          for (final question in questions)
+            ExpansionTile(
+              key: ValueKey(question.$1),
+              title: Text(question.$1),
+              children: [
+                Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(l.faqTicketsBody))
-            ]),
-            ExpansionTile(title: Text(l.refundPolicy), children: [
-              Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(l.faqRefundBody))
-            ]),
-            ExpansionTile(title: Text(l.faqCheckin), children: [
-              Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(l.faqCheckinBody))
-            ]),
-          ],
-        ]));
+                  child: Text(question.$2),
+                ),
+              ],
+            ),
+      ]),
+    );
   }
 }

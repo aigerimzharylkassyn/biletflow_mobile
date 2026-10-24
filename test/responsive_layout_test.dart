@@ -117,15 +117,16 @@ final api = ApiClient(client: MockClient((request) async {
 }));
 
 class LayoutAuth extends AuthService {
-  LayoutAuth() : super(api);
+  LayoutAuth({this.role = UserRole.attendee}) : super(api);
+  final UserRole role;
   @override
   bool get isAuthenticated => true;
   @override
-  AppUser get currentUser => const AppUser(
+  AppUser get currentUser => AppUser(
       id: 'user-id',
       name: 'VeryLongFirstname Very Long Surname',
       email: 'long.email.address.for.layout.testing@example.com',
-      role: UserRole.attendee);
+      role: role);
 }
 
 final event = AppEvent(
@@ -202,6 +203,9 @@ void main() {
     'notifications': () => const NotificationsScreen(),
     'support': () => const SupportScreen(),
     'FAQ': () => const HelpScreen(),
+    'organizer FAQ': () => ChangeNotifierProvider<AuthService>(
+        create: (_) => LayoutAuth(role: UserRole.organizer),
+        child: const HelpScreen()),
     'profile': () => const ProfileScreen(),
     'application form': () => const OrganizerApplicationScreen(),
     'admin applications': () => const OrganizerApplicationsScreen(),

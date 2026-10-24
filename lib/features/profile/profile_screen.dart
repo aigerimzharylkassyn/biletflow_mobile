@@ -81,13 +81,16 @@ class ProfileScreen extends StatelessWidget {
           const Divider(),
           const LanguageSettingsRow(),
           const Divider(),
-          _ProfileRow(
-            icon: Icons.help_outline_rounded,
-            label: l10n.profileFaq,
-            onTap: () => Navigator.push(
-                context, MaterialPageRoute(builder: (_) => const HelpScreen())),
-          ),
-          const Divider(),
+          if (user?.role == UserRole.attendee ||
+              user?.role == UserRole.organizer) ...[
+            _ProfileRow(
+              icon: Icons.help_outline_rounded,
+              label: l10n.profileFaq,
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const HelpScreen())),
+            ),
+            const Divider(),
+          ],
           _ProfileRow(
             icon: Icons.mail_outline_rounded,
             label: l10n.profileContactUs,
