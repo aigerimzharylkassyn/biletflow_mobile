@@ -16,6 +16,7 @@ class DataService extends ChangeNotifier {
   final ApiClient api;
   final AuthService auth;
   String? _userId;
+  UserRole? _userRole;
   int _generation = 0;
   bool isLoading = false;
   String? errorMessage;
@@ -36,8 +37,9 @@ class DataService extends ChangeNotifier {
   double _revenue = 0;
   double get totalRevenue => _revenue;
   void _sessionChanged() {
-    if (_userId == auth.currentUser?.id) return;
+    if (_userId == auth.currentUser?.id && _userRole == auth.currentUser?.role) return;
     _userId = auth.currentUser?.id;
+    _userRole = auth.currentUser?.role;
     _generation++;
     _events = []; _tickets = []; _adminUsers = []; _organizers.clear(); _revenue = 0; _orders = {};
     errorMessage = null;

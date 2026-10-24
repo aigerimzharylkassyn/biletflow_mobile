@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../services/auth_service.dart';
+import '../../models/user.dart';
 
 class OrganizerApplicationScreen extends StatefulWidget {
   const OrganizerApplicationScreen({super.key});
@@ -92,8 +93,12 @@ class _OrganizerApplicationScreenState
       final auth = context.read<AuthService>();
       await auth.refreshUser();
       if (!mounted || !auth.isAuthenticated) return;
+      if (auth.currentUser!.role != UserRole.organizer &&
+          auth.currentUser!.role != UserRole.admin) {
+        throw StateError(context.l10n.applicationPending);
+      }
       final route =
-          auth.currentUser!.role.name == 'admin' ? '/admin' : '/organizer';
+          auth.currentUser!.role == UserRole.admin ? '/admin' : '/organizer';
       Navigator.of(context).pushNamedAndRemoveUntil(route, (_) => false);
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
