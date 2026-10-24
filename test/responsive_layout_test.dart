@@ -1,3 +1,5 @@
+import 'package:biletflow_mobile/features/profile/account_screens.dart';
+import 'package:biletflow_mobile/features/profile/support_screen.dart';
 import 'package:biletflow_mobile/features/profile/organizer_application_screen.dart';
 import 'package:biletflow_mobile/features/admin/organizer_applications_screen.dart';
 import 'package:biletflow_mobile/features/organizer/assign_staff_dialog.dart';
@@ -117,6 +119,10 @@ void main() {
     'admin events': () => const AdminEventsScreen(),
     'admin users': () => const AdminUsersScreen(),
     'admin reports': () => const AdminReportsScreen(),
+    'edit profile': () => const EditProfileScreen(),
+    'notifications': () => const NotificationsScreen(),
+    'support': () => const SupportScreen(),
+    'FAQ': () => const HelpScreen(),
     'profile': () => const ProfileScreen(),
     'application form': () => const OrganizerApplicationScreen(),
     'admin applications': () => const OrganizerApplicationsScreen(),

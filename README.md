@@ -105,6 +105,12 @@ are excluded from Git. Kazakh translations still need native-speaker review.
 - `lib/app/` — app configuration, routes, and theme.
 - `test/api_integration_test.dart` — client authentication tests using mocked HTTP responses.
 
+## Profile and support
+
+Profile supports editing name/phone, reading and marking notifications, FAQ,
+and creating/replying to support cases. All user-facing labels are available in
+English, Russian and Kazakh. Requests use the existing authenticated backend API.
+
 ## Validation
 
 ```sh
@@ -123,7 +129,7 @@ FastAPI server; exercise the app against your backend to validate the full flows
 - Ticket QR codes are rendered locally from server-issued credentials; no extra
   image request is needed. Camera scanning should be tested on a physical phone.
 - Event creation currently uses 18:00–22:00 and a capacity of 100.
-- Profile editing, notification settings, FAQ, and contact links show Coming Soon.
+- Official terms/privacy documents have not been supplied; request current documents through support.
 - Suspended accounts cannot be reactivated through the app because the API has no
   reactivation endpoint.
 

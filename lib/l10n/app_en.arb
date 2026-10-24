@@ -1,8 +1,6 @@
 {
   "@@locale": "en",
-
   "appName": "BiletFlow",
-
   "commonOk": "OK",
   "commonCancel": "Cancel",
   "commonSave": "Save",
@@ -12,7 +10,6 @@
   "commonLoading": "Loading...",
   "commonErrorGeneric": "Something went wrong",
   "commonComingSoon": "Coming soon",
-
   "authWelcomeTitle": "Welcome to BiletFlow",
   "authWelcomeSubtitle": "Sign in to discover events and get tickets",
   "authEmailLabel": "E-mail",
@@ -38,9 +35,7 @@
   "authValidationPasswordMismatch": "Passwords do not match",
   "authLoginErrorInvalid": "Incorrect email or password",
   "authMockCredentialsHint": "Try: attendee@example.com / organizer@example.com / admin@example.com (any password)",
-
   "languageTitle": "Language",
-
   "navHome": "Home",
   "navEvents": "Events",
   "navMyTickets": "My Tickets",
@@ -48,14 +43,12 @@
   "navDashboard": "Dashboard",
   "navCheckin": "Check-in",
   "navUsers": "Users",
-
   "homeHello": "Hello, {name}!",
   "homeSearchHint": "Search events",
   "homeFeaturedEvents": "Featured Events",
   "homeUpcomingEvents": "Upcoming Events",
   "homeCategories": "Categories",
   "homeNoEvents": "No events found",
-
   "eventDate": "Date",
   "eventTime": "Time",
   "eventLocation": "Location",
@@ -69,21 +62,18 @@
   "eventTicketConfirmedTitle": "Ticket confirmed!",
   "eventTicketConfirmedBody": "Your ticket has been added to My Tickets.",
   "eventViewTicket": "View ticket",
-
   "categoryAll": "All",
   "categoryMusic": "Music",
   "categorySport": "Sport",
   "categoryBusiness": "Business",
   "categoryArt": "Art & Culture",
   "categoryFood": "Food & Drink",
-
   "ticketsTitle": "My Tickets",
   "ticketsTabUpcoming": "Upcoming",
   "ticketsTabPast": "Past",
   "ticketsNoneUpcoming": "You have no upcoming tickets",
   "ticketsNonePast": "You have no past tickets",
   "ticketsCode": "Ticket code",
-
   "profileEdit": "Edit Profile",
   "profileNotifications": "Notifications",
   "profileFaq": "Frequently Asked Questions",
@@ -93,7 +83,6 @@
   "profilePrivacy": "Privacy Policy",
   "profileSignOutConfirmTitle": "Sign out?",
   "profileSignOutConfirmBody": "Are you sure you want to sign out of BiletFlow?",
-
   "organizerWelcome": "Welcome back, {name}!",
   "organizerMyEvents": "My Events",
   "organizerCreateEvent": "Create Event",
@@ -116,7 +105,6 @@
   "organizerPublish": "Publish Event",
   "organizerPublished": "Event published successfully",
   "organizerSoldOf": "{sold} / {total} sold",
-
   "adminWelcome": "Welcome, {name}",
   "adminOverview": "Overview",
   "adminTotalUsers": "Total users",
@@ -163,5 +151,27 @@
   "applicationEmpty": "No pending applications",
   "applicationRetry": "Refresh",
   "applicationInvalid": "Please check the length of this field.",
-  "ticketQrHelp": "Show this QR code to the organizer at the entrance."
+  "ticketQrHelp": "Show this QR code to the organizer at the entrance.",
+  "faqCheckin": "How do I enter the event?",
+  "notificationsEmpty": "No notifications yet",
+  "policyUnavailable": "No published policy has been provided in this app. Contact support for the current official document.",
+  "profileSaved": "Profile saved",
+  "supportSend": "Send message",
+  "supportMessage": "Message",
+  "supportNew": "New request",
+  "supportEmpty": "No support requests yet",
+  "supportTicket": "Ticket delivery",
+  "markRead": "Mark as read",
+  "supportSubject": "Subject",
+  "faqTickets": "Where are my tickets?",
+  "supportPayment": "Payment",
+  "supportAccount": "Account",
+  "supportTechnical": "Technical issue",
+  "refundPolicy": "Refund policy",
+  "supportCategory": "Category",
+  "phoneLabel": "Phone (optional)",
+  "faqTicketsBody": "Open My Tickets after confirming checkout. Each issued ticket has its own QR. You can share a PDF from its ticket card.",
+  "faqRefundBody": "Refund rules are shown on the event page. Contact support with your order details before requesting a refund.",
+  "faqCheckinBody": "Show the full ticket QR at the entrance. If scanning fails, show the signed credential to staff. A ticket admits once unless staff reverse the check-in.",
+  "supportRefund": "Refund"
 }

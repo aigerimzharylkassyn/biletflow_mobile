@@ -1,8 +1,6 @@
 {
   "@@locale": "ru",
-
   "appName": "BiletFlow",
-
   "commonOk": "Хорошо",
   "commonCancel": "Отмена",
   "commonSave": "Сохранить",
@@ -12,7 +10,6 @@
   "commonLoading": "Загрузка...",
   "commonErrorGeneric": "Что-то пошло не так",
   "commonComingSoon": "Скоро будет доступно",
-
   "authWelcomeTitle": "Добро пожаловать в BiletFlow",
   "authWelcomeSubtitle": "Войдите, чтобы находить мероприятия и получать билеты",
   "authEmailLabel": "Эл. почта",
@@ -38,9 +35,7 @@
   "authValidationPasswordMismatch": "Пароли не совпадают",
   "authLoginErrorInvalid": "Неверная эл. почта или пароль",
   "authMockCredentialsHint": "Попробуйте: attendee@example.com / organizer@example.com / admin@example.com (любой пароль)",
-
   "languageTitle": "Язык",
-
   "navHome": "Главная",
   "navEvents": "Мероприятия",
   "navMyTickets": "Мои билеты",
@@ -48,14 +43,12 @@
   "navDashboard": "Панель",
   "navCheckin": "Check-in",
   "navUsers": "Пользователи",
-
   "homeHello": "Привет, {name}!",
   "homeSearchHint": "Поиск мероприятий",
   "homeFeaturedEvents": "Рекомендуемые мероприятия",
   "homeUpcomingEvents": "Ближайшие мероприятия",
   "homeCategories": "Категории",
   "homeNoEvents": "Мероприятия не найдены",
-
   "eventDate": "Дата",
   "eventTime": "Время",
   "eventLocation": "Место проведения",
@@ -69,21 +62,18 @@
   "eventTicketConfirmedTitle": "Билет подтверждён!",
   "eventTicketConfirmedBody": "Билет добавлен в раздел «Мои билеты».",
   "eventViewTicket": "Посмотреть билет",
-
   "categoryAll": "Все",
   "categoryMusic": "Музыка",
   "categorySport": "Спорт",
   "categoryBusiness": "Бизнес",
   "categoryArt": "Искусство и культура",
   "categoryFood": "Еда и напитки",
-
   "ticketsTitle": "Мои билеты",
   "ticketsTabUpcoming": "Предстоящие",
   "ticketsTabPast": "Прошедшие",
   "ticketsNoneUpcoming": "У вас нет предстоящих билетов",
   "ticketsNonePast": "У вас нет прошедших билетов",
   "ticketsCode": "Код билета",
-
   "profileEdit": "Редактировать профиль",
   "profileNotifications": "Уведомления",
   "profileFaq": "Часто задаваемые вопросы",
@@ -93,7 +83,6 @@
   "profilePrivacy": "Политика конфиденциальности",
   "profileSignOutConfirmTitle": "Выйти из аккаунта?",
   "profileSignOutConfirmBody": "Вы уверены, что хотите выйти из BiletFlow?",
-
   "organizerWelcome": "С возвращением, {name}!",
   "organizerMyEvents": "Мои мероприятия",
   "organizerCreateEvent": "Создать мероприятие",
@@ -116,7 +105,6 @@
   "organizerPublish": "Опубликовать",
   "organizerPublished": "Мероприятие успешно опубликовано",
   "organizerSoldOf": "Продано {sold} из {total}",
-
   "adminWelcome": "Добро пожаловать, {name}",
   "adminOverview": "Обзор",
   "adminTotalUsers": "Всего пользователей",
@@ -163,5 +151,27 @@
   "applicationEmpty": "Нет заявок на рассмотрении",
   "applicationRetry": "Обновить",
   "applicationInvalid": "Проверьте длину этого поля.",
-  "ticketQrHelp": "Покажите этот QR-код организатору на входе."
+  "ticketQrHelp": "Покажите этот QR-код организатору на входе.",
+  "faqCheckin": "Как пройти на мероприятие?",
+  "notificationsEmpty": "Уведомлений пока нет",
+  "policyUnavailable": "Опубликованный документ пока не добавлен в приложение. Запросите актуальный официальный документ у поддержки.",
+  "profileSaved": "Профиль сохранён",
+  "supportSend": "Отправить сообщение",
+  "supportMessage": "Сообщение",
+  "supportNew": "Новое обращение",
+  "supportEmpty": "Обращений пока нет",
+  "supportTicket": "Получение билетов",
+  "markRead": "Отметить прочитанным",
+  "supportSubject": "Тема обращения",
+  "faqTickets": "Где мои билеты?",
+  "supportPayment": "Оплата",
+  "supportAccount": "Аккаунт",
+  "supportTechnical": "Техническая проблема",
+  "refundPolicy": "Правила возврата",
+  "supportCategory": "Категория",
+  "phoneLabel": "Телефон (необязательно)",
+  "faqTicketsBody": "Откройте «Мои билеты» после подтверждения заказа. У каждого билета есть QR-код. PDF можно отправить из карточки билета.",
+  "faqRefundBody": "Правила возврата указаны на странице мероприятия. Перед запросом возврата обратитесь в поддержку с данными заказа.",
+  "faqCheckinBody": "Покажите QR-код на входе. Если сканирование не работает, покажите сотруднику полный код допуска. Повторный вход требует отмены предыдущей отметки сотрудником.",
+  "supportRefund": "Возврат"
 }

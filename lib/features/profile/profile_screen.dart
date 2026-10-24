@@ -6,6 +6,8 @@ import '../../l10n/loc_extensions.dart';
 import '../../services/auth_service.dart';
 import '../../models/user.dart';
 import 'organizer_application_screen.dart';
+import 'account_screens.dart';
+import 'support_screen.dart';
 import '../../shared/widgets/app_avatar.dart';
 import '../../shared/widgets/language_selector.dart';
 
@@ -36,12 +38,16 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     Text(
                       user?.name ?? '',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                      style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       user?.email ?? '',
-                      style: const TextStyle(fontSize: 13, color: AppColors.textDark),
+                      style: const TextStyle(
+                          fontSize: 13, color: AppColors.textDark),
                     ),
                   ],
                 ),
@@ -62,13 +68,15 @@ class ProfileScreen extends StatelessWidget {
           _ProfileRow(
             icon: Icons.edit_outlined,
             label: l10n.profileEdit,
-            onTap: () => _showComingSoon(context),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const EditProfileScreen())),
           ),
           const Divider(),
           _ProfileRow(
             icon: Icons.notifications_outlined,
             label: l10n.profileNotifications,
-            onTap: () => _showComingSoon(context),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const NotificationsScreen())),
           ),
           const Divider(),
           const LanguageSettingsRow(),
@@ -76,13 +84,15 @@ class ProfileScreen extends StatelessWidget {
           _ProfileRow(
             icon: Icons.help_outline_rounded,
             label: l10n.profileFaq,
-            onTap: () => _showComingSoon(context),
+            onTap: () => Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const HelpScreen())),
           ),
           const Divider(),
           _ProfileRow(
             icon: Icons.mail_outline_rounded,
             label: l10n.profileContactUs,
-            onTap: () => _showComingSoon(context),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const SupportScreen())),
           ),
           const Divider(),
           _ProfileRow(
@@ -97,19 +107,25 @@ class ProfileScreen extends StatelessWidget {
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              TextButton(onPressed: () => _showComingSoon(context), child: Text(l10n.profileTerms)),
+              TextButton(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              HelpScreen(policy: l10n.profileTerms))),
+                  child: Text(l10n.profileTerms)),
               const Text('|', style: TextStyle(color: AppColors.textTertiary)),
-              TextButton(onPressed: () => _showComingSoon(context), child: Text(l10n.profilePrivacy)),
+              TextButton(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              HelpScreen(policy: l10n.profilePrivacy))),
+                  child: Text(l10n.profilePrivacy)),
             ],
           ),
         ],
       ),
-    );
-  }
-
-  void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.commonComingSoon)),
     );
   }
 
@@ -130,9 +146,11 @@ class ProfileScreen extends StatelessWidget {
             onPressed: () {
               Navigator.of(dialogContext).pop();
               context.read<AuthService>().logout();
-              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/login', (route) => false);
             },
-            child: Text(l10n.profileSignOut, style: const TextStyle(color: AppColors.error)),
+            child: Text(l10n.profileSignOut,
+                style: const TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -175,7 +193,8 @@ class _ProfileRow extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
+            const Icon(Icons.chevron_right_rounded,
+                color: AppColors.textTertiary),
           ],
         ),
       ),

@@ -1,8 +1,6 @@
 {
   "@@locale": "kk",
-
   "appName": "BiletFlow",
-
   "commonOk": "Jaray",
   "commonCancel": "Bas tartu",
   "commonSave": "Saqtau",
@@ -12,7 +10,6 @@
   "commonLoading": "Zhuktelude...",
   "commonErrorGeneric": "Bir qate ketti",
   "commonComingSoon": "Zhaqynda qosylady",
-
   "authWelcomeTitle": "BiletFlow-ğa qosh keldiñiz",
   "authWelcomeSubtitle": "Is-sharalardy izdep, biletterdi alu üshin kiriñiz",
   "authEmailLabel": "E-mail",
@@ -38,9 +35,7 @@
   "authValidationPasswordMismatch": "Qupiya sözder saikes kelmeidi",
   "authLoginErrorInvalid": "E-mail nemese qupiya söz qate",
   "authMockCredentialsHint": "Synap köriñiz: attendee@example.com / organizer@example.com / admin@example.com (kez kelgen qupiya söz)",
-
   "languageTitle": "Til",
-
   "navHome": "Basty bet",
   "navEvents": "Is-sharalar",
   "navMyTickets": "Biletterim",
@@ -48,11 +43,12 @@
   "navDashboard": "Basqaru paneli",
   "navCheckin": "Check-in",
   "navUsers": "Paidalanushylar",
-
   "homeHello": "Sälem, {name}!",
   "@homeHello": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "homeSearchHint": "Is-sharalardy izdeu",
@@ -60,7 +56,6 @@
   "homeUpcomingEvents": "Zhaqyndağy is-sharalar",
   "homeCategories": "Sanattar",
   "homeNoEvents": "Is-sharalar tabylmady",
-
   "eventDate": "Küni",
   "eventTime": "Uaqyty",
   "eventLocation": "Ornalasqan zheri",
@@ -74,21 +69,18 @@
   "eventTicketConfirmedTitle": "Bilet rastaldy!",
   "eventTicketConfirmedBody": "Biletiñiz \"Biletterim\" bölimine qosyldy.",
   "eventViewTicket": "Biletti köru",
-
   "categoryAll": "Barlyğy",
   "categoryMusic": "Muzyka",
   "categorySport": "Sport",
   "categoryBusiness": "Biznes",
   "categoryArt": "Öner men madeniet",
   "categoryFood": "Tamaq pen susyn",
-
   "ticketsTitle": "Biletterim",
   "ticketsTabUpcoming": "Aldağy",
   "ticketsTabPast": "Ötken",
   "ticketsNoneUpcoming": "Aldağy biletteriñiz zhoq",
   "ticketsNonePast": "Ötken biletteriñiz zhoq",
   "ticketsCode": "Bilet kody",
-
   "profileEdit": "Profildi özgertu",
   "profileNotifications": "Bildirimder",
   "profileFaq": "Zhii qoiylatyn suraqtar",
@@ -98,11 +90,12 @@
   "profilePrivacy": "Qupiyalyq sayasaty",
   "profileSignOutConfirmTitle": "Shyğasyz ba?",
   "profileSignOutConfirmBody": "BiletFlow-dan shyğuğa senimdisiz be?",
-
   "organizerWelcome": "Qosh keldiñiz, {name}!",
   "@organizerWelcome": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "organizerMyEvents": "Meniñ is-sharalarym",
@@ -116,7 +109,9 @@
   "organizerCheckinSuccess": "Tirkeldi: {name}",
   "@organizerCheckinSuccess": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "organizerViewAttendees": "Qatysushylardy köru",
@@ -133,15 +128,20 @@
   "organizerSoldOf": "{sold} / {total} satyldy",
   "@organizerSoldOf": {
     "placeholders": {
-      "sold": {"type": "int"},
-      "total": {"type": "int"}
+      "sold": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
-
   "adminWelcome": "Qosh keldiñiz, {name}",
   "@adminWelcome": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminOverview": "Zhalpy sholu",
@@ -189,5 +189,27 @@
   "applicationEmpty": "Qaralatyn ótinimder joq",
   "applicationRetry": "Jańartý",
   "applicationInvalid": "Bul óris uzyndyǵyn tekserińiz.",
-  "ticketQrHelp": "Kirý kezinde osy QR-kodty uıymdastyrýshyǵa kórsetińiz."
+  "ticketQrHelp": "Kirý kezinde osy QR-kodty uıymdastyrýshyǵa kórsetińiz.",
+  "faqCheckin": "Is-sharaǵa qalaı kiremın?",
+  "notificationsEmpty": "Ázirge habarlama joq",
+  "policyUnavailable": "Jarıalanǵan qujat qosymshaǵa ázir qosylmaǵan. Resmi qujatty qoldaý qyzmetinen surańyz.",
+  "profileSaved": "Profıl saqtaldy",
+  "supportSend": "Habardy jiberý",
+  "supportMessage": "Habar",
+  "supportNew": "Jańa ótinish",
+  "supportEmpty": "Ázirge ótinish joq",
+  "supportTicket": "Bıletterdi alý",
+  "markRead": "Oqyldy dep belgileý",
+  "supportSubject": "Ótinish taqyryby",
+  "faqTickets": "Bıletterim qaıda?",
+  "supportPayment": "Tólem",
+  "supportAccount": "Akkaýnt",
+  "supportTechnical": "Tehnıkalyq másele",
+  "refundPolicy": "Qaıtarý erejeleri",
+  "supportCategory": "Sanat",
+  "phoneLabel": "Telefon (mindetti emes)",
+  "faqTicketsBody": "Tapsyrysty rastaǵannan keıin «Bıletterim» betin ashyńyz. Ár bılettiń QR-kody bar. PDF bıletti bólısýge bolady.",
+  "faqRefundBody": "Qaıtarý erejeleri is-shara betinde kórsetilgen. Tapsyrys derekterimen qoldaý qyzmetine habarlasyńyz.",
+  "faqCheckinBody": "Kirýde QR-kodty kórsetińiz. Skaner istegen joq bolsa, qyzmetkerge tolyq kodty kórsetińiz. Bılet bir ret kirgizedi.",
+  "supportRefund": "Qaıtarý"
 }
