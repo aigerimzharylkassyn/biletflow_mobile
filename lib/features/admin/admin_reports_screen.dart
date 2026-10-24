@@ -17,6 +17,8 @@ class AdminReportsScreen extends StatelessWidget {
         EventCategory.business => l10n.categoryBusiness,
         EventCategory.art => l10n.categoryArt,
         EventCategory.food => l10n.categoryFood,
+        EventCategory.tech => l10n.categoryTech,
+        EventCategory.student => l10n.categoryStudent,
       };
 
   @override

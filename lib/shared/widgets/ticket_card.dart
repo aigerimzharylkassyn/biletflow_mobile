@@ -21,27 +21,38 @@ class TicketCard extends StatelessWidget {
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(AppRadius.card),
       child: InkWell(
-        onTap: onTap ??
-            () => showDialog<void>(
-                context: context,
-                builder: (_) => AlertDialog(
-                      scrollable: true,
-                      title: Text(ticket.event.title),
-                      content: SingleChildScrollView(
-                          child: SizedBox(
-                              width: 300,
-                              child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(
-                                      height: (MediaQuery.sizeOf(context).width - 128).clamp(0.0, 260.0),
-                                      child: QrImageView(data: ticket.ticketCode, size: 260, backgroundColor: Colors.white)),
-                                    const SizedBox(height: 12),
-                                    Text(context.l10n.ticketQrHelp),
-                                    const SizedBox(height: 12),
-                                    SelectableText(ticket.ticketCode),
-                                  ]))),
-                    )),
+        onTap: !ticket.canShowQr
+            ? null
+            : onTap ??
+                () => showDialog<void>(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                          scrollable: true,
+                          title: Text(ticket.event.title),
+                          content: SingleChildScrollView(
+                              child: SizedBox(
+                                  width: 300,
+                                  child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(
+                                            height: (MediaQuery.sizeOf(context)
+                                                        .width -
+                                                    128)
+                                                .clamp(0.0, 260.0),
+                                            child: !ticket.canShowQr
+                                                ? const Icon(Icons.block)
+                                                : QrImageView(
+                                                    data: ticket.ticketCode,
+                                                    size: 260,
+                                                    backgroundColor:
+                                                        Colors.white)),
+                                        const SizedBox(height: 12),
+                                        Text(context.l10n.ticketQrHelp),
+                                        const SizedBox(height: 12),
+                                        SelectableText(ticket.ticketCode),
+                                      ]))),
+                        )),
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: Opacity(
           opacity: isPast ? 0.6 : 1,
@@ -101,11 +112,13 @@ class TicketCard extends StatelessWidget {
                     border: Border.all(color: AppColors.divider),
                   ),
                   alignment: Alignment.center,
-                  child: QrImageView(
-                      data: ticket.ticketCode,
-                      size: 64,
-                      padding: const EdgeInsets.all(4),
-                      backgroundColor: Colors.white),
+                  child: !ticket.canShowQr
+                      ? const Icon(Icons.block)
+                      : QrImageView(
+                          data: ticket.ticketCode,
+                          size: 64,
+                          padding: const EdgeInsets.all(4),
+                          backgroundColor: Colors.white),
                 ),
               ],
             ),

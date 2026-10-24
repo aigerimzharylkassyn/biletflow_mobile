@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../app/theme.dart';
 import '../../models/event.dart';
+import '../../l10n/loc_extensions.dart';
 
 /// The "Event Card" component from the Figma design system.
 /// Since real event photography isn't available for this prototype,
@@ -56,7 +57,16 @@ class EventCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 alignment: Alignment.center,
-                child: Icon(event.icon, color: event.accentColor, size: 32),
+                child: event.imageUrl == null
+                    ? Icon(event.icon, color: event.accentColor, size: 32)
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: Image.network(event.imageUrl!,
+                            width: 84,
+                            height: 96,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(event.icon,
+                                color: event.accentColor, size: 32))),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -81,6 +91,14 @@ class EventCard extends StatelessWidget {
                         color: AppColors.textPrimary,
                       ),
                     ),
+                    const SizedBox(height: 6),
+                    Text(
+                        event.isFree
+                            ? context.l10n.eventFree
+                            : '${event.price.toStringAsFixed(0)} ₸',
+                        style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600)),
                     const SizedBox(height: 6),
                     Row(
                       children: [

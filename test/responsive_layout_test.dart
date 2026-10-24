@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:biletflow_mobile/features/attendee/checkout_screen.dart';
+import 'package:biletflow_mobile/features/attendee/order_details_screen.dart';
 import 'package:biletflow_mobile/features/profile/account_screens.dart';
 import 'package:biletflow_mobile/features/profile/support_screen.dart';
 import 'package:biletflow_mobile/features/profile/organizer_application_screen.dart';
@@ -37,10 +40,81 @@ import 'package:biletflow_mobile/features/admin/admin_users_screen.dart';
 import 'package:biletflow_mobile/features/admin/admin_reports_screen.dart';
 import 'package:biletflow_mobile/features/profile/profile_screen.dart';
 
-
-final api = ApiClient(
-    client: MockClient((request) async =>
-        http.Response(request.url.path.endsWith('/me') ? 'null' : '[]', 200)));
+final api = ApiClient(client: MockClient((request) async {
+  final path = request.url.path;
+  dynamic payload = [];
+  final type = {
+    'id': 'type-id',
+    'name': 'A long ticket type name for admission',
+    'kind': 'paid',
+    'description': 'Ticket description',
+    'price_minor': 125000,
+    'quantity': 100,
+    'sold_count': 2,
+    'reserved_count': 0,
+    'max_per_order': 5,
+    'sales_start': '2025-01-01T00:00:00Z',
+    'sales_end': '2035-01-01T00:00:00Z'
+  };
+  if (path.endsWith('/events/event-id')) {
+    payload = {
+      'id': 'event-id',
+      'title': event.title,
+      'description': event.description,
+      'category': 'music',
+      'status': 'published',
+      'paid_sales_status': 'active',
+      'starts_at': '2027-01-01T13:00:00Z',
+      'ends_at': '2027-01-01T17:00:00Z',
+      'venue': {
+        'name': event.venue,
+        'address': 'A very long street address in the city center',
+        'city': event.city
+      },
+      'available_ticket_types': [type],
+      'refund_policy':
+          'Refunds are available according to the organizer policy. ' * 4,
+    };
+  }
+  if (path.endsWith('/ticket-types')) payload = [type];
+  if (path.endsWith('/orders/order-id')) {
+    payload = {
+      'id': 'order-id',
+      'event_id': 'event-id',
+      'status': 'confirmed',
+      'attendee_name': 'A long attendee name for ticket holder',
+      'attendee_email': 'long.address@example.com',
+      'total_minor': 12345000,
+      'subtotal_minor': 12000000,
+      'discount_minor': 0,
+      'processing_fee_minor': 345000,
+      'tickets': [
+        {
+          'id': 'ticket-id',
+          'attendee_name': 'Long attendee name',
+          'status': 'valid',
+          'qr_credential': 'ticket.signed-credential'
+        },
+        {
+          'id': 'refunded-ticket',
+          'attendee_name': 'Long attendee name',
+          'status': 'refunded',
+          'qr_credential': 'ticket.refunded'
+        }
+      ]
+    };
+  }
+  if (path.endsWith('/organizer-applications/me')) payload = null;
+  if (path.endsWith('/users/me')) {
+    payload = {
+      'id': 'user-id',
+      'full_name': 'Very long full name',
+      'email': 'test@example.com',
+      'roles': ['attendee']
+    };
+  }
+  return http.Response(jsonEncode(payload), 200);
+}));
 
 class LayoutAuth extends AuthService {
   LayoutAuth() : super(api);
@@ -113,12 +187,17 @@ void main() {
     'create event': () => const CreateEventScreen(),
     'event overview': () => EventOverviewScreen(event: event),
     'staff shell': () => const StaffShell(),
-    'assign staff': () => AssignStaffDialog(event: event, data: LayoutData(LayoutAuth())),
+    'assign staff': () =>
+        AssignStaffDialog(event: event, data: LayoutData(LayoutAuth())),
     'check-in': () => CheckinScreen(event: event),
     'admin dashboard': () => const AdminDashboardScreen(),
     'admin events': () => const AdminEventsScreen(),
     'admin users': () => const AdminUsersScreen(),
     'admin reports': () => const AdminReportsScreen(),
+    'checkout': () => CheckoutScreen(event: event, items: const [
+          {'ticket_type_id': 'type-id', 'quantity': 2}
+        ], types: const []),
+    'order details': () => const OrderDetailsScreen(orderId: 'order-id'),
     'edit profile': () => const EditProfileScreen(),
     'notifications': () => const NotificationsScreen(),
     'support': () => const SupportScreen(),

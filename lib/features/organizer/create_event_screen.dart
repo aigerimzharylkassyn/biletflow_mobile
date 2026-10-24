@@ -47,6 +47,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         EventCategory.business => l10n.categoryBusiness,
         EventCategory.art => l10n.categoryArt,
         EventCategory.food => l10n.categoryFood,
+        EventCategory.tech => l10n.categoryTech,
+        EventCategory.student => l10n.categoryStudent,
       };
 
   IconData _categoryIcon(EventCategory category) => switch (category) {
@@ -55,6 +57,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         EventCategory.business => Icons.rocket_launch_rounded,
         EventCategory.art => Icons.palette_rounded,
         EventCategory.food => Icons.ramen_dining_rounded,
+        EventCategory.tech => Icons.computer_rounded,
+        EventCategory.student => Icons.school_rounded,
       };
 
   Future<void> _pickDate() async {

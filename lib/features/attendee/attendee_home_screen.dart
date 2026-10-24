@@ -25,7 +25,13 @@ class AttendeeHomeScreen extends StatelessWidget {
     final user = context.watch<AuthService>().currentUser;
     final data = context.watch<DataService>();
     final featured = data.featuredEvents;
-    final upcoming = data.events.where((e) => !e.featured).take(4).toList();
+    final upcoming = data.events
+        .where((e) =>
+            e.date.isAfter(DateTime.now()) &&
+            e.eventStatus == 'published' &&
+            e.visibility == 'public')
+        .take(4)
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -43,62 +49,81 @@ class AttendeeHomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-        children: [
-          _SearchBar(onTap: () => _openEvents(context)),
-          const SizedBox(height: 24),
-          _SectionHeader(title: l10n.homeCategories),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
+      body: RefreshIndicator(
+          onRefresh: data.refresh,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             children: [
-              for (final entry in _categoryEntries(l10n))
+              Text(l10n.discoverTitle,
+                  style: Theme.of(context).textTheme.headlineMedium),
+              const SizedBox(height: 8),
+              Text(l10n.discoverSubtitle),
+              const SizedBox(height: 20),
+              if (data.isLoading) const LinearProgressIndicator(),
+              if (data.errorMessage != null)
+                TextButton(
+                    onPressed: data.refresh,
+                    child: Text('${data.errorMessage} · ${l10n.commonRetry}')),
+              if (!data.isLoading && data.events.isEmpty)
                 Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: CategoryChip(
-                    label: entry.value,
-                    selected: false,
-                    onTap: () => _openEvents(context, category: entry.key),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _SectionHeader(
-            title: l10n.homeFeaturedEvents,
-            onSeeAll: () => _openEvents(context),
-          ),
-          const SizedBox(height: 12),
-          ResponsiveCards(
-            minimumWidth: 300,
-            children: [
-              for (final event in featured)
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Text(l10n.homeNoEvents)),
+              _SearchBar(onTap: () => _openEvents(context)),
+              const SizedBox(height: 24),
+              _SectionHeader(title: l10n.homeCategories),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final entry in _categoryEntries(l10n))
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: CategoryChip(
+                        label: entry.value,
+                        selected: false,
+                        onTap: () => _openEvents(context, category: entry.key),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _SectionHeader(
+                title: l10n.homeFeaturedEvents,
+                onSeeAll: () => _openEvents(context),
+              ),
+              const SizedBox(height: 12),
+              ResponsiveCards(
+                minimumWidth: 300,
+                children: [
+                  for (final event in featured)
+                    EventCard(
+                        event: event,
+                        onTap: () => _openDetails(context, event)),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _SectionHeader(
+                title: l10n.homeUpcomingEvents,
+                onSeeAll: () => _openEvents(context),
+              ),
+              const SizedBox(height: 12),
+              for (final event in upcoming) ...[
                 EventCard(
                     event: event, onTap: () => _openDetails(context, event)),
+                const SizedBox(height: 12),
+              ],
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const MyTicketsScreen()),
+                ),
+                icon: const Icon(Icons.confirmation_number_outlined, size: 18),
+                label: Text(l10n.navMyTickets),
+              ),
             ],
-          ),
-          const SizedBox(height: 24),
-          _SectionHeader(
-            title: l10n.homeUpcomingEvents,
-            onSeeAll: () => _openEvents(context),
-          ),
-          const SizedBox(height: 12),
-          for (final event in upcoming) ...[
-            EventCard(event: event, onTap: () => _openDetails(context, event)),
-            const SizedBox(height: 12),
-          ],
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const MyTicketsScreen()),
-            ),
-            icon: const Icon(Icons.confirmation_number_outlined, size: 18),
-            label: Text(l10n.navMyTickets),
-          ),
-        ],
-      ),
+          )),
     );
   }
 
@@ -111,6 +136,8 @@ class AttendeeHomeScreen extends StatelessWidget {
         MapEntry(EventCategory.business, l10n.categoryBusiness),
         MapEntry(EventCategory.art, l10n.categoryArt),
         MapEntry(EventCategory.food, l10n.categoryFood),
+        MapEntry(EventCategory.tech, l10n.categoryTech),
+        MapEntry(EventCategory.student, l10n.categoryStudent),
       ];
 
   void _openEvents(BuildContext context, {EventCategory? category}) {

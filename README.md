@@ -105,11 +105,26 @@ are excluded from Git. Kazakh translations still need native-speaker review.
 - `lib/app/` — app configuration, routes, and theme.
 - `test/api_integration_test.dart` — client authentication tests using mocked HTTP responses.
 
-## Profile and support
+## Attendee mobile experience
 
-Profile supports editing name/phone, reading and marking notifications, FAQ,
-and creating/replying to support cases. All user-facing labels are available in
-English, Russian and Kazakh. Requests use the existing authenticated backend API.
+The attendee UI follows the flows in the sibling `biletflow_web` project:
+
+- Search public events by title, venue, address or city, with category filters,
+  refresh, loading/error feedback and empty states.
+- View event images, local date/time, venue/map, host, refund policy and a shareable
+  calendar file. Select multiple ticket types/quantities within inventory and
+  per-order limits; apply a promo code.
+- Enter attendee details, reserve tickets, review backend fees/discounts and the
+  countdown, confirm a simulated payment, or explicitly cancel a reservation.
+- Browse upcoming/past tickets and order history. Booking pages show money/status,
+  per-ticket QR/status, seats where supplied, calendar sharing and authenticated
+  PDF ticket export. Refunded/cancelled tickets have no admission QR.
+- Edit profile, read/mark notifications, browse FAQ, and create/reply to support
+  requests. Support launched from a booking includes its order/event context.
+
+Run `flutter pub get` and fully restart/rebuild the app after these changes;
+PDF/calendar sharing and maps use native plugins. Test the native share sheet,
+calendar import, PDF export and map handoff on a physical device.
 
 ## Validation
 
@@ -129,7 +144,14 @@ FastAPI server; exercise the app against your backend to validate the full flows
 - Ticket QR codes are rendered locally from server-issued credentials; no extra
   image request is needed. Camera scanning should be tested on a physical phone.
 - Event creation currently uses 18:00–22:00 and a capacity of 100.
-- Official terms/privacy documents have not been supplied; request current documents through support.
+- Official terms/privacy documents have not been supplied; their screens explain
+  how to request the current official documents through support.
+- The local backend currently lacks standalone promo quotes and order-to-ticket
+  links in ticket responses. Promo codes are validated during reservation when
+  quoting returns 404/405. My Tickets remains available independently of orders;
+  booking details never guess which tickets belong to an order.
+- Checkout sends stable Idempotency-Key headers on retries, but duplicate-request
+  guarantees require backend enforcement of those keys.
 - Suspended accounts cannot be reactivated through the app because the API has no
   reactivation endpoint.
 
