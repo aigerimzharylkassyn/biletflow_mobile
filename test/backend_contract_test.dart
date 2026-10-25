@@ -3,6 +3,12 @@ import 'package:biletflow_mobile/models/user.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('uncategorized events use Other rather than Business', () {
+    expect(parseEventCategory('other'), EventCategory.other);
+    expect(parseEventCategory('community gathering'), EventCategory.other);
+    expect(parseEventCategory('business'), EventCategory.business);
+  });
+
   test('event model reads the backend venue and inventory contract', () {
     final event = AppEvent.fromJson({
       'id': 'event-id',

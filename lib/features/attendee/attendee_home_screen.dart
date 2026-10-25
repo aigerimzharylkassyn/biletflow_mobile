@@ -131,13 +131,8 @@ class AttendeeHomeScreen extends StatelessWidget {
           AppLocalizations l10n) =>
       [
         MapEntry(null, l10n.categoryAll),
-        MapEntry(EventCategory.music, l10n.categoryMusic),
-        MapEntry(EventCategory.sport, l10n.categorySport),
-        MapEntry(EventCategory.business, l10n.categoryBusiness),
-        MapEntry(EventCategory.art, l10n.categoryArt),
-        MapEntry(EventCategory.food, l10n.categoryFood),
-        MapEntry(EventCategory.tech, l10n.categoryTech),
-        MapEntry(EventCategory.student, l10n.categoryStudent),
+        for (final category in EventCategory.values)
+          MapEntry(category, category.localizedLabel(l10n)),
       ];
 
   void _openEvents(BuildContext context, {EventCategory? category}) {

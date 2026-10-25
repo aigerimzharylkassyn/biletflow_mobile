@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum EventCategory { music, sport, business, art, food, tech, student }
+enum EventCategory { music, sport, business, art, food, tech, student, other }
 
 class AppEvent {
   final String id;
@@ -73,18 +73,7 @@ class AppEvent {
         .cast<Map<String, dynamic>>()
         .where((t) => t['is_hidden'] != true)
         .toList();
-    final category = EventCategory.values
-            .where((e) =>
-                e.name ==
-                switch (json['category']) {
-                  'concert' || 'concerts' => 'music',
-                  'sports' => 'sport',
-                  'technology' || 'conference' => 'tech',
-                  'students' || 'education' => 'student',
-                  _ => json['category']
-                })
-            .firstOrNull ??
-        EventCategory.business;
+    final category = parseEventCategory(json['category']);
     final venue = json['venue'] as Map<String, dynamic>? ?? {};
     String time(DateTime date) =>
         '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
@@ -142,3 +131,17 @@ class AppEvent {
 
 DateTime parseApiDate(String value) => DateTime.parse(
     RegExp(r'(Z|[+-]\d\d:\d\d)$').hasMatch(value) ? value : '${value}Z');
+
+EventCategory parseEventCategory(Object? value) {
+  final name = switch (value?.toString().trim().toLowerCase()) {
+    'concert' || 'concerts' => 'music',
+    'sports' => 'sport',
+    'technology' || 'conference' => 'tech',
+    'students' || 'education' => 'student',
+    final name => name,
+  };
+  return EventCategory.values
+          .where((category) => category.name == name)
+          .firstOrNull ??
+      EventCategory.other;
+}

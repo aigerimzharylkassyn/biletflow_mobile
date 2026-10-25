@@ -256,5 +256,6 @@
   "faqOrganizerSales": "Where can I see sales and registrations?",
   "faqOrganizerSalesBody": "Use the organizer dashboard for totals. Open an event for its ticket sales, capacity and revenue, then View attendees for confirmed registrations. Revenue is calculated from confirmed orders, including their fees and discounts; pending and failed orders are not counted as confirmed revenue.",
   "faqOrganizerSupport": "How do I respond to attendee support requests?",
-  "faqOrganizerSupportBody": "Open Profile → Contact us to view support cases available to your account, including those linked to events you own. Open a case to read its messages and send a reply. Refresh the list or conversation to load updates."
+  "faqOrganizerSupportBody": "Open Profile → Contact us to view support cases available to your account, including those linked to events you own. Open a case to read its messages and send a reply. Refresh the list or conversation to load updates.",
+  "categoryOther": "Other"
 }
