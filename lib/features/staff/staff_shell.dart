@@ -4,6 +4,7 @@ import '../../l10n/loc_extensions.dart';
 import '../../shared/widgets/role_shell.dart';
 import '../organizer/checkin_screen.dart';
 import '../profile/profile_screen.dart';
+import 'staff_events_screen.dart';
 
 /// Navigation available to users assigned as event check-in staff.
 class StaffShell extends StatelessWidget {
@@ -14,6 +15,11 @@ class StaffShell extends StatelessWidget {
     final l10n = context.l10n;
     return RoleShell(
       items: [
+        RoleNavItem(
+            label: l10n.navEvents,
+            icon: Icons.event_outlined,
+            activeIcon: Icons.event,
+            screen: const StaffEventsScreen()),
         RoleNavItem(
           label: l10n.navCheckin,
           icon: Icons.qr_code_scanner_outlined,

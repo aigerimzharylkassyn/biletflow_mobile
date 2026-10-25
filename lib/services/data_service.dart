@@ -47,7 +47,8 @@ class DataService extends ChangeNotifier {
   double _revenue = 0;
   double get totalRevenue => _revenue;
   void _sessionChanged() {
-    if (_userId == auth.currentUser?.id && _userRole == auth.currentUser?.role) {
+    if (_userId == auth.currentUser?.id &&
+        _userRole == auth.currentUser?.role) {
       return;
     }
     _userId = auth.currentUser?.id;
@@ -249,6 +250,29 @@ class DataService extends ChangeNotifier {
     }
     await api.request('POST', '/admin/users/$userId/suspend');
     await refresh();
+  }
+
+  Future<List<Map<String, dynamic>>> listEventAttendees(String eventId) async =>
+      (await api.request(
+              'GET', '/events/${Uri.encodeComponent(eventId)}/orders') as List)
+          .map((row) => Map<String, dynamic>.from(row))
+          .toList();
+
+  Future<List<Map<String, dynamic>>> eventAttendance(String eventId) async =>
+      (await api.request('GET',
+                  '/check-in/events/${Uri.encodeComponent(eventId)}/attendees')
+              as List)
+          .map((row) => Map<String, dynamic>.from(row))
+          .toList();
+
+  Future<void> manualCheckin(String eventId, String ticketId) async {
+    await api.request('POST',
+        '/check-in/events/${Uri.encodeComponent(eventId)}/tickets/${Uri.encodeComponent(ticketId)}/admit');
+  }
+
+  Future<void> reverseCheckin(String recordId) async {
+    await api.request(
+        'POST', '/check-in/records/${Uri.encodeComponent(recordId)}/reverse');
   }
 
   Future<void> assignStaff(String eventId, String email) async {

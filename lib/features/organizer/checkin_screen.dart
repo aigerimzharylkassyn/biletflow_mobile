@@ -4,6 +4,7 @@ import '../../l10n/loc_extensions.dart';
 import '../../models/event.dart';
 import '../../services/data_service.dart';
 import 'ticket_scanner_screen.dart';
+import 'event_attendance_screen.dart';
 
 class CheckinScreen extends StatefulWidget {
   final AppEvent? event;
@@ -17,6 +18,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
   String? _eventId;
   bool _busy = false;
   bool _scanning = false;
+  int _attendanceRevision = 0;
 
   @override
   void initState() {
@@ -57,6 +59,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
           await context.read<DataService>().admit(_eventId!, credential.trim());
       if (!mounted) return;
       _code.clear();
+      setState(() => _attendanceRevision++);
       await _result(true, l.organizerCheckinSuccess(name));
     } catch (error) {
       if (mounted) await _result(false, error.toString());
@@ -107,6 +110,25 @@ class _CheckinScreenState extends State<CheckinScreen> {
             onChanged:
                 enabled ? (value) => setState(() => _eventId = value) : null,
           ),
+        const SizedBox(height: 20),
+        OutlinedButton.icon(
+          onPressed: enabled && _eventId != null
+              ? () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => EventAttendanceScreen(
+                            eventId: _eventId!,
+                            eventTitle: widget.event?.title ??
+                                events
+                                    .where((event) => event.id == _eventId)
+                                    .firstOrNull
+                                    ?.title ??
+                                l.navEvents,
+                          )))
+              : null,
+          icon: const Icon(Icons.groups_outlined),
+          label: Text(l.organizerViewAttendees),
+        ),
         const SizedBox(height: 24),
         const Icon(Icons.qr_code_scanner, size: 100),
         const SizedBox(height: 16),
@@ -135,6 +157,14 @@ class _CheckinScreenState extends State<CheckinScreen> {
             onPressed:
                 enabled && _eventId != null ? () => _admit(_code.text) : null,
             child: Text(_busy ? l.checkinBusy : l.checkinSubmit)),
+        if (_eventId != null) ...[
+          const SizedBox(height: 32),
+          AttendancePanel(
+              key: ValueKey(_eventId),
+              eventId: _eventId!,
+              revision: _attendanceRevision,
+              enabled: enabled),
+        ],
       ]),
     );
   }

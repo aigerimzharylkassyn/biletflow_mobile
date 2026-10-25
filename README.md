@@ -70,7 +70,7 @@ organizer role; applicants refresh their status to open the organizer dashboard.
   and view owned tickets with QR images.
 - Organizers: create events, view registrations and revenue, and check in attendees
   by scanning their ticket QR code or entering their signed credential.
-- Check-in staff: view assigned events and admit attendees.
+- Check-in staff: Events, Check-in and Profile tabs, assigned events sorted by start time with All / Upcoming / Live / Past / Cancelled filters, attendance statistics, searchable ticket rosters, manual admission and check-in reversal.
 - Administrators: view users and events, and suspend users.
 
 ## Android Studio
@@ -140,7 +140,11 @@ FastAPI server; exercise the app against your backend to validate the full flows
 
 - Payment completion is simulated; real payment processing is not integrated.
 - Paid sales require organizer verification and paid-sales activation on the backend.
-- Camera scanning and manual credential entry are available for check-in.
+- Camera scanning, manual credential entry and attendee search are available for check-in.
+  Organizers and assigned staff can admit a valid ticket or reverse an active check-in.
+  Attendance statistics count valid and checked-in tickets, excluding cancelled/refunded tickets.
+  The backend must include `GET /check-in/events/{event_id}/attendees` and
+  `POST /check-in/events/{event_id}/tickets/{ticket_id}/admit`.
 - Ticket QR codes are rendered locally from server-issued credentials; no extra
   image request is needed. Camera scanning should be tested on a physical phone.
 - Organizer creation uses a three-step wizard matching the web: custom event and

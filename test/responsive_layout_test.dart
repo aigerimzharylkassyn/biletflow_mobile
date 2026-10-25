@@ -1,3 +1,5 @@
+import 'package:biletflow_mobile/features/organizer/event_attendees_screen.dart';
+import 'package:biletflow_mobile/features/organizer/event_attendance_screen.dart';
 import 'dart:convert';
 import 'package:biletflow_mobile/features/attendee/checkout_screen.dart';
 import 'package:biletflow_mobile/features/attendee/order_details_screen.dart';
@@ -76,7 +78,34 @@ final api = ApiClient(client: MockClient((request) async {
           'Refunds are available according to the organizer policy. ' * 4,
     };
   }
+  if (path.endsWith('/attendees')) {
+    payload = [
+      {
+        'id': 'ticket-id',
+        'attendee_name': 'A very long attendee name for admission testing',
+        'attendee_email': 'a.very.long.attendee.email.address@example.com',
+        'status': 'valid',
+        'ticket_type': 'A long general admission ticket type name',
+        'record_id': null
+      }
+    ];
+  }
   if (path.endsWith('/ticket-types')) payload = [type];
+  if (path.endsWith('/events/event-id/orders')) {
+    payload = [
+      {
+        'id': 'order-id',
+        'attendee_name': 'A very long attendee name for the guest list',
+        'attendee_email':
+            'a.very.long.email.address.for.attendee.testing@example.com',
+        'status': 'confirmed',
+        'total_minor': 123456789000,
+        'items': [
+          {'quantity': 10}
+        ]
+      }
+    ];
+  }
   if (path.endsWith('/orders/order-id')) {
     payload = {
       'id': 'order-id',
@@ -187,6 +216,10 @@ void main() {
     'organizer events': () => const OrganizerEventsScreen(),
     'create event': () => const CreateEventScreen(),
     'event overview': () => EventOverviewScreen(event: event),
+    'event attendees': () => const EventAttendeesScreen(
+        eventId: 'event-id', eventTitle: 'An event with a long title'),
+    'event attendance': () => const EventAttendanceScreen(
+        eventId: 'event-id', eventTitle: 'A long event title for attendance'),
     'staff shell': () => const StaffShell(),
     'assign staff': () =>
         AssignStaffDialog(event: event, data: LayoutData(LayoutAuth())),

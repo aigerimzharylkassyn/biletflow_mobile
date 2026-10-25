@@ -27,10 +27,11 @@ final event = AppEvent(
     accentColor: Colors.blue,
     icon: Icons.event);
 
-
 class TestData extends DataService {
-  TestData()
-      : super(ApiClient(), AuthService(ApiClient()));
+  TestData() : super(ApiClient(), AuthService(ApiClient()));
+  @override
+  Future<List<Map<String, dynamic>>> eventAttendance(String eventId) async =>
+      [];
   final calls = <String>[];
   final response = Completer<String>();
   @override
@@ -83,13 +84,17 @@ void main() {
     final data = TestData();
     await tester.pumpWidget(ChangeNotifierProvider<DataService>.value(
         value: data, child: app(CheckinScreen(event: event))));
-    await tester.enterText(find.byType(TextField), 'ticket.signed-code');
+    await tester.enterText(
+        find.byWidgetPredicate((w) => w is TextField && w.maxLines == 4),
+        'ticket.signed-code');
     await tester.ensureVisible(find.text('Check in'));
     await tester.tap(find.text('Check in'));
     await tester.pump();
     expect(data.calls, ['event-id:ticket.signed-code']);
-    expect(tester.widget<OutlinedButton>(find.byType(OutlinedButton)).onPressed,
-        isNull);
+    for (final button
+        in tester.widgetList<OutlinedButton>(find.byType(OutlinedButton))) {
+      expect(button.onPressed, isNull);
+    }
     data.response.complete('Attendee');
     await tester.pumpAndSettle();
     expect(find.text('Ticket accepted'), findsOneWidget);
@@ -99,7 +104,9 @@ void main() {
     final data = TestData();
     await tester.pumpWidget(ChangeNotifierProvider<DataService>.value(
         value: data, child: app(CheckinScreen(event: event))));
-    await tester.enterText(find.byType(TextField), 'ticket.used-code');
+    await tester.enterText(
+        find.byWidgetPredicate((w) => w is TextField && w.maxLines == 4),
+        'ticket.used-code');
     await tester.ensureVisible(find.text('Check in'));
     await tester.tap(find.text('Check in'));
     await tester.pump();

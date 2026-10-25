@@ -13,6 +13,7 @@ import '../../shared/widgets/event_status_badge.dart';
 import '../../shared/widgets/responsive_cards.dart';
 import 'checkin_screen.dart';
 import 'assign_staff_dialog.dart';
+import 'event_attendance_screen.dart';
 
 class EventOverviewScreen extends StatelessWidget {
   final AppEvent event;
@@ -84,40 +85,10 @@ class EventOverviewScreen extends StatelessWidget {
   }
 
   void _showAttendees(BuildContext context) {
-    final orders = context.read<DataService>().eventOrders(event.id);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (sheetContext) {
-        return SafeArea(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                child: Text(
-                  sheetContext.l10n.organizerViewAttendees,
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary),
-                ),
-              ),
-              if (orders.isEmpty)
-                const ListTile(title: Text("No confirmed registrations yet")),
-              for (final order in orders)
-                ListTile(
-                  leading: const Icon(Icons.person_outline_rounded,
-                      color: AppColors.textSecondary),
-                  title: Text(order['attendee_name']),
-                ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        );
-      },
-    );
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => EventAttendanceScreen(
+                eventId: event.id, eventTitle: event.title)));
   }
 }
