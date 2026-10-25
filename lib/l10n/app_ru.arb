@@ -377,5 +377,14 @@
         "type": "int"
       }
     }
-  }
+  },
+  "organizerEventsAll": "Все",
+  "organizerEventsUpcoming": "Предстоящие",
+  "organizerEventsActive": "Сейчас идут",
+  "organizerEventsPast": "Прошедшие",
+  "organizerEventsEmptyGroup": "В этой группе пока нет мероприятий.",
+  "eventStatusDraft": "Черновик",
+  "eventStatusPublished": "Опубликовано",
+  "eventStatusCompleted": "Завершено",
+  "eventStatusCancelled": "Отменено"
 }

@@ -9,6 +9,7 @@ import '../../models/event.dart';
 import '../../shared/widgets/outlined_app_button.dart';
 import '../../shared/widgets/primary_button.dart';
 import '../../shared/widgets/stat_card.dart';
+import '../../shared/widgets/event_status_badge.dart';
 import '../../shared/widgets/responsive_cards.dart';
 import 'checkin_screen.dart';
 import 'assign_staff_dialog.dart';
@@ -27,6 +28,10 @@ class EventOverviewScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          Align(
+              alignment: Alignment.centerLeft,
+              child: EventStatusBadge(status: event.eventStatus)),
+          const SizedBox(height: 12),
           Text(dateLabel,
               style: const TextStyle(
                   fontSize: 14, color: AppColors.textSecondary)),

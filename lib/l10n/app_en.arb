@@ -377,5 +377,14 @@
         "type": "int"
       }
     }
-  }
+  },
+  "organizerEventsAll": "All",
+  "organizerEventsUpcoming": "Upcoming",
+  "organizerEventsActive": "Active",
+  "organizerEventsPast": "Past",
+  "organizerEventsEmptyGroup": "No events in this group yet.",
+  "eventStatusDraft": "Draft",
+  "eventStatusPublished": "Published",
+  "eventStatusCompleted": "Completed",
+  "eventStatusCancelled": "Cancelled"
 }

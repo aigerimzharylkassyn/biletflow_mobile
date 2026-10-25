@@ -6,6 +6,7 @@ import '../../l10n/loc_extensions.dart';
 import '../../services/auth_service.dart';
 import '../../services/data_service.dart';
 import '../../shared/widgets/event_card.dart';
+import '../../shared/widgets/event_status_badge.dart';
 import '../../shared/widgets/primary_button.dart';
 import '../../shared/widgets/stat_card.dart';
 import '../../shared/widgets/responsive_cards.dart';
@@ -78,14 +79,21 @@ class OrganizerDashboardScreen extends StatelessWidget {
           for (final event in myEvents) ...[
             EventCard(
               event: event,
-              trailingBadge: Text(
-                l10n.organizerSoldOf(event.ticketsSold, event.ticketsTotal),
-                style: const TextStyle(
-                    fontSize: 11, color: AppColors.textTertiary),
-              ),
+              trailingBadge: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    EventStatusBadge(status: event.eventStatus),
+                    if (event.eventStatus != 'draft') ...[
+                      const SizedBox(height: 6),
+                      Text(l10n.organizerSoldOf(
+                          event.ticketsSold, event.ticketsTotal))
+                    ],
+                  ]),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                    builder: (_) => EventOverviewScreen(event: event)),
+                    builder: (_) => event.eventStatus == 'draft'
+                        ? CreateEventScreen(draftId: event.id)
+                        : EventOverviewScreen(event: event)),
               ),
             ),
             const SizedBox(height: 12),

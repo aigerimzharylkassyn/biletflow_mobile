@@ -415,5 +415,14 @@
         "type": "int"
       }
     }
-  }
+  },
+  "organizerEventsAll": "Barlyǵy",
+  "organizerEventsUpcoming": "Aldaǵy",
+  "organizerEventsActive": "Ótip jatqan",
+  "organizerEventsPast": "Ótken",
+  "organizerEventsEmptyGroup": "Bul topta ázirge is-shara joq.",
+  "eventStatusDraft": "Joba",
+  "eventStatusPublished": "Jarıalanǵan",
+  "eventStatusCompleted": "Aıaqtalǵan",
+  "eventStatusCancelled": "Kúshi joıylǵan"
 }
