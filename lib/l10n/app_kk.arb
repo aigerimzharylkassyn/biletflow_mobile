@@ -284,9 +284,9 @@
   "faqAttendeePaymentBody": "Tólem ázir synaq rejıminde: naqty aqsha alynbaıdy. Tapsyrysty sátti rastaǵannan keıin kirýde tekserýge bolatyn jarandy bıletter beriledi.",
   "faqAttendeeOrganizerBody": "«Profıl → Uıymdastyrýshy bolý» bólimin ashyńyz. Atyńyzdy, uıymdy, telefondy jáne is-shara josparyn engizińiz. Ákimshi maqúldaǵannan keıin ótinish mártebesin jańartyp, uıymdastyrýshy panelin ashyńyz.",
   "faqOrganizerPublish": "Is-sharany qalaı jasap, jarıalaı myn?",
-  "faqOrganizerPublishBody": "«Meniń is-sharalarym → Is-shara jasaw» bólimin ashyńyz. Ataýyn, ornyn, qalasyn, mekenjaıyn, kúnin, sanatyn, sıpattamasyn jáne bılet baǵasyn engizip, jarıalańyz. Ázirgi mobıldi forma 18:00–22:00 ýaqytyna 100 General admission bıletin jasaıdy. Jarıalaý sátsiz bolsa, jańa is-shara jasamas buryn saqtalǵan jobany tekserińiz.",
+  "faqOrganizerPublishBody": "«Meniń is-sharalarym → Is-shara jasaw» bólimin ashyńyz. Is-shara derekterin, bıletterdi jáne aqyly satýdy retteńiz. Óz ýaqytyńyzdy, tirkelý aralyǵyn, sııymdylyqty, kórinýdi, oryndy, banner URL-in jáne qaıtarý erejelerin engizińiz. Bılet túrlerin, sanyn, satý kúnderin jáne shekteýlerin qosyńyz. Jobany saqtap, keıin jalǵastyrýǵa nemese tekserýden keıin jarıalaýǵa bolady.",
   "faqOrganizerPaid": "Aqyly bıletter nege satylmaıdy?",
-  "faqOrganizerPaidBody": "Ótinıshti maqúldaý tek uıymdastyrýshy quqyǵyn beredi. Aqyly satý úshin tulǵany tekserý, tólem alý shotyn qosý jáne rastaý, belsendirý aqysy men sharttardy qabıldaý qajet. Bular ótinishten bólek, ázirgi mobıldi formada tolyq oryndalmaıdy.",
+  "faqOrganizerPaidBody": "Ótinıshti maqúldaý tek uıymdastyrýshy quqyǵyn beredi. Aqyly bıletter úshin tekserý qadamynda baılanys derekterin, synaq tulǵasyn, DEMO tólem kodyn, sharttardy jáne synaq aqysyn retteńiz. Jarıalaý aldynda aqyly satýdy belsendirińiz. Naqty qujattar, bank derekteri men aqsha qajet emes.",
   "faqOrganizerStaff": "Is-shara qyzmetkerlerin qalaı taǵaıyndaımyn?",
   "faqOrganizerStaffBody": "«Meniń is-sharalarym» bóliminen is-sharany tańdap, «Qyzmetker taǵaıyndaý» túımesin basyńyz. Tirkelgen paıdalanýshynyń poshtasyn engizińiz. Server ony osy is-sharaǵa taǵaıyndaıdy. Qyzmetker betin jáne taǵaıyndalǵan is-sharalardy kórý úshin qaıta kirýdi surańyz.",
   "faqOrganizerCheckin": "Qatysýshylardyń kirýin qalaı belgileımin?",
@@ -295,5 +295,125 @@
   "faqOrganizerSalesBody": "Jalpy kórsetkishterdi uıymdastyrýshy panelinen qarawǵa bolady. Is-shara betinde bılet satylymy, sııymdylyq jáne tabys kórsetiledi. «Qatysýshylardy qaraw» arqyly rastalǵan tirkelýdi kórińiz. Tabys tek rastalǵan tapsyrystardan, aqy men jeńildikti eskerip esepteledi.",
   "faqOrganizerSupport": "Qatysýshylardyń ótinisterine qalaı jaýap beremin?",
   "faqOrganizerSupportBody": "«Profıl → Bizge habarlasý» bóliminde akkaýntyńyzǵa qoljetimdi, sonyń ishinde óz is-sharalaryńyzǵa qatysty ótinishterdi kórińiz. Ótinishti ashyp, habarlardy oqyp, jaýap jiberińiz. Jańa habarlardy alý úshin tizimdi nemese hattardy jańartyńyz.",
-  "categoryOther": "Basqa"
+  "categoryOther": "Basqa",
+  "creationDetails": "Is-shara derekteri",
+  "creationTickets": "Bıletterdi retteý",
+  "creationReview": "Tekserý jáne satýdy belsendirý",
+  "creationTimezone": "Erkin ornalasý · Qazaqstan ýaqyty (UTC+05:00)",
+  "creationBanner": "Banner sýretiniń URL mekenjaıy (mindetti emes)",
+  "creationStarts": "Is-sharanyń bastalýy",
+  "creationEnds": "Is-sharanyń aıaqtalýy",
+  "creationOpens": "Tirkelýdiń ashylýy",
+  "creationCloses": "Tirkelýdiń jabylýy",
+  "creationCity": "Qala",
+  "creationAddress": "Ótetin ornyń mekenjaıy",
+  "creationCapacity": "Is-shara sııymdylyǵy",
+  "creationVisibility": "Is-sharanyń kórinýi",
+  "creationPublic": "Ashyq",
+  "creationUnlisted": "Tek silteme arqyly",
+  "creationPrivate": "Jabyq",
+  "creationDefaultRefund": "Qaıtarý úshin uıymdastyrýshyǵa habarlasyńyz.",
+  "creationSaveDetails": "Derekterdi saqtap, jalǵastyrý",
+  "creationSaveTickets": "Bıletterdi saqtap, jalǵastyrý",
+  "creationSavedDraft": "Saqtalǵan joba",
+  "creationSavedVenue": "Saqtalǵan jobada ótkiziletin oryn ózgertilmeıdi. Kúnderdi, sıpattamany, sııymdylyqty jáne tirkelýdi jańartýǵa bolady.",
+  "creationBannerFailed": "Joba saqtaldy, biraq banner qosylmady. Qaıta saqtańyz nemese jańa bannersiz jalǵastyryńyz.",
+  "creationSkipBanner": "Bannersiz jalǵastyrý",
+  "creationTicketType": "Bılet túri",
+  "creationTicketName": "Bılet ataýy",
+  "creationTicketKind": "Bılet sanaty",
+  "creationPaid": "Aqyly (KZT)",
+  "creationQuantity": "Bılet sany",
+  "creationSalesStart": "Bılet satylymynyń bastalýy",
+  "creationSalesEnd": "Bılet satylymynyń aıaqtalýy",
+  "creationMaximum": "Tapsyrysqa shekteý",
+  "creationTicketDescription": "Bılet sıpattamasy",
+  "creationAddType": "Bılet túrin qosý",
+  "creationRemoveType": "Bılet túrin óshirý",
+  "creationSavedType": "Saqtaldy. Basqa bılet túrin qosyńyz nemese tekserýge ótińiz.",
+  "creationBackDetails": "Derekterge oralý",
+  "creationBackTickets": "Bıletterge oralý",
+  "creationKeepDraft": "Joba retinde saqtaý",
+  "creationFreeHelp": "Tegın is-sharalar úshin aqyly satýdy belsendirý qajet emes.",
+  "creationDateError": "Is-shara men tirkelýdiń tórt kúni men ýaqytyn tańdańyz.",
+  "creationFutureError": "Is-sharanyń bastalýyn bolashaq ýaqytqa tańdańyz.",
+  "creationEndError": "Is-sharanyń aıaqtalýy bastalýynan keıin bolýy kerek.",
+  "creationRegistrationError": "Tirkelý ashylýy jabylýynan buryn, al jabylýy is-shara bastalǵanǵa deıin bolýy kerek.",
+  "creationBannerError": "Banner úshin HTTP nemese HTTPS URL qoldanyńyz.",
+  "creationQuantityError": "Sııymdylyq pen bılet sany oń bútin san bolýy kerek.",
+  "creationPriceError": "Aqyly bıletke KZT boıynsha oń baǵa engizińiz, útirden keıin eki tańbaǵa deıin.",
+  "creationMaximumError": "Bir tapsyrysqa shekteý 1-den 50-ge deıin bolýy kerek.",
+  "creationSalesError": "Bılet satý bastalýy aıaqtalýynan buryn jáne tirkelý aralyǵynda bolýy kerek.",
+  "creationTicketsError": "Ataýy bar keminde bir bılet túrin qosyńyz.",
+  "creationCapacityError": "Bıletterdiń jalpy sany sııymdylyqtan aspaw kerek.",
+  "creationNotDraft": "Bul is-shara endi joba emes.",
+  "paidChecklist": "Aqyly satýdy belsendirý tizimi",
+  "paidSandboxHelp": "Tek synaq rejımi: naqty qujattar, bank derekteri, tólemder men aqsha aýdarymdary qajet emes.",
+  "paidTicketReady": "Aqyly bılet retteýli",
+  "paidIdentityReady": "Tulǵa synaq rejıminde rastaldy",
+  "paidPayoutReady": "Synaq tólem shoty qosyldy",
+  "paidFeeReady": "Belsendirý aqysy eskerildi",
+  "paidTermsReady": "Sharttar qabıldandy",
+  "paidVerify": "Synaq tulǵasyn rastaý",
+  "paidOrganization": "Uıym ataýy (mindetti emes)",
+  "paidPhone": "Baılanys telefony (mindetti emes)",
+  "paidPayoutReference": "Synaq tólem shotynyń kodı",
+  "paidPayoutError": "DEMO-0001 sııaqty synaq kodyn qoldanyńyz.",
+  "paidConnect": "Synaq tólem shotyn qosý",
+  "paidTermsText": "Aqyly synaq is-sharanyń sharttaryn qabıldaımyn: naqty aqsha alınbaıdy jáne aýdarylmaıdy. Is-shara derekteri men qaıtarý erejelerine jaýaptymyn.",
+  "paidAcceptTerms": "Aqyly is-shara sharttaryn qabıldaý",
+  "paidPayFee": "Synaq belsendirý aqysyn tóleý",
+  "paidActivate": "Is-shara úshin aqyly satýdy belsendirý",
+  "paidActive": "Aqyly satý belsendi. Tólemder men aýdarymdar synaq rejıminde qalady.",
+  "paidSuspended": "Aqyly satý toqtatylǵan. Qoldaý qyzmetine habarlasyńyz.",
+  "paidActionFailed": "Server áreketti rastamady. Derekti jańartyp, qaıta kórińiz.",
+  "creationPricing": "Bılet baǵasy",
+  "creationFreeEvent": "Tegın is-shara",
+  "creationPaidMixed": "Aqyly / aralas bıletter",
+  "creationFreeEventHelp": "Barlyq bıletter tegın. Aqyly satý tekserýi, tólem shoty jáne belsendirý aqysy qajet emes.",
+  "creationPaidMixedHelp": "Aqyly bıletter qosyńyz nemese tegın jáne aqyly bıletterdi aralastyryńyz. Aqyly satý úshin synaq belsendirý tizimi qajet.",
+  "fieldRequired": "Bul órishti toltyryńyz.",
+  "fieldMinCharacters": "Keminde {min} tańba engizińiz.",
+  "fieldMaxCharacters": "{max} tańbadan asyrmańyz.",
+  "fieldLengthRange": "{min}–{max} tańba.",
+  "fieldLengthMinimum": "Keminde {min} tańba.",
+  "fieldLengthMaximum": "Mindetti emes · {max} tańbaǵa deıin.",
+  "@fieldMinCharacters": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "@fieldMaxCharacters": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "@fieldLengthRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "@fieldLengthMinimum": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "@fieldLengthMaximum": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  }
 }

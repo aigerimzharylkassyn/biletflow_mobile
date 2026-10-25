@@ -143,7 +143,12 @@ FastAPI server; exercise the app against your backend to validate the full flows
 - Camera scanning and manual credential entry are available for check-in.
 - Ticket QR codes are rendered locally from server-issued credentials; no extra
   image request is needed. Camera scanning should be tested on a physical phone.
-- Event creation currently uses 18:00–22:00 and a capacity of 100.
+- Organizer creation uses a three-step wizard matching the web: custom event and
+  registration dates in UTC+05:00, venue, capacity, visibility, banner URL, refund
+  policy, multiple free/paid ticket types, review and sandbox paid-sales activation.
+  Choose Free event (the default) for zero-price tickets without paid activation,
+  or Paid / mixed tickets to configure paid admission. Saved drafts can be reopened
+  from My Events; saved ticket types are read-only.
 - Official terms/privacy documents have not been supplied; their screens explain
   how to request the current official documents through support.
 - The local backend currently lacks standalone promo quotes and order-to-ticket

@@ -241,42 +241,6 @@ class DataService extends ChangeNotifier {
     await refresh();
   }
 
-  Future<void> createEvent(AppEvent event,
-      {required String address, required String city}) async {
-    final start =
-        DateTime(event.date.year, event.date.month, event.date.day, 18).toUtc();
-    final end = start.add(const Duration(hours: 4));
-    final now = DateTime.now().toUtc().toIso8601String();
-    final draft = await api.request('POST', '/events', body: {
-      'title': event.title,
-      'description': event.description,
-      'category': event.category.name,
-      'venue': {'name': event.venue, 'address': address, 'city': city},
-      'starts_at': start.toIso8601String(),
-      'ends_at': end.toIso8601String(),
-      'registration_opens_at': now,
-      'registration_closes_at': start.toIso8601String(),
-      'capacity': event.ticketsTotal,
-    });
-    final id = draft['id'];
-    try {
-      await api.request('POST', '/events/$id/ticket-types', body: {
-        'name': 'General admission',
-        'kind': event.isFree ? 'free' : 'paid',
-        'price_minor': (event.price * 100).round(),
-        'quantity': event.ticketsTotal,
-        'sales_start': now,
-        'sales_end': start.toIso8601String(),
-      });
-      await api.request('POST', '/events/$id/publish');
-    } catch (error) {
-      await refresh();
-      throw ApiException(
-          'Draft $id was saved, but publishing did not finish: $error');
-    }
-    await refresh();
-  }
-
   Future<void> toggleUserActive(String userId) async {
     final row = _adminUsers.firstWhere((r) => r.user.id == userId);
     if (!row.active) {

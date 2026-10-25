@@ -246,9 +246,9 @@
   "faqAttendeePaymentBody": "Payments currently run in demo mode. No real money is charged. Confirming a successful booking still issues real admission tickets that can be checked in.",
   "faqAttendeeOrganizerBody": "Open Profile → Become an organizer. Submit your contact name, organization, phone and event plans. Wait for admin approval, refresh the application status, then open the organizer dashboard once approved.",
   "faqOrganizerPublish": "How do I create and publish an event?",
-  "faqOrganizerPublishBody": "Open My Events → Create event. Enter the title, venue, city, street address, date, category, description and ticket price, then publish. The current mobile form creates 100 General admission tickets and uses 18:00–22:00. If publishing fails after the draft is saved, refresh My Events and check the saved draft before creating another event.",
+  "faqOrganizerPublishBody": "Open My Events → Create event. Complete Event details, Ticket configuration, then Review & paid activation. Enter your own event and registration times, capacity, visibility, venue, banner URL and refund policy. Add free or paid ticket types with their quantities, sales dates and per-order limits. Save a draft to resume later, or publish after the required checks.",
   "faqOrganizerPaid": "Why are paid ticket sales unavailable?",
-  "faqOrganizerPaidBody": "Organizer application approval grants organizer access only. Paid sales additionally require backend identity verification, a connected and verified payout account, the activation fee and accepted terms. These checks are separate from the Become an organizer application and cannot all be completed in the current mobile form.",
+  "faqOrganizerPaidBody": "Organizer application approval grants access only. For paid tickets, complete the review-step sandbox checklist: contact details and identity verification, a DEMO payout reference, accepted terms, and a simulated activation fee. Activate paid sales before publishing. No real identity documents, bank details or money are required.",
   "faqOrganizerStaff": "How do I assign event staff?",
   "faqOrganizerStaffBody": "Open My Events, select an event and tap Assign staff. Enter the email of an existing registered user. The backend assigns that user to this event. Ask them to sign out and sign in again to open the staff screen and see their assigned events.",
   "faqOrganizerCheckin": "How do I check in attendees?",
@@ -257,5 +257,125 @@
   "faqOrganizerSalesBody": "Use the organizer dashboard for totals. Open an event for its ticket sales, capacity and revenue, then View attendees for confirmed registrations. Revenue is calculated from confirmed orders, including their fees and discounts; pending and failed orders are not counted as confirmed revenue.",
   "faqOrganizerSupport": "How do I respond to attendee support requests?",
   "faqOrganizerSupportBody": "Open Profile → Contact us to view support cases available to your account, including those linked to events you own. Open a case to read its messages and send a reply. Refresh the list or conversation to load updates.",
-  "categoryOther": "Other"
+  "categoryOther": "Other",
+  "creationDetails": "Event details",
+  "creationTickets": "Ticket configuration",
+  "creationReview": "Review & paid activation",
+  "creationTimezone": "General admission · Dates and times in Kazakhstan (UTC+05:00)",
+  "creationBanner": "Banner image URL (optional)",
+  "creationStarts": "Event starts",
+  "creationEnds": "Event ends",
+  "creationOpens": "Registration opens",
+  "creationCloses": "Registration closes",
+  "creationCity": "City",
+  "creationAddress": "Venue address",
+  "creationCapacity": "Event capacity",
+  "creationVisibility": "Event visibility",
+  "creationPublic": "Public",
+  "creationUnlisted": "Unlisted",
+  "creationPrivate": "Private",
+  "creationDefaultRefund": "Contact the organizer to request a refund.",
+  "creationSaveDetails": "Save details & continue",
+  "creationSaveTickets": "Save tickets & continue",
+  "creationSavedDraft": "Saved draft",
+  "creationSavedVenue": "Saved drafts retain their venue. Dates, description, capacity and registration settings can be updated.",
+  "creationBannerFailed": "Draft saved, but the banner could not be attached. Retry saving or continue without the new banner.",
+  "creationSkipBanner": "Continue without banner",
+  "creationTicketType": "Ticket type",
+  "creationTicketName": "Ticket name",
+  "creationTicketKind": "Ticket kind",
+  "creationPaid": "Paid (KZT)",
+  "creationQuantity": "Ticket quantity",
+  "creationSalesStart": "Ticket sales start",
+  "creationSalesEnd": "Ticket sales end",
+  "creationMaximum": "Maximum per order",
+  "creationTicketDescription": "Ticket description",
+  "creationAddType": "Add ticket type",
+  "creationRemoveType": "Remove ticket type",
+  "creationSavedType": "Saved. Add another ticket type or continue to review.",
+  "creationBackDetails": "Back to details",
+  "creationBackTickets": "Back to tickets",
+  "creationKeepDraft": "Keep as draft",
+  "creationFreeHelp": "Free-only events do not require paid-sales activation.",
+  "creationDateError": "Select all four event and registration dates and times.",
+  "creationFutureError": "Choose a future event start date and time.",
+  "creationEndError": "Event end must be after its start.",
+  "creationRegistrationError": "Registration must open before it closes and close no later than event start.",
+  "creationBannerError": "Use an HTTP or HTTPS URL for the banner.",
+  "creationQuantityError": "Use positive whole numbers for capacity and ticket quantities.",
+  "creationPriceError": "Paid tickets need a positive KZT amount with up to two decimal places.",
+  "creationMaximumError": "The per-order limit must be from 1 to 50.",
+  "creationSalesError": "Ticket sales must start before they end and stay within the registration window.",
+  "creationTicketsError": "Configure at least one ticket type with a name.",
+  "creationCapacityError": "Total ticket quantity must not exceed event capacity.",
+  "creationNotDraft": "This event is no longer a draft.",
+  "paidChecklist": "Paid-sales activation checklist",
+  "paidSandboxHelp": "Sandbox only: no real identity documents, bank details, payments or payouts are required.",
+  "paidTicketReady": "Paid ticket configured",
+  "paidIdentityReady": "Sandbox identity verified",
+  "paidPayoutReady": "Sandbox payout connected",
+  "paidFeeReady": "Activation fee recorded",
+  "paidTermsReady": "Terms accepted",
+  "paidVerify": "Verify sandbox identity",
+  "paidOrganization": "Organization name (optional)",
+  "paidPhone": "Contact phone (optional)",
+  "paidPayoutReference": "Sandbox payout reference",
+  "paidPayoutError": "Use a demo reference such as DEMO-0001.",
+  "paidConnect": "Connect sandbox payout",
+  "paidTermsText": "I accept the sandbox paid-event terms: no real money is charged or paid out. I am responsible for event information and the stated refund policy.",
+  "paidAcceptTerms": "Accept paid-event terms",
+  "paidPayFee": "Pay simulated activation fee",
+  "paidActivate": "Activate paid sales for this event",
+  "paidActive": "Paid sales are active. Payments and payouts remain simulated.",
+  "paidSuspended": "Paid sales are suspended. Contact platform support.",
+  "paidActionFailed": "The backend did not confirm this action. Refresh and retry.",
+  "creationPricing": "Ticket pricing",
+  "creationFreeEvent": "Free event",
+  "creationPaidMixed": "Paid / mixed tickets",
+  "creationFreeEventHelp": "All tickets are free. No paid-sales verification, payout setup or activation fee is needed.",
+  "creationPaidMixedHelp": "Add paid tickets or combine free and paid tickets. Paid sales require the sandbox activation checklist.",
+  "fieldRequired": "This field is required.",
+  "fieldMinCharacters": "Enter at least {min} characters.",
+  "fieldMaxCharacters": "Use no more than {max} characters.",
+  "fieldLengthRange": "{min}–{max} characters",
+  "fieldLengthMinimum": "At least {min} characters.",
+  "fieldLengthMaximum": "Optional · Up to {max} characters.",
+  "@fieldMinCharacters": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "@fieldMaxCharacters": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "@fieldLengthRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "@fieldLengthMinimum": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "@fieldLengthMaximum": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  }
 }
