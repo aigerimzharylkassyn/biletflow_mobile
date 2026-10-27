@@ -256,8 +256,7 @@ class DataService extends ChangeNotifier {
   }
 
   Future<void> cancelCheckout(String orderId) async {
-    await api.request('POST', '/checkout/sessions/$orderId/complete',
-        body: {'outcome': 'failure'});
+    await api.request('POST', '/checkout/sessions/$orderId/cancel');
   }
 
   Future<void> completeCheckout(String orderId) async {

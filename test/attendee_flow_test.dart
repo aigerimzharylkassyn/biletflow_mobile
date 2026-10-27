@@ -262,7 +262,9 @@ void main() {
     await tester.ensureVisible(find.text('Reserve and review'));
     await tester.tap(find.text('Reserve and review'));
     await tester.pumpAndSettle();
-    expect(find.text('Reservation expired. Select your tickets again.'),
+    expect(
+        find.text(
+            'This reservation expired and its inventory has been released. Start again to check current availability.'),
         findsOneWidget);
     expect(tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
         isNull);

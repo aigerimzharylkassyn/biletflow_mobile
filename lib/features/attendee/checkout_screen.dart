@@ -80,6 +80,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           key: _reserveKey);
       if (!mounted) return;
       setState(() => _order = order);
+      _clock?.cancel();
       _clock = Timer.periodic(const Duration(seconds: 1), (_) {
         if (mounted) setState(() {});
       });
@@ -233,7 +234,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         Text('${l.promoCode}: ${widget.promo}'),
                       Text(_seconds > 0
                           ? '${l.reservationExpires} ${_seconds ~/ 60}:${(_seconds % 60).toString().padLeft(2, '0')}'
-                          : l.reservationExpired),
+                          : l.opsExpiredHelp),
+                      if (_seconds == 0)
+                        OutlinedButton.icon(
+                            onPressed: _busy
+                                ? null
+                                : () {
+                                    _clock?.cancel();
+                                    setState(() {
+                                      _order = null;
+                                      _signature = null;
+                                      _reserveKey = checkoutKey();
+                                    });
+                                  },
+                            icon: const Icon(Icons.restart_alt),
+                            label: Text(l.opsStartAgain)),
                       const SizedBox(height: 20),
                       Text(l.demoPaymentHelp),
                       const SizedBox(height: 20),
