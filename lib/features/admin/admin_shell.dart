@@ -5,9 +5,9 @@ import '../../shared/widgets/role_shell.dart';
 import '../profile/profile_screen.dart';
 import 'admin_dashboard_screen.dart';
 import 'admin_events_screen.dart';
-import 'admin_users_screen.dart';
+import 'paid_event_applications_screen.dart';
 
-/// Admin bottom nav: Dashboard | Users | Events | Profile.
+/// Admin bottom nav: Dashboard | Applications | Events | Profile.
 class AdminShell extends StatelessWidget {
   const AdminShell({super.key});
 
@@ -23,10 +23,10 @@ class AdminShell extends StatelessWidget {
           screen: const AdminDashboardScreen(),
         ),
         RoleNavItem(
-          label: l10n.navUsers,
-          icon: Icons.groups_outlined,
-          activeIcon: Icons.groups_rounded,
-          screen: const AdminUsersScreen(),
+          label: l10n.navApplications,
+          icon: Icons.fact_check_outlined,
+          activeIcon: Icons.fact_check_rounded,
+          screen: const PaidEventApplicationsScreen(),
         ),
         RoleNavItem(
           label: l10n.navEvents,

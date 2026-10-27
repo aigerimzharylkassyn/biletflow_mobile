@@ -144,7 +144,7 @@ FastAPI server; exercise the app against your backend to validate the full flows
 ## Current limitations
 
 - Payment completion is simulated; real payment processing is not integrated.
-- Paid sales require organizer verification and paid-sales activation on the backend.
+- Paid events require a completed activation checklist and manual Platform Admin approval before publication and paid checkout.
 - Camera scanning, manual credential entry and attendee search are available for check-in.
   Organizers and assigned staff can admit a valid ticket or reverse an active check-in.
   Attendance statistics count valid and checked-in tickets, excluding cancelled/refunded tickets.
@@ -175,3 +175,46 @@ Commit source code, platform project files, and `pubspec.lock`. Generated build
 files, local environment files, and signing credentials should stay out of Git.
 If configuration examples are needed, use `.env.example` with placeholder values.
 The app reads `API_BASE_URL` through `--dart-define`; it does not load `.env` files.
+
+### Paid event applications and admin navigation
+
+Organizers complete event details and tickets, record the simulated activation fee,
+and submit for review. The event stays in draft with publishing disabled until a
+Platform Admin approves it. Rejection includes a reason; corrections can be
+resubmitted without paying the fee again. Material changes require a new review.
+Approval and rejection generate in-app notifications; approval does not publish.
+
+Admin navigation is Dashboard / Applications / Events / Inbox / Profile.
+Applications contains paid-event reviews; user management and organizer-role
+applications are available through Dashboard buttons. Events has lifecycle and
+category filters, organizer/title search, and global database statistics.
+Existing events can be moved back to draft through Edit event before resubmission.
+Previously unreviewed paid events must complete review before new paid checkout.
+
+### Sample paid-event applications
+
+Sign in as `admin.demo@example.com` and open Applications. Five `[Demo]` samples
+are available: Evening Jazz and Tech Forum (awaiting review), Food and Craft
+Market (approved, still a draft), Stand-up Comedy Night (rejected with a reason),
+and Contemporary Art Workshop (changes require review).
+
+Use `paid.organizer.demo@example.com` to inspect the organizer side and try
+publishing or resubmitting these drafts. Both demo accounts use `DemoPass123!`.
+The dedicated organizer has simulated profile/payout data and recorded demo fees;
+no real payment or verification is involved. Existing account passwords are preserved.
+
+To add these samples to another local backend database, run
+`python -m app.dev_paid_event_seed` in the backend environment. Repeated runs
+preserve decisions and edits instead of duplicating or resetting applications.
+
+### Finding paid-event review decisions
+
+My Events displays the paid-review state on draft cards: Awaiting review,
+Approved / ready to publish, Rejected, Needs resubmission, or Not submitted.
+Opening a submitted draft takes the organizer directly to the Review step.
+Publishing remains disabled until the current backend checklist confirms approval.
+
+Profile → Notifications includes Open event for paid-event review decisions.
+The link checks the event's current state: drafts open at Review, while published
+or cancelled events open their details. Missing/inaccessible events show an error;
+opening a notification never publishes or resubmits an event automatically.

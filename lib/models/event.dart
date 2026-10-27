@@ -9,6 +9,7 @@ class AppEvent {
   final String timeZone;
   final String eventStatus;
   final String paidSalesStatus;
+  final String paidReviewStatus;
   final DateTime? endsAt;
   final DateTime? registrationOpensAt;
   final DateTime? registrationClosesAt;
@@ -40,6 +41,7 @@ class AppEvent {
     this.timeZone = 'Asia/Almaty',
     this.eventStatus = 'published',
     this.paidSalesStatus = 'active',
+    this.paidReviewStatus = 'not_applicable',
     this.endsAt,
     this.registrationOpensAt,
     this.registrationClosesAt,
@@ -84,6 +86,7 @@ class AppEvent {
         timeZone: json['time_zone'] ?? 'Asia/Almaty',
         eventStatus: json['status'] ?? 'published',
         paidSalesStatus: json['paid_sales_status'] ?? 'not_ready',
+        paidReviewStatus: json['paid_review_status'] ?? 'not_applicable',
         endsAt: end,
         registrationOpensAt: json['registration_opens_at'] == null
             ? null

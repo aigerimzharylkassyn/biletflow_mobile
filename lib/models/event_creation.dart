@@ -78,6 +78,9 @@ class EventDraft {
             uri.host.isEmpty)) {
       throw const CreationValidation('banner');
     }
+    if (!freeOnly && fields['refund']!.trim().isEmpty) {
+      throw const CreationValidation('refundPolicy');
+    }
     return {
       'title': fields['title']!.trim(),
       'category': fields['category']!.trim(),
@@ -146,6 +149,9 @@ class TicketDraft {
   DateTime? start, end;
   Map<String, dynamic> body(EventDraft event) {
     if (fields['name']!.trim().isEmpty) throw const CreationValidation('name');
+    if (fields['kind'] == 'paid' && event.fields['refund']!.trim().isEmpty) {
+      throw const CreationValidation('refundPolicy');
+    }
     final quantity = positiveWhole(fields['quantity']!);
     final maximum = positiveWhole(fields['maximum']!);
     if (maximum > 50) throw const CreationValidation('maximum');

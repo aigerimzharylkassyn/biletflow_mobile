@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/loc_extensions.dart';
@@ -16,6 +17,7 @@ class PaidActivationPanel extends StatefulWidget {
 }
 
 class _PaidActivationPanelState extends State<PaidActivationPanel> {
+  Timer? _poll;
   final _identityForm = GlobalKey<FormState>();
   final _payoutForm = GlobalKey<FormState>();
   late final TextEditingController _contact;
@@ -32,10 +34,21 @@ class _PaidActivationPanelState extends State<PaidActivationPanel> {
     _contact = TextEditingController(
         text: context.read<AuthService>().currentUser?.name);
     _load();
+    _poll = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted &&
+          !_busy &&
+          !_loading &&
+          _data?['review_status'] == 'pending_review' &&
+          (ModalRoute.of(context)?.isCurrent ?? false) &&
+          TickerMode.valuesOf(context).enabled) {
+        _load();
+      }
+    });
   }
 
   @override
   void dispose() {
+    _poll?.cancel();
     _contact.dispose();
     _organization.dispose();
     _phone.dispose();
@@ -52,7 +65,8 @@ class _PaidActivationPanelState extends State<PaidActivationPanel> {
       final data = await widget.session.checklist();
       if (!mounted) return;
       setState(() => _data = data);
-      widget.onActive(data['status'] == 'active');
+      widget.onActive(
+          data['status'] == 'active' && data['review_status'] == 'approved');
     } catch (e) {
       if (mounted) setState(() => _error = creationError(context, e));
     } finally {
@@ -89,17 +103,55 @@ class _PaidActivationPanelState extends State<PaidActivationPanel> {
     final status = _data?['status'];
     final checks = _data?['checklist'] as Map? ?? {};
     return _spaced([
-      Text(l.paidChecklist, style: Theme.of(context).textTheme.titleLarge),
+      Row(children: [
+        Expanded(
+            child: Text(l.paidChecklist,
+                style: Theme.of(context).textTheme.titleLarge)),
+        IconButton(
+            tooltip: l.refreshStatus,
+            onPressed: _busy ? null : _load,
+            icon: const Icon(Icons.refresh))
+      ]),
       if (_error != null) ...[
         Text(_error!,
             style: TextStyle(color: Theme.of(context).colorScheme.error)),
         TextButton(onPressed: _busy ? null : _load, child: Text(l.commonRetry))
       ],
-      if (status == 'active')
-        Text(l.paidActive)
+      if (status == 'active' && _data?['review_status'] == 'approved')
+        _section(
+            context,
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(Icons.check_circle_outline_rounded,
+                  color: Theme.of(context).colorScheme.primary),
+              const SizedBox(height: 12),
+              Text(l.paidActive),
+            ]))
+      else if (_data?['review_status'] == 'pending_review')
+        _section(
+            context,
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Icon(Icons.hourglass_top_rounded),
+              const SizedBox(height: 12),
+              Text(l.paidReviewPending,
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 8),
+              Text(l.paidReviewWaitingHelp),
+            ]))
       else if (status == 'suspended')
         Text(l.paidSuspended)
       else if (_data != null) ...[
+        if (['rejected', 'changes_required'].contains(_data?['review_status']))
+          _section(
+              context,
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(
+                    _data?['review_status'] == 'rejected'
+                        ? l.paidReviewRejected
+                        : l.paidReviewChanges,
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                Text(_data?['review_reason'] as String? ?? ''),
+              ])),
         Text(l.paidSandboxHelp),
         _section(
             context,
@@ -313,9 +365,9 @@ class _PaidActivationPanelState extends State<PaidActivationPanel> {
                 ? null
                 : () => _act(() async {
                       final result = await api.request(
-                          'POST', '/events/$id/paid-sales/activate',
+                          'POST', '/events/$id/paid-sales/apply',
                           idempotencyKey: _activateKey);
-                      if (result['status'] != 'active') {
+                      if (result['status'] != 'pending_review') {
                         throw StateError(l.paidActionFailed);
                       }
                     }),

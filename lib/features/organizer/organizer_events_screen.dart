@@ -10,6 +10,7 @@ import '../../shared/widgets/event_card.dart';
 import '../../shared/widgets/event_status_badge.dart';
 import 'create_event_screen.dart';
 import 'event_overview_screen.dart';
+import '../../shared/widgets/paid_event_review_badge.dart';
 
 class OrganizerEventsScreen extends StatefulWidget {
   const OrganizerEventsScreen({super.key});
@@ -122,6 +123,13 @@ class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   EventStatusBadge(status: event.eventStatus),
+                                  if (event.eventStatus == 'draft' &&
+                                      event.paidReviewStatus !=
+                                          'not_applicable') ...[
+                                    const SizedBox(height: 8),
+                                    PaidEventReviewBadge(
+                                        status: event.paidReviewStatus),
+                                  ],
                                   if (event.eventStatus != 'draft') ...[
                                     const SizedBox(height: 6),
                                     Text(l.organizerSoldOf(
@@ -132,7 +140,14 @@ class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (_) => event.eventStatus == 'draft'
-                                        ? CreateEventScreen(draftId: event.id)
+                                        ? CreateEventScreen(
+                                            draftId: event.id,
+                                            openReview: [
+                                              'approved',
+                                              'pending_review',
+                                              'rejected',
+                                              'changes_required'
+                                            ].contains(event.paidReviewStatus))
                                         : EventOverviewScreen(event: event))),
                           ));
                     },

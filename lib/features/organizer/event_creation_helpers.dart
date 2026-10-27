@@ -19,6 +19,7 @@ String creationError(BuildContext context, Object error) {
     'tickets' || 'name' => l.creationTicketsError,
     'capacity' => l.creationCapacityError,
     'notDraft' => l.creationNotDraft,
+    'refundPolicy' => l.refundPolicyRequiredError,
     _ => l.applicationInvalid,
   };
 }

@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../services/auth_service.dart';
 import '../../models/user.dart';
+import '../../models/event.dart';
+import '../../services/api_client.dart';
+import '../organizer/create_event_screen.dart';
+import '../organizer/event_overview_screen.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -147,6 +151,38 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  Future<void> _openPaidEvent(Map row) async {
+    if (_busy != null) return;
+    setState(() {
+      _busy = row['id'] as String;
+      _error = null;
+    });
+    try {
+      final rows = await context
+          .read<AuthService>()
+          .api
+          .request('GET', '/organizer/events') as List;
+      final event =
+          rows.where((e) => e['id'] == row['data']['event_id']).firstOrNull;
+      if (!mounted) return;
+      if (event == null) {
+        throw ApiException(context.l10n.paidReviewEventUnavailable);
+      }
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => event['status'] == 'draft'
+                  ? CreateEventScreen(draftId: event['id'], openReview: true)
+                  : EventOverviewScreen(
+                      event: AppEvent.fromJson(
+                          Map<String, dynamic>.from(event)))));
+    } catch (e) {
+      if (mounted) setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _busy = null);
+    }
+  }
+
   Future<void> _read(String id) async {
     if (_busy != null) return;
     setState(() => _busy = id);
@@ -195,6 +231,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                               .titleMedium),
                                       const SizedBox(height: 8),
                                       Text(row['message']),
+                                      if (row['kind'] == 'paid_event_review' &&
+                                          row['data'] is Map &&
+                                          row['data']['event_id'] != null &&
+                                          context
+                                                  .read<AuthService>()
+                                                  .currentUser?.role == UserRole.organizer)
+                                        TextButton.icon(
+                                            onPressed: _busy != null
+                                                ? null
+                                                : () => _openPaidEvent(row),
+                                            icon: const Icon(
+                                                Icons.event_note_outlined),
+                                            label: Text(l.paidReviewOpenEvent)),
                                       if (row['is_read'] != true)
                                         TextButton(
                                             onPressed: _busy != null

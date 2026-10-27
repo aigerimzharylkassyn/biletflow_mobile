@@ -79,7 +79,7 @@ void main() {
     expect(field('city').validator!('A' * 121),
         'Use no more than 120 characters.');
     expect(field('banner').validator!(''), isNull);
-    expect(field('refund').validator!('  '), 'This field is required.');
+    expect(field('refund').validator!('  '), isNull);
     expect(
         tester
             .widget<TextField>(find.descendant(
@@ -299,9 +299,9 @@ void main() {
     expect(find.text('Keep as draft'), findsOneWidget);
   });
   testWidgets(
-      'paid checklist requires explicit terms and server confirmation before activation',
+      'paid checklist requires terms and fee, then waits for manual approval',
       (tester) async {
-    var terms = false, fee = false, active = false;
+    var terms = false, fee = false, submitted = false, approved = false;
     final posts = <String>[];
     final api = ApiClient(client: MockClient((r) async {
       if (r.method == 'POST') {
@@ -314,13 +314,22 @@ void main() {
           fee = true;
           return jsonResponse({'status': 'succeeded', 'amount_minor': 100000});
         }
-        if (r.url.path.endsWith('/activate')) {
-          active = true;
-          return jsonResponse({'status': 'active'});
+        if (r.url.path.endsWith('/apply')) {
+          submitted = true;
+          return jsonResponse({'status': 'pending_review'});
         }
       }
       return jsonResponse({
-        'status': active ? 'active' : 'not_ready',
+        'status': approved
+            ? 'active'
+            : submitted
+                ? 'pending_review'
+                : 'not_ready',
+        'review_status': approved
+            ? 'approved'
+            : submitted
+                ? 'pending_review'
+                : 'not_submitted',
         'checklist': {
           'has_paid_ticket': true,
           'identity_verified': true,
@@ -358,13 +367,20 @@ void main() {
     await tester.ensureVisible(pay);
     await tester.tap(pay);
     await tester.pumpAndSettle();
-    final activate = find.text('Activate paid sales for this event');
+    final activate = find.text('Submit for admin review');
     await tester.ensureVisible(activate);
     await tester.tap(activate);
     await tester.pumpAndSettle();
-    expect(confirmed, isTrue);
+    expect(confirmed, isFalse);
+    expect(find.text('Awaiting review'), findsOneWidget);
     expect(posts.length, 3);
-    expect(find.textContaining('Paid sales are active.'), findsOneWidget);
+    approved = true;
+    await tester.tap(find.byIcon(Icons.refresh));
+    await tester.pumpAndSettle();
+    expect(confirmed, isTrue);
+    expect(find.textContaining('Platform Admin approved this paid event.'),
+        findsOneWidget);
+    expect(posts.length, 3);
   });
   for (final locale in ['en', 'ru', 'kk']) {
     for (final config in [

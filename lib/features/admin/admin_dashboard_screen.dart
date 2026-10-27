@@ -9,6 +9,7 @@ import '../../shared/widgets/outlined_app_button.dart';
 import '../../shared/widgets/stat_card.dart';
 import '../../shared/widgets/responsive_cards.dart';
 import 'admin_reports_screen.dart';
+import 'admin_users_screen.dart';
 import 'organizer_applications_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
@@ -61,6 +62,12 @@ class AdminDashboardScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
+          OutlinedAppButton(
+              label: l10n.adminManageUsers,
+              icon: Icons.groups_outlined,
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const AdminUsersScreen()))),
+          const SizedBox(height: 12),
           OutlinedAppButton(
             label: l10n.organizerApplications,
             icon: Icons.person_add_alt_1_outlined,

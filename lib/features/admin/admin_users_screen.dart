@@ -24,8 +24,7 @@ class AdminUsersScreen extends StatelessWidget {
     final data = context.watch<DataService>();
 
     return Scaffold(
-      appBar: AppBar(
-          automaticallyImplyLeading: false, title: Text(l10n.adminManageUsers)),
+      appBar: AppBar(title: Text(l10n.adminManageUsers)),
       body: ListView.separated(
         padding: const EdgeInsets.symmetric(vertical: 8),
         itemCount: data.adminUsers.length,
