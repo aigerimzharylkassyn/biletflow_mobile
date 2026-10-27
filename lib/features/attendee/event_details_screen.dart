@@ -7,6 +7,9 @@ import '../../models/event.dart';
 import '../../services/data_service.dart';
 import '../../services/api_client.dart';
 import 'attendee_ui.dart';
+import '../profile/support_screen.dart';
+import '../../models/user.dart';
+import '../../services/auth_service.dart';
 import 'checkout_screen.dart';
 import 'ticket_support_actions.dart';
 
@@ -249,6 +252,25 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                       () => shareCalendar(context, event)),
                                   icon: const Icon(Icons.calendar_month),
                                   label: Text(l.addCalendar)),
+                              if (context
+                                      .read<AuthService>()
+                                      .currentUser
+                                      ?.role ==
+                                  UserRole.attendee) ...[
+                                const SizedBox(height: 12),
+                                OutlinedButton.icon(
+                                    onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => SupportScreen(
+                                                eventId: event.id,
+                                                subject: event.title,
+                                                initialCategory: 'report_event',
+                                                startNew: true,
+                                                view: 'mine'))),
+                                    icon: const Icon(Icons.flag_outlined),
+                                    label: Text(l.opsReportEvent)),
+                              ],
                             ]),
                             const SizedBox(height: 20),
                             Text(l.chooseTickets,

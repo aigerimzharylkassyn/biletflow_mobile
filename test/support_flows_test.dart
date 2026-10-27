@@ -13,6 +13,9 @@ import 'package:biletflow_mobile/services/api_client.dart';
 import 'package:biletflow_mobile/services/auth_service.dart';
 import 'package:biletflow_mobile/services/support_service.dart';
 import 'event_attendees_test.dart' as fixtures;
+import 'attendee_flow_test.dart' as booking;
+import 'package:biletflow_mobile/features/attendee/event_details_screen.dart';
+import 'package:biletflow_mobile/models/event.dart';
 
 Map<String, dynamic> platformCase() => {
       'id': 'platform-case',
@@ -52,6 +55,68 @@ class SupportStaffAuth extends fixtures.ListAuth {
 }
 
 void main() {
+  testWidgets('report event opens a prefilled private platform support request',
+      (tester) async {
+    viewport(tester);
+    Map<String, dynamic>? submitted;
+    final row = {
+      ...platformCase(),
+      'flow': 'attendee',
+      'category': 'report_event',
+      'event_id': 'event-id',
+      'subject': 'Community concert'
+    };
+    final api = ApiClient(client: MockClient((r) async {
+      if (r.method == 'POST') {
+        submitted = jsonDecode(r.body);
+        return http.Response(jsonEncode(row), 201);
+      }
+      if (r.url.path.endsWith('/messages') ||
+          r.url.path.endsWith('/history') ||
+          r.url.path.endsWith('/cases') ||
+          r.url.path.endsWith('/ticket-types')) {
+        return http.Response('[]', 200);
+      }
+      return http.Response(jsonEncode(row), 200);
+    }));
+    await tester.pumpWidget(supportApp(api, UserRole.attendee,
+        EventDetailsScreen(event: AppEvent.fromJson(booking.eventJson))));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Report event'), 250,
+        scrollable: find.byType(Scrollable).first);
+    await tester.tap(find.text('Report event'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SupportScreen), findsOneWidget);
+    expect(find.textContaining('This report goes directly to Platform Admin.'),
+        findsOneWidget);
+    expect(find.text('Sent to the organizer of the selected event or booking.'),
+        findsNothing);
+    expect(find.text('Event: Community concert'), findsOneWidget);
+    await tester.enterText(find.widgetWithText(TextFormField, 'Message'),
+        'The venue information looks misleading.');
+    await tester.ensureVisible(find.text('Send message'));
+    await tester.tap(find.text('Send message'));
+    await tester.pumpAndSettle();
+    expect(submitted?['category'], 'report_event');
+    expect(submitted?['event_id'], 'event-id');
+    expect(submitted?['flow'], 'attendee');
+    expect(submitted?.containsKey('order_id'), isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final role in [UserRole.attendee, UserRole.organizer, UserRole.admin]) {
+    testWidgets('$role profile has no separate reports or disputes page',
+        (tester) async {
+      viewport(tester);
+      final api =
+          ApiClient(client: MockClient((_) async => http.Response('[]', 200)));
+      await tester.pumpWidget(supportApp(api, role, const ProfileScreen()));
+      await tester.pumpAndSettle();
+      expect(find.text('My reports & disputes'), findsNothing);
+      expect(find.text('Moderation & disputes'), findsNothing);
+    });
+  }
+
   testWidgets('admin profile has no personal support chat entry',
       (tester) async {
     viewport(tester);
@@ -76,6 +141,15 @@ void main() {
             jsonEncode([
               {
                 ...platformCase(),
+                'id': 'report',
+                'flow': 'attendee',
+                'routing': 'platform',
+                'category': 'report_event',
+                'event_id': 'event-id',
+                'subject': 'Misleading venue'
+              },
+              {
+                ...platformCase(),
                 'id': 'general',
                 'flow': 'attendee',
                 'routing': 'platform',
@@ -97,6 +171,7 @@ void main() {
         const SupportScreen(flow: 'organizer_platform', view: 'inbox')));
     await tester.pumpAndSettle();
     expect(find.text('General attendee help'), findsOneWidget);
+    expect(find.text('Misleading venue'), findsOneWidget);
     expect(find.text('Activation help'), findsOneWidget);
     expect(find.text('Event organizer question'), findsNothing);
   });

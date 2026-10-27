@@ -21,6 +21,7 @@ const supportStatuses = [
   'resolved'
 ];
 const supportCategories = [
+  'report_event',
   'ticket_delivery',
   'payment',
   'refund',
@@ -46,6 +47,7 @@ String supportStatusLabel(BuildContext c, String status) => switch (status) {
     };
 String supportCategoryLabel(BuildContext c, String category) =>
     switch (category) {
+      'report_event' => c.l10n.opsReportEvent,
       'ticket_delivery' => c.l10n.supportTicket,
       'payment' => c.l10n.supportPayment,
       'refund' => c.l10n.supportRefund,
@@ -103,7 +105,16 @@ class _SupportScreenState extends State<SupportScreen>
               context.read<AuthService>().currentUser?.isAdmin == true
           ? {...platformSupportCategories, ...supportCategories}.toList()
           : platformSupportCategories)
-      : supportCategories;
+      : supportCategories
+          .where((category) =>
+              category != 'report_event' ||
+              (context.read<AuthService>().currentUser?.role ==
+                      UserRole.attendee &&
+                  (!_creating ||
+                      (widget.eventId != null &&
+                          widget.orderId == null &&
+                          widget.ticketId == null))))
+          .toList();
   bool _loading = true, _busy = false, _creating = false;
   String? _error;
   String _category = 'ticket_delivery',
@@ -686,7 +697,10 @@ class _SupportScreenState extends State<SupportScreen>
                                           if (_case!['routing'] == 'platform' &&
                                               _case!['flow'] !=
                                                   'organizer_platform')
-                                            Text(l.supportFallback),
+                                            Text(_case!['category'] ==
+                                                    'report_event'
+                                                ? l.supportReportDestination
+                                                : l.supportFallback),
                                           if (_case!['event_title'] != null)
                                             Text(_case!['event_title']),
                                           if (_case!['order_id'] != null)
@@ -873,7 +887,9 @@ class _SupportScreenState extends State<SupportScreen>
                                           })
                                         else
                                           Text(attendeeChat
-                                              ? l.supportSentToOrganizer
+                                              ? (_category == 'report_event'
+                                                  ? l.supportReportDestination
+                                                  : l.supportSentToOrganizer)
                                               : widget.flow ==
                                                       'organizer_platform'
                                                   ? l.supportPlatformFlow
@@ -914,7 +930,7 @@ class _SupportScreenState extends State<SupportScreen>
                                         ],
                                         if (widget.eventId != null)
                                           SelectableText(
-                                              '${l.supportEventFilter}: ${widget.eventId}'),
+                                              '${l.supportEventFilter}: ${_category == 'report_event' ? widget.subject ?? widget.eventId : widget.eventId}'),
                                         if (_category == 'refund') ...[
                                           Text(l.supportRefundRequestHelp),
                                           const SizedBox(height: 12)
