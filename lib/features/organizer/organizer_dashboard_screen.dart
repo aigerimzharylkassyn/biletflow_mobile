@@ -13,6 +13,7 @@ import '../../shared/widgets/responsive_cards.dart';
 import 'create_event_screen.dart';
 import 'event_overview_screen.dart';
 import 'event_management_screen.dart';
+import '../operations/payouts_screen.dart';
 
 class OrganizerDashboardScreen extends StatelessWidget {
   const OrganizerDashboardScreen({super.key});
@@ -45,6 +46,12 @@ class OrganizerDashboardScreen extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const CreateEventScreen()),
             ),
           ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const PayoutsScreen())),
+              icon: const Icon(Icons.account_balance_wallet_outlined),
+              label: Text(l10n.opsPayouts)),
           const SizedBox(height: 20),
           ResponsiveCards(
             children: [

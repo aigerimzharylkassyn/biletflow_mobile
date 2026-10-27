@@ -10,6 +10,8 @@ import '../../shared/widgets/stat_card.dart';
 import '../../shared/widgets/responsive_cards.dart';
 import 'admin_reports_screen.dart';
 import 'admin_operations_screen.dart';
+import '../operations/payouts_screen.dart';
+import 'platform_settings_screen.dart';
 import 'admin_users_screen.dart';
 import 'organizer_applications_screen.dart';
 
@@ -70,6 +72,20 @@ class AdminDashboardScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (_) => const AdminOperationsScreen()))),
+          const SizedBox(height: 12),
+          OutlinedAppButton(
+              label: l10n.opsSettings,
+              icon: Icons.tune_rounded,
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const PlatformSettingsScreen()))),
+          const SizedBox(height: 12),
+          OutlinedAppButton(
+              label: l10n.opsPayouts,
+              icon: Icons.account_balance_wallet_outlined,
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const PayoutsScreen()))),
           const SizedBox(height: 12),
           OutlinedAppButton(
               label: l10n.adminManageUsers,

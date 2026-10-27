@@ -8,6 +8,8 @@ import '../../services/api_client.dart';
 import '../organizer/create_event_screen.dart';
 import '../organizer/event_overview_screen.dart';
 import 'support_screen.dart';
+import '../attendee/event_details_screen.dart';
+import '../operations/payouts_screen.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -184,6 +186,27 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  Future<void> _openUpdate(Map row) async {
+    if (_busy != null) return;
+    setState(() => _busy = row['id']);
+    try {
+      final data = await context
+          .read<AuthService>()
+          .api
+          .request('GET', '/events/${row['data']['event_id']}');
+      if (!mounted) return;
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => EventDetailsScreen(
+                  event: AppEvent.fromJson(Map<String, dynamic>.from(data)))));
+    } catch (e) {
+      if (mounted) setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _busy = null);
+    }
+  }
+
   Future<void> _read(String id) async {
     if (_busy != null) return;
     setState(() => _busy = id);
@@ -261,6 +284,33 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                             icon: const Icon(
                                                 Icons.event_note_outlined),
                                             label: Text(l.paidReviewOpenEvent)),
+                                      if (row['kind'] == 'event_update' &&
+                                          row['data'] is Map &&
+                                          row['data']['event_id'] != null)
+                                        TextButton.icon(
+                                            onPressed: _busy != null
+                                                ? null
+                                                : () => _openUpdate(row),
+                                            icon: const Icon(
+                                                Icons.event_outlined),
+                                            label: Text(l.creationDetails)),
+                                      if (row['kind'] == 'payout_status' ||
+                                          ('${row['kind']}'
+                                                  .startsWith('dispute_') &&
+                                              context
+                                                      .read<AuthService>()
+                                                      .currentUser
+                                                      ?.isOrganizer ==
+                                                  true))
+                                        TextButton.icon(
+                                            onPressed: () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        const PayoutsScreen())),
+                                            icon: const Icon(Icons
+                                                .account_balance_wallet_outlined),
+                                            label: Text(l.opsPayouts)),
                                       if (row['is_read'] != true)
                                         TextButton(
                                             onPressed: _busy != null
