@@ -211,7 +211,7 @@ The support seed preserves existing conversations and adds no duplicates on reru
 
 | Sign in as | Where to open | Sample conversations |
 |---|---|---|
-| `attendee.demo@example.com` | Profile → Contact Us | Refund review (Open), missing ticket email (In Progress), accessible entrance (Waiting for Customer), ticket download (Resolved) |
+| `attendee.demo@example.com` | Profile → Support chat | Refund review (Open), missing ticket email (In Progress), accessible entrance (Waiting for Customer), ticket download (Resolved) |
 | `organizer.demo@example.com` | Inbox | All four attendee cases; open a case to reply, assign staff, or update status |
 | `staff.demo@example.com` | Inbox | Three assigned cases: ticket email, accessible entrance, and resolved download |
 | `organizer.demo@example.com` | Profile → Contact Platform Admin | Demonstration payment report question |
@@ -329,3 +329,59 @@ as CSV. User management supports suspension/restoration with reasons. These flow
 use the backend in the sibling `biletflow` folder; restart that server after updating
 its code. No new database columns are required for these management features.
 The separate email screens remain frontend-only demos.
+
+
+## SRS completion: inventory, private access and operational workflows
+
+- **Checkout (§4.6):** closing an active reservation uses an explicit cancellation
+  endpoint and releases inventory without a failed-payment record. Expired holds
+  are released on inventory/checkout reads and by a lifespan worker every 30
+  seconds. Checkout retry keys replay the original reservation; changed requests
+  cannot reuse a key. Event and ticket capacities are checked server-side.
+- **Ticket types (§4.3):** Event details or Event workspace → Ticket inventory
+  shows available, reserved, sold, refunded and checked-in counts, including hidden
+  types. Organizers can hide/restore types without invalidating issued tickets.
+  Draft types with no sales, refunds or reservations can be edited or added.
+  Changes to reviewed financial details require another paid-event review.
+- **Event editing/private access (§4.2):** Edit event now saves venue changes to a
+  separate venue record, preserving historical/shared venues. Confirmed attendees
+  receive an event-update notification with a link to current information.
+  For a private event, organizers open Private invitations, create an email-bound
+  code, and share it manually. Attendees use Events → key icon or Profile →
+  Invited events. Acceptance, expiry and revocation are enforced on the server,
+  including at checkout completion. Revocation releases pending holds but keeps
+  existing orders and tickets. Codes are shown once and stored only as hashes;
+  invitation emails are not automatically sent.
+- **Administration (§4.12):** Dashboard links to Platform
+  settings, and Simulated payouts. User search queries the server by name, email
+  or stored role. Attendees report an event from its details through Support Chat, using the Report event category. These conversations go directly to platform admins and remain private from the event organizer and staff. Separate reports/disputes pages are no longer exposed.
+  Support replies and status changes notify requesters. Reports do not automatically
+  suspend an event or refund an order: administrators use the existing explicit
+  event/order controls for those actions.
+- **Fees/payouts (§4.6, §4.10):** settings changes apply to new reservations and
+  activation-fee quotes; existing orders and recorded activation fees keep their
+  amounts. Estimated payout is retained order payments less processing fees, so
+  fees already included in checkout are deducted once. Refunded orders are
+  excluded. Only ended events with a positive balance, no pending checkouts,
+  no open dispute and no suspension are eligible for payout progression. Admins
+  record simulated states and organizers receive notifications. A recorded paid
+  transfer cannot be sent twice; later refunds preserve the ledger and flag a
+  reconciliation state. No real bank transfers are performed.
+
+Restart the backend after updating: startup adds the operations/settings,
+invitation, moderation, payout, activation-fee and checkout-retry tables without
+removing existing data. Keep the ASGI lifespan enabled for scheduled cleanup;
+request-time cleanup also recovers expired inventory.
+
+### Remaining SRS work after these changes
+
+Email verification/password reset and confirmation/ticket emails remain UI demos
+with incomplete delivery/integration. Campaign authoring/disable controls,
+ticket-type discount restrictions, campaign QR opening/automatic promo application,
+full campaign financial breakdowns and the mobile promo-preview API integration
+remain incomplete. Printable PDF Cyrillic/font/layout support also needs work.
+Accessibility, PostgreSQL concurrent-load/latency tests, backup/restore and deployed
+transport/storage security require separate validation. Assigned seating, common
+calendar-service shortcuts, GA4, offline scanning and chat attachments are stretch
+features under §8. Real financial processing, production KYC and advanced disputes
+are outside the academic MVP; the simulated flows above are intentional.
