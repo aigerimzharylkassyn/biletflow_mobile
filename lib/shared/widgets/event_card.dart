@@ -27,7 +27,9 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateLabel = DateFormat('EEE, d MMM yyyy').format(event.date);
+    final dateLabel = DateFormat(
+            'EEE, d MMM yyyy', Localizations.localeOf(context).languageCode)
+        .format(event.date);
 
     return Material(
       color: AppColors.surface,

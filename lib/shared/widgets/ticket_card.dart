@@ -15,7 +15,9 @@ class TicketCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPast = ticket.status == TicketStatus.past;
-    final dateLabel = DateFormat('EEE, d MMM yyyy').format(ticket.event.date);
+    final dateLabel = DateFormat(
+            'EEE, d MMM yyyy', Localizations.localeOf(context).languageCode)
+        .format(ticket.event.date);
 
     return Material(
       color: AppColors.surface,

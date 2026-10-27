@@ -87,9 +87,14 @@ The debug manifest permits local HTTP for development. Confirm the server first 
 
 ## Languages
 
-The default language is Kazakh (Latin script), with Russian and English also
+The default language is Kazakh (Cyrillic script), with Russian and English also
 available. Switch languages from the login screen or Profile → Language.
 The preference persists across restarts.
+
+Interface text uses bundled Noto Sans in regular, medium, semibold, and bold
+weights, with Latin and Kazakh/Russian Cyrillic glyphs in each file. Font files
+and their SIL Open Font License are in `assets/fonts/noto_sans/`. The source is
+[the Noto fonts repository](https://github.com/notofonts/noto-fonts/tree/main/hinted/ttf/NotoSans).
 
 Translations are in `lib/l10n/app_kk.arb`, `app_ru.arb`, and `app_en.arb`.
 Run `flutter gen-l10n` after editing them; generated files in `lib/l10n/gen/`

@@ -158,7 +158,7 @@ class _OrganizerApplicationScreenState
                           child: TextFormField(
                             controller: _fields[i],
                             decoration: InputDecoration(
-                                labelText: labels[i],
+                                label: Text(labels[i], maxLines: 4),
                                 border: const OutlineInputBorder()),
                             maxLength: maximum[i],
                             maxLines: i == 3 ? 4 : 1,

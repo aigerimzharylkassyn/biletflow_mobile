@@ -8,6 +8,9 @@ class AppColors {
   AppColors._();
 
   static const Color primary = Color(0xFFF0534F); // Coral
+  static const Color primarySoft = Color(0xFFFFEDE9);
+  static const Color primaryInk = Color(0xFF9E302B);
+  static const Color caseBackground = Color(0xFFFBF7F5);
   static const Color primaryDark = Color(0xFF1D1D1D); // Grayish Black
   static const Color background = Color(0xFFF8F8F8); // Grayish White
   static const Color surface = Color(0xFFFFFFFF); // White
@@ -18,6 +21,10 @@ class AppColors {
   static const Color inputHint = Color(0xFFACACAC);
   static const Color border = Color(0xB2828282); // rgba(130,130,130,0.7)
   static const Color divider = Color(0xFFE7E7E7);
+  static const Color supportNavy = Color(0xFF243550);
+  static const Color supportBlue = Color(0xFF2858A5);
+  static const Color supportAmber = Color(0xFF8B580B);
+  static const Color supportBackground = Color(0xFFF1F4FA);
   static const Color success = Color(0xFF2E9E5B);
   static const Color error = Color(0xFFD64545);
 }
@@ -45,10 +52,12 @@ class AppTheme {
   AppTheme._();
 
   static ThemeData get light {
-    final baseTextTheme = GoogleFonts.poppinsTextTheme();
+    // Use the same bundled glyphs and weights for Latin and Kazakh/Russian Cyrillic.
+    final baseTextTheme = ThemeData(fontFamily: 'NotoSans').textTheme;
 
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'NotoSans',
       scaffoldBackgroundColor: AppColors.background,
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
@@ -60,17 +69,18 @@ class AppTheme {
         bodyColor: AppColors.textPrimary,
         displayColor: AppColors.textPrimary,
       ),
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: TextStyle(
+          fontFamily: 'NotoSans',
           color: AppColors.textPrimary,
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        iconTheme: IconThemeData(color: AppColors.textPrimary),
       ),
       cardTheme: CardThemeData(
         color: AppColors.surface,
@@ -83,10 +93,12 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
-        hintStyle:
-            GoogleFonts.poppins(color: AppColors.inputHint, fontSize: 14),
-        labelStyle:
-            GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 14),
+        hintStyle: const TextStyle(
+            fontFamily: 'NotoSans', color: AppColors.inputHint, fontSize: 14),
+        labelStyle: const TextStyle(
+            fontFamily: 'NotoSans',
+            color: AppColors.textSecondary,
+            fontSize: 14),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
         border: OutlineInputBorder(
@@ -116,8 +128,10 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.button),
           ),
-          textStyle:
-              GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
+          textStyle: const TextStyle(
+              fontFamily: 'NotoSans',
+              fontSize: 16,
+              fontWeight: FontWeight.w500),
           elevation: 0,
         ),
       ),
@@ -130,32 +144,34 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.button),
           ),
-          textStyle:
-              GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
+          textStyle: const TextStyle(
+              fontFamily: 'NotoSans',
+              fontSize: 16,
+              fontWeight: FontWeight.w500),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
-          textStyle: GoogleFonts.poppins(fontSize: 14),
+          textStyle: const TextStyle(fontFamily: 'NotoSans', fontSize: 14),
         ),
       ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.surface,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textTertiary,
-        selectedLabelStyle: GoogleFonts.poppins(fontSize: 11),
-        unselectedLabelStyle: GoogleFonts.poppins(fontSize: 11),
+        selectedLabelStyle: TextStyle(fontFamily: 'NotoSans', fontSize: 11),
+        unselectedLabelStyle: TextStyle(fontFamily: 'NotoSans', fontSize: 11),
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surface,
         selectedColor: AppColors.primary,
-        labelStyle:
-            GoogleFonts.poppins(fontSize: 13, color: AppColors.textPrimary),
-        secondaryLabelStyle:
-            GoogleFonts.poppins(fontSize: 13, color: Colors.white),
+        labelStyle: const TextStyle(
+            fontFamily: 'NotoSans', fontSize: 13, color: AppColors.textPrimary),
+        secondaryLabelStyle: const TextStyle(
+            fontFamily: 'NotoSans', fontSize: 13, color: Colors.white),
         side: const BorderSide(color: AppColors.border),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.chip),
@@ -166,8 +182,8 @@ class AppTheme {
           const DividerThemeData(color: AppColors.divider, thickness: 1),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimary,
-        contentTextStyle:
-            GoogleFonts.poppins(color: Colors.white, fontSize: 14),
+        contentTextStyle: const TextStyle(
+            fontFamily: 'NotoSans', color: Colors.white, fontSize: 14),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.input)),
