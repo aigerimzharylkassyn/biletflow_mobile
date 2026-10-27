@@ -1,3 +1,7 @@
+import 'package:biletflow_mobile/features/operations/invitations_screen.dart';
+import 'package:biletflow_mobile/features/operations/payouts_screen.dart';
+import 'package:biletflow_mobile/features/admin/platform_settings_screen.dart';
+import 'package:biletflow_mobile/features/organizer/ticket_inventory_screen.dart';
 import 'package:biletflow_mobile/features/organizer/event_management_screen.dart';
 import 'package:biletflow_mobile/features/admin/admin_operations_screen.dart';
 import 'event_management_test.dart' as management_fixtures;
@@ -177,6 +181,70 @@ final api = ApiClient(client: MockClient((request) async {
       'activation_fee_minor': 100000,
       'processing_fee_bps': 300
     };
+  }
+  if (path.endsWith('/inventory')) {
+    payload = {
+      'event_status': 'draft',
+      'capacity': 100,
+      'refund_policy': 'Refund before start',
+      'registration_opens_at': '2027-01-01T00:00:00Z',
+      'registration_closes_at': '2027-10-20T10:00:00Z',
+      'ticket_types': [
+        {
+          ...type,
+          'editable': true,
+          'available': 100,
+          'checked_in': 0,
+          'sold_count': 0,
+          'refunded_count': 0,
+          'is_hidden': false
+        }
+      ]
+    };
+  }
+  if (path.endsWith('/invitations')) {
+    payload = [
+      {
+        'id': 'invitation-id',
+        'email': 'a.long.invited.attendee.address@example.com',
+        'status': 'accepted',
+        'expires_at': '2027-10-20T10:00:00Z'
+      }
+    ];
+  }
+  if (path.endsWith('/events/invited/mine')) {
+    payload = [
+      {
+        ...paid_fixtures.paidApplication()['event'] as Map,
+        'visibility': 'private'
+      }
+    ];
+  }
+  if (path.endsWith('/admin/platform-settings')) {
+    payload = {
+      'activation_fee_minor': 100000,
+      'processing_fee_bps': 300,
+      'hold_minutes': 15,
+      'version': 1
+    };
+  }
+  if (path.endsWith('/organizer/payouts')) {
+    payload = [
+      {
+        'event_id': 'event-id',
+        'event_title': 'A long event title for simulated payout testing',
+        'gross_minor': 123456789000,
+        'discounts_minor': 120000,
+        'fees_minor': 30000,
+        'refunds_minor': 500000,
+        'estimated_payout_minor': 1234560000,
+        'status': 'pending',
+        'eligible': true,
+        'open_dispute': false,
+        'amount_minor': 0,
+        'note': 'Waiting for demonstration settlement.'
+      }
+    ];
   }
   if (path.endsWith('/ticket-types')) payload = [type];
   if (path.endsWith('/events/event-id/orders')) {
@@ -360,6 +428,20 @@ void main() {
         eventId: 'event-id',
         title: 'A long event title for activity',
         historyOnly: true),
+    'ticket inventory': () => const TicketInventoryScreen(
+        eventId: 'event-id', title: 'A long event title for inventory'),
+    'private invitations': () => const InvitationsScreen(
+        eventId: 'event-id', title: 'A long private event title'),
+    'invited events': () => const InvitedEventsScreen(),
+    'platform settings': () => const PlatformSettingsScreen(),
+    'event report chat': () => const SupportScreen(
+        eventId: 'event-id',
+        subject: 'An event with a long title',
+        initialCategory: 'report_event',
+        startNew: true,
+        view: 'mine'),
+    'organizer payouts': () => const PayoutsScreen(),
+    'admin payouts': () => const PayoutsScreen(),
     'operations monitor': () => const AdminOperationsScreen(),
     'event overview': () => EventOverviewScreen(event: event),
     'event attendees': () => const EventAttendeesScreen(
@@ -437,10 +519,20 @@ void main() {
           tester.view.viewInsets = FakeViewPadding(bottom: config.keyboard);
           addTearDown(tester.view.reset);
           final auth = LayoutAuth(
-              role: screen.key == 'admin event controls'
+              role: [
+            'admin event controls',
+            'platform settings',
+            'admin payouts'
+          ].contains(screen.key)
                   ? UserRole.admin
-                  : ['event overview', 'event attendees', 'event analytics']
-                          .contains(screen.key)
+                  : [
+                      'event overview',
+                      'event attendees',
+                      'event analytics',
+                      'ticket inventory',
+                      'private invitations',
+                      'organizer payouts'
+                    ].contains(screen.key)
                       ? UserRole.organizer
                       : UserRole.attendee);
           await tester.pumpWidget(MultiProvider(
@@ -474,6 +566,30 @@ void main() {
             await tester.pumpAndSettle();
             expect(tester.takeException(), isNull);
           }
+          if ([
+            'ticket inventory',
+            'private invitations',
+            'invited events',
+            'platform settings',
+            'admin payouts'
+          ].contains(screen.key)) {
+            final l = AppLocalizations.of(
+                tester.element(find.byType(Scaffold).first));
+            final action = switch (screen.key) {
+              'ticket inventory' => l.opsEditTicket,
+              'private invitations' => l.opsInvite,
+              'invited events' => l.opsJoin,
+              'platform settings' => l.opsSave,
+              _ => l.opsPayoutUpdate,
+            };
+            await tester.scrollUntilVisible(find.text(action).first, 200,
+                scrollable: find.byType(Scrollable).first);
+            await tester.pumpAndSettle();
+            await tester.tap(find.text(action).first);
+            await tester.pumpAndSettle();
+            expect(tester.takeException(), isNull);
+            expectTranslatedLabelsFit(tester, labels);
+          }
           if (screen.key == 'password reset demo') {
             final l = AppLocalizations.of(
                 tester.element(find.byType(EmailAuthScreen)));
@@ -501,7 +617,11 @@ void main() {
               ? find.descendant(
                   of: find.byType(BottomSheet),
                   matching: find.byType(Scrollable))
-              : find.byType(Scrollable);
+              : find.byType(AlertDialog).evaluate().isNotEmpty
+                  ? find.descendant(
+                      of: find.byType(AlertDialog).last,
+                      matching: find.byType(Scrollable))
+                  : find.byType(Scrollable);
           if (scroll.evaluate().isNotEmpty) {
             await tester.drag(scroll.first, const Offset(0, -900));
             await tester.pumpAndSettle();
