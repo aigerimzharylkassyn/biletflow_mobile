@@ -134,9 +134,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         child: StatusBadge(order['status'])),
                                     const SizedBox(height: 16),
                                     Text(
-                                        order['status'] == 'confirmed'
-                                            ? l.bookingConfirmed
-                                            : l.bookingDetails,
+                                        event.eventStatus == 'cancelled'
+                                            ? l.eventCancelled
+                                            : order['status'] == 'confirmed'
+                                                ? l.bookingConfirmed
+                                                : l.bookingDetails,
                                         style: Theme.of(context)
                                             .textTheme
                                             .headlineMedium),
@@ -145,6 +147,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleLarge),
+                                    if (event.eventStatus == 'cancelled')
+                                      const CancelledEventNotice(),
                                     const SizedBox(height: 8),
                                     SelectableText(
                                         '${l.orderLabel}: ${order['id']}'),
@@ -221,9 +225,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                             Align(
                                                 alignment: Alignment.centerLeft,
                                                 child: StatusBadge(
-                                                    ticket['status'])),
+                                                    event.eventStatus ==
+                                                                'cancelled' &&
+                                                            ticket['status'] ==
+                                                                'valid'
+                                                        ? 'cancelled'
+                                                        : ticket['status'])),
                                             const SizedBox(height: 12),
-                                            if ([
+                                            if (event.eventStatus !=
+                                                    'cancelled' &&
+                                                [
                                                   'valid',
                                                   'checked_in'
                                                 ].contains(ticket['status']) &&
@@ -254,20 +265,26 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                             SelectableText(
                                                 '${l.ticketsCode}: ${ticket['id']}'),
                                             const SizedBox(height: 12),
-                                            if (['valid', 'checked_in']
-                                                .contains(ticket['status']))
+                                            if (event.eventStatus !=
+                                                    'cancelled' &&
+                                                ['valid', 'checked_in']
+                                                    .contains(ticket['status']))
                                               Text(l.ticketQrHelp),
-                                            OutlinedButton.icon(
-                                                onPressed: _exporting != null
-                                                    ? null
-                                                    : () =>
-                                                        _export(ticket['id']),
-                                                icon:
-                                                    const Icon(Icons.ios_share),
-                                                label: Text(
-                                                    _exporting == ticket['id']
-                                                        ? l.commonLoading
-                                                        : l.exportPdf)),
+                                            if (event.eventStatus !=
+                                                    'cancelled' &&
+                                                ['valid', 'checked_in']
+                                                    .contains(ticket['status']))
+                                              OutlinedButton.icon(
+                                                  onPressed: _exporting != null
+                                                      ? null
+                                                      : () =>
+                                                          _export(ticket['id']),
+                                                  icon: const Icon(
+                                                      Icons.ios_share),
+                                                  label: Text(
+                                                      _exporting == ticket['id']
+                                                          ? l.commonLoading
+                                                          : l.exportPdf)),
                                           ])),
                                     if (_tickets.isEmpty &&
                                         _ticketError == null)

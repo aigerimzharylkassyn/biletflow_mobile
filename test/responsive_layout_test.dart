@@ -1,12 +1,23 @@
 import 'package:biletflow_mobile/features/organizer/event_attendees_screen.dart';
 import 'package:biletflow_mobile/features/organizer/event_attendance_screen.dart';
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:biletflow_mobile/features/staff/staff_event_status_badge.dart';
+import 'package:biletflow_mobile/models/staff_event_filter.dart';
+import 'package:biletflow_mobile/app/theme.dart';
 import 'package:biletflow_mobile/features/attendee/checkout_screen.dart';
 import 'package:biletflow_mobile/features/attendee/order_details_screen.dart';
 import 'package:biletflow_mobile/features/profile/account_screens.dart';
 import 'package:biletflow_mobile/features/profile/support_screen.dart';
+import 'package:biletflow_mobile/features/profile/support_staff_dialog.dart';
 import 'package:biletflow_mobile/features/profile/organizer_application_screen.dart';
 import 'package:biletflow_mobile/features/admin/organizer_applications_screen.dart';
+import 'package:biletflow_mobile/features/admin/paid_event_applications_screen.dart';
+import 'paid_event_admin_test.dart' as paid_fixtures;
+import 'package:biletflow_mobile/shared/widgets/paid_event_review_badge.dart';
+import 'package:biletflow_mobile/shared/widgets/event_card.dart';
 import 'package:biletflow_mobile/features/organizer/assign_staff_dialog.dart';
 import 'package:biletflow_mobile/features/staff/staff_shell.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +87,43 @@ final api = ApiClient(client: MockClient((request) async {
       'available_ticket_types': [type],
       'refund_policy':
           'Refunds are available according to the organizer policy. ' * 4,
+    };
+  }
+  if (path.endsWith('/support/cases/case-id/messages') ||
+      path.endsWith('/support/cases/platform-case/messages')) {
+    payload = [
+      {
+        'sender_id': 'attendee-id',
+        'body': 'Please review my refund request for this event.'
+      }
+    ];
+  }
+  if (path.endsWith('/support/cases/platform-case')) {
+    payload = {
+      'id': 'platform-case',
+      'flow': 'organizer_platform',
+      'number': 'BF-12345',
+      'subject': 'A long platform activation support case title',
+      'category': 'activation',
+      'status': 'waiting_for_customer',
+      'event_title': event.title,
+      'can_manage': true,
+      'can_refund': false
+    };
+  }
+  if (path.endsWith('/support/cases/case-id')) {
+    payload = {
+      'id': 'case-id',
+      'subject': 'Refund request for a long event name',
+      'category': 'refund',
+      'status': 'open',
+      'event_title': event.title,
+      'order_id': 'order-id',
+      'order_status': 'confirmed',
+      'refund_policy': 'Full refunds are available before the event starts.',
+      'can_manage': true,
+      'can_refund': true,
+      'order_total_minor': 123456789000
     };
   }
   if (path.endsWith('/attendees')) {
@@ -201,7 +249,37 @@ class LayoutData extends DataService {
   double get totalRevenue => 1234567890123;
 }
 
+void expectTranslatedLabelsFit(WidgetTester tester, Set<String> labels) {
+  for (final element in find.byType(RichText).evaluate()) {
+    final paragraph = element.renderObject as RenderParagraph;
+    final text = paragraph.text.toPlainText();
+    var isActionLabel = false;
+    element.visitAncestorElements((ancestor) {
+      if (ancestor.widget is ButtonStyleButton || ancestor.widget is RawChip) {
+        isActionLabel = true;
+        return false;
+      }
+      return true;
+    });
+    // Buttons and filter chips must show their full action. Editable-field
+    // hints and navigation titles follow their own scrolling/truncation rules.
+    if (isActionLabel && labels.contains(text)) {
+      expect(paragraph.didExceedMaxLines, isFalse,
+          reason: 'Translated label is clipped: $text');
+    }
+  }
+}
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() async {
+    final font = FontLoader('NotoSans');
+    for (final weight in ['Regular', 'Medium', 'SemiBold', 'Bold']) {
+      font.addFont(
+          rootBundle.load('assets/fonts/noto_sans/NotoSans-$weight.ttf'));
+    }
+    await font.load();
+  });
   final screens = <String, Widget Function()>{
     'attendee shell': () => const AttendeeShell(),
     'organizer shell': () => const OrganizerShell(),
@@ -214,6 +292,12 @@ void main() {
     'tickets': () => const MyTicketsScreen(),
     'organizer dashboard': () => const OrganizerDashboardScreen(),
     'organizer events': () => const OrganizerEventsScreen(),
+    'approved organizer event': () => Scaffold(
+            body: ListView(padding: const EdgeInsets.all(20), children: [
+          EventCard(
+              event: event,
+              trailingBadge: const PaidEventReviewBadge(status: 'approved'))
+        ])),
     'create event': () => const CreateEventScreen(),
     'event overview': () => EventOverviewScreen(event: event),
     'event attendees': () => const EventAttendeesScreen(
@@ -221,6 +305,16 @@ void main() {
     'event attendance': () => const EventAttendanceScreen(
         eventId: 'event-id', eventTitle: 'A long event title for attendance'),
     'staff shell': () => const StaffShell(),
+    'staff event statuses': () => Scaffold(
+            body: ListView(padding: const EdgeInsets.all(20), children: [
+          for (final group in StaffEventFilter.values
+              .where((g) => g != StaffEventFilter.all))
+            Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: EventCard(
+                    event: event,
+                    trailingBadge: StaffEventStatusBadge(group: group))),
+        ])),
     'assign staff': () =>
         AssignStaffDialog(event: event, data: LayoutData(LayoutAuth())),
     'check-in': () => CheckinScreen(event: event),
@@ -228,6 +322,9 @@ void main() {
     'admin events': () => const AdminEventsScreen(),
     'admin users': () => const AdminUsersScreen(),
     'admin reports': () => const AdminReportsScreen(),
+    'paid event applications': () => const PaidEventApplicationsScreen(),
+    'paid event review': () =>
+        PaidEventReviewScreen(application: paid_fixtures.paidApplication()),
     'checkout': () => CheckoutScreen(event: event, items: const [
           {'ticket_type_id': 'type-id', 'quantity': 2}
         ], types: const []),
@@ -235,6 +332,17 @@ void main() {
     'edit profile': () => const EditProfileScreen(),
     'notifications': () => const NotificationsScreen(),
     'support': () => const SupportScreen(),
+    'platform support request': () => const SupportScreen(
+        flow: 'organizer_platform', view: 'mine', startNew: true),
+    'platform support conversation': () => const SupportScreen(
+        caseId: 'platform-case', flow: 'organizer_platform', view: 'inbox'),
+    'authorize support staff': () => const Scaffold(body: SupportStaffDialog()),
+    'refund request': () => const SupportScreen(
+        startNew: true,
+        initialCategory: 'refund',
+        eventId: 'event-id',
+        orderId: 'order-id'),
+    'refund approval': () => const SupportScreen(caseId: 'case-id'),
     'FAQ': () => const HelpScreen(),
     'organizer FAQ': () => ChangeNotifierProvider<AuthService>(
         create: (_) => LayoutAuth(role: UserRole.organizer),
@@ -244,6 +352,13 @@ void main() {
     'admin applications': () => const OrganizerApplicationsScreen(),
   };
   for (final locale in ['en', 'ru', 'kk']) {
+    final labels =
+        (jsonDecode(File('lib/l10n/app_$locale.arb').readAsStringSync())
+                as Map<String, dynamic>)
+            .entries
+            .where((e) => !e.key.startsWith('@') && e.value is String)
+            .map((e) => e.value as String)
+            .toSet();
     for (final config in [
       (size: const Size(800, 1024), scale: 1.5, keyboard: 0.0),
       (size: const Size(320, 568), scale: 1.0, keyboard: 0.0),
@@ -271,17 +386,7 @@ void main() {
                 locale: Locale(locale),
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
                 supportedLocales: AppLocalizations.supportedLocales,
-                theme: ThemeData(
-                    elevatedButtonTheme: ElevatedButtonThemeData(
-                        style: ElevatedButton.styleFrom(
-                            minimumSize: const Size.fromHeight(50),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 14))),
-                    outlinedButtonTheme: OutlinedButtonThemeData(
-                        style: OutlinedButton.styleFrom(
-                            minimumSize: const Size.fromHeight(50),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 14)))),
+                theme: AppTheme.light,
                 builder: (context, child) => MediaQuery(
                     data: MediaQuery.of(context)
                         .copyWith(textScaler: TextScaler.linear(config.scale)),
@@ -290,12 +395,14 @@ void main() {
               )));
           await tester.pumpAndSettle();
           expect(tester.takeException(), isNull);
+          expectTranslatedLabelsFit(tester, labels);
           // Inspect content further down each scrollable page as well.
           final scroll = find.byType(Scrollable);
           if (scroll.evaluate().isNotEmpty) {
             await tester.drag(scroll.first, const Offset(0, -900));
             await tester.pumpAndSettle();
             expect(tester.takeException(), isNull);
+            expectTranslatedLabelsFit(tester, labels);
           }
         });
       }

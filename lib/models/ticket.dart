@@ -31,5 +31,6 @@ class AppTicket {
     required this.holderName,
   });
   bool get canShowQr =>
-      admissionStatus == 'valid' || admissionStatus == 'checked_in';
+      event.eventStatus != 'cancelled' &&
+      (admissionStatus == 'valid' || admissionStatus == 'checked_in');
 }

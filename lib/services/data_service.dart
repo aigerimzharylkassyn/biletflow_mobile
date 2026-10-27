@@ -105,7 +105,8 @@ class DataService extends ChangeNotifier {
               id: row['id'],
               event: event,
               ticketCode: row['qr_credential'],
-              status: row['status'] == 'valid' &&
+              status: event.eventStatus != 'cancelled' &&
+                      row['status'] == 'valid' &&
                       (event.endsAt ?? event.date).isAfter(DateTime.now())
                   ? TicketStatus.upcoming
                   : TicketStatus.past,
@@ -230,6 +231,28 @@ class DataService extends ChangeNotifier {
         {'ticket_type_id': typeId, 'quantity': 1}
       ],
     }));
+  }
+
+  Future<AppEvent> unpublishEvent(String eventId) async {
+    final result = await api.request('POST', '/events/$eventId/unpublish');
+    final updated = AppEvent.fromJson(Map<String, dynamic>.from(result));
+    _events = [
+      for (final event in _events)
+        if (event.id == eventId) updated else event
+    ];
+    notifyListeners();
+    return updated;
+  }
+
+  Future<AppEvent> cancelEvent(String eventId) async {
+    final result = await api.request('POST', '/events/$eventId/cancel');
+    final cancelled = AppEvent.fromJson(Map<String, dynamic>.from(result));
+    _events = [
+      for (final event in _events)
+        if (event.id == eventId) cancelled else event
+    ];
+    notifyListeners();
+    return cancelled;
   }
 
   Future<void> cancelCheckout(String orderId) async {

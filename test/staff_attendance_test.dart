@@ -144,7 +144,7 @@ void main() {
     expect(tester.widget<FilledButton>(action).onPressed, isNotNull);
   });
   testWidgets(
-      'staff navigation has Events, Check-in and Profile and opens assigned event',
+      'staff navigation has Events, Check-in, Inbox and Profile and opens assigned event',
       (tester) async {
     tester.view.physicalSize = const Size(900, 1500);
     tester.view.devicePixelRatio = 1;
@@ -163,7 +163,8 @@ void main() {
     await tester.pumpAndSettle();
     final bar =
         tester.widget<BottomNavigationBar>(find.byType(BottomNavigationBar));
-    expect(bar.items.map((i) => i.label), ['Events', 'Check-in', 'Profile']);
+    expect(bar.items.map((i) => i.label),
+        ['Events', 'Check-in', 'Inbox', 'Profile']);
     await tester.tap(find.text(events.eventJson['title'] as String).first);
     await tester.pumpAndSettle();
     expect(find.byType(EventAttendanceScreen), findsOneWidget);

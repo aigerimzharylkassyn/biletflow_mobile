@@ -6,6 +6,7 @@ import '../../models/staff_event_filter.dart';
 import '../../services/data_service.dart';
 import '../../shared/widgets/event_card.dart';
 import '../../shared/widgets/category_chip.dart';
+import 'staff_event_status_badge.dart';
 import '../organizer/event_attendance_screen.dart';
 
 class StaffEventsScreen extends StatefulWidget {
@@ -104,15 +105,8 @@ class _StaffEventsScreenState extends State<StaffEventsScreen> {
                                 padding: const EdgeInsets.only(bottom: 16),
                                 child: EventCard(
                                     event: event,
-                                    trailingBadge: Text(labels[group]!,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color:
-                                                group == StaffEventFilter.live
-                                                    ? const Color(0xFF176B3A)
-                                                    : Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurfaceVariant)),
+                                    trailingBadge:
+                                        StaffEventStatusBadge(group: group),
                                     onTap: () => Navigator.push(
                                         context,
                                         MaterialPageRoute(

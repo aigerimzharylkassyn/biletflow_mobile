@@ -144,9 +144,13 @@ FastAPI server; exercise the app against your backend to validate the full flows
 ## Current limitations
 
 - Payment completion is simulated; real payment processing is not integrated.
-- Paid events require a written refund policy; free-event policies are optional.
-- Attendee refund requests and organizer platform conversations use separate scoped support queues. Refunds remain simulated.
 - Paid events require a completed activation checklist and manual Platform Admin approval before publication and paid checkout.
+- Paid events require a written refund policy; it is optional for free events.
+- Attendees can request a full-order refund or contact the organizer from their tickets.
+  The organizer inbox supports search and status, event and category filters.
+  Approval completes a simulated refund, invalidates all order tickets, notifies the
+  attendee and solves the linked refund case in both views. Ticket-scanning permissions do not grant support. Explicit support staff can handle
+  scoped cases but cannot issue refunds. Real payment-provider refunds are not integrated.
 - Camera scanning, manual credential entry and attendee search are available for check-in.
   Organizers and assigned staff can admit a valid ticket or reverse an active check-in.
   Attendance statistics count valid and checked-in tickets, excluding cancelled/refunded tickets.
@@ -162,10 +166,9 @@ FastAPI server; exercise the app against your backend to validate the full flows
   from My Events; saved ticket types are read-only.
 - Official terms/privacy documents have not been supplied; their screens explain
   how to request the current official documents through support.
-- The local backend currently lacks standalone promo quotes and order-to-ticket
-  links in ticket responses. Promo codes are validated during reservation when
-  quoting returns 404/405. My Tickets remains available independently of orders;
-  booking details never guess which tickets belong to an order.
+- The local backend currently lacks standalone promo quotes. Promo codes are
+  validated during reservation when quoting returns 404/405. Ticket responses now
+  include order IDs so booking details can display the correct tickets.
 - Checkout sends stable Idempotency-Key headers on retries, but duplicate-request
   guarantees require backend enforcement of those keys.
 - Suspended accounts cannot be reactivated through the app because the API has no
@@ -177,49 +180,6 @@ Commit source code, platform project files, and `pubspec.lock`. Generated build
 files, local environment files, and signing credentials should stay out of Git.
 If configuration examples are needed, use `.env.example` with placeholder values.
 The app reads `API_BASE_URL` through `--dart-define`; it does not load `.env` files.
-
-### Paid event applications and admin navigation
-
-Organizers complete event details and tickets, record the simulated activation fee,
-and submit for review. The event stays in draft with publishing disabled until a
-Platform Admin approves it. Rejection includes a reason; corrections can be
-resubmitted without paying the fee again. Material changes require a new review.
-Approval and rejection generate in-app notifications; approval does not publish.
-
-Admin navigation is Dashboard / Applications / Events / Inbox / Profile.
-Applications contains paid-event reviews; user management and organizer-role
-applications are available through Dashboard buttons. Events has lifecycle and
-category filters, organizer/title search, and global database statistics.
-Existing events can be moved back to draft through Edit event before resubmission.
-Previously unreviewed paid events must complete review before new paid checkout.
-
-### Sample paid-event applications
-
-Sign in as `admin.demo@example.com` and open Applications. Five `[Demo]` samples
-are available: Evening Jazz and Tech Forum (awaiting review), Food and Craft
-Market (approved, still a draft), Stand-up Comedy Night (rejected with a reason),
-and Contemporary Art Workshop (changes require review).
-
-Use `paid.organizer.demo@example.com` to inspect the organizer side and try
-publishing or resubmitting these drafts. Both demo accounts use `DemoPass123!`.
-The dedicated organizer has simulated profile/payout data and recorded demo fees;
-no real payment or verification is involved. Existing account passwords are preserved.
-
-To add these samples to another local backend database, run
-`python -m app.dev_paid_event_seed` in the backend environment. Repeated runs
-preserve decisions and edits instead of duplicating or resetting applications.
-
-### Finding paid-event review decisions
-
-My Events displays the paid-review state on draft cards: Awaiting review,
-Approved / ready to publish, Rejected, Needs resubmission, or Not submitted.
-Opening a submitted draft takes the organizer directly to the Review step.
-Publishing remains disabled until the current backend checklist confirms approval.
-
-Profile → Notifications includes Open event for paid-event review decisions.
-The link checks the event's current state: drafts open at Review, while published
-or cancelled events open their details. Missing/inaccessible events show an error;
-opening a notification never publishes or resubmits an event automatically.
 
 ## Support queues
 
@@ -264,3 +224,56 @@ It does not execute refunds or change ticket/payment states. To try assignment,
 open the refund case as organizer and assign Demo Check-in Staff. Sign in as staff
 and open Inbox; the active inbox refreshes within 30 seconds, or tap Refresh.
 Reply as staff, then sign in as attendee and open the same conversation.
+
+### Event cancellation
+
+Organizer cancellation stops sales, cancels unused tickets, and creates one in-app
+cancellation notification per attendee. Check-in and ticket admission exports are
+blocked for cancelled events, including older tickets whose saved status is valid.
+Checked-in/refunded records are retained. Reversing an earlier check-in on a
+cancelled event leaves its ticket cancelled. Pending checkout cannot issue tickets
+after cancellation. Cancellation does not execute refunds: paid orders remain
+available for a separate full refund through orders or refund support cases.
+
+### Paid event applications and admin navigation
+
+Organizers complete event details and tickets, record the simulated activation fee,
+and submit for review. The event stays in draft with publishing disabled until a
+Platform Admin approves it. Rejection includes a reason; corrections can be
+resubmitted without paying the fee again. Material changes require a new review.
+Approval and rejection generate in-app notifications; approval does not publish.
+
+Admin navigation is Dashboard / Applications / Events / Inbox / Profile.
+Applications contains paid-event reviews; user management and organizer-role
+applications are available through Dashboard buttons. Events has lifecycle and
+category filters, organizer/title search, and global database statistics.
+Existing events can be moved back to draft through Edit event before resubmission.
+Previously unreviewed paid events must complete review before new paid checkout.
+
+### Sample paid-event applications
+
+Sign in as `admin.demo@example.com` and open Applications. Five `[Demo]` samples
+are available: Evening Jazz and Tech Forum (awaiting review), Food and Craft
+Market (approved, still a draft), Stand-up Comedy Night (rejected with a reason),
+and Contemporary Art Workshop (changes require review).
+
+Use `paid.organizer.demo@example.com` to inspect the organizer side and try
+publishing or resubmitting these drafts. Both demo accounts use `DemoPass123!`.
+The dedicated organizer has simulated profile/payout data and recorded demo fees;
+no real payment or verification is involved. Existing account passwords are preserved.
+
+To add these samples to another local backend database, run
+`python -m app.dev_paid_event_seed` in the backend environment. Repeated runs
+preserve decisions and edits instead of duplicating or resetting applications.
+
+### Finding paid-event review decisions
+
+My Events displays the paid-review state on draft cards: Awaiting review,
+Approved / ready to publish, Rejected, Needs resubmission, or Not submitted.
+Opening a submitted draft takes the organizer directly to the Review step.
+Publishing remains disabled until the current backend checklist confirms approval.
+
+Profile → Notifications includes Open event for paid-event review decisions.
+The link checks the event's current state: drafts open at Review, while published
+or cancelled events open their details. Missing/inaccessible events show an error;
+opening a notification never publishes or resubmits an event automatically.

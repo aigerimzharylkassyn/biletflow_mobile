@@ -182,3 +182,23 @@ Future<void> exportTicket(ApiClient api, String ticketId) async {
   await Printing.sharePdf(
       bytes: bytes, filename: 'biletflow-ticket-$ticketId.pdf');
 }
+
+class CancelledEventNotice extends StatelessWidget {
+  const CancelledEventNotice({super.key});
+  @override
+  Widget build(BuildContext context) => Container(
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.errorContainer,
+          borderRadius: BorderRadius.circular(12)),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Icon(Icons.event_busy_outlined,
+            color: Theme.of(context).colorScheme.onErrorContainer),
+        const SizedBox(width: 12),
+        Expanded(
+            child: Text(context.l10n.attendeeCancelledEventHelp,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer))),
+      ]));
+}

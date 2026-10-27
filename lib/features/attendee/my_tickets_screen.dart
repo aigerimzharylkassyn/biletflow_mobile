@@ -139,8 +139,14 @@ class _TicketList extends StatelessWidget {
                       children: [
                         Align(
                             alignment: Alignment.centerLeft,
-                            child: StatusBadge(ticket.admissionStatus)),
+                            child: StatusBadge(
+                                ticket.event.eventStatus == 'cancelled' &&
+                                        ticket.admissionStatus == 'valid'
+                                    ? 'cancelled'
+                                    : ticket.admissionStatus)),
                         const SizedBox(height: 6),
+                        if (ticket.event.eventStatus == 'cancelled')
+                          const CancelledEventNotice(),
                         TicketCard(ticket: ticket),
                         const SizedBox(height: 12),
                         TicketSupportActions(
