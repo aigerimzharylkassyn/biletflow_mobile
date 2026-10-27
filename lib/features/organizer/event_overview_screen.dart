@@ -20,6 +20,8 @@ import 'assign_staff_dialog.dart';
 import 'event_attendance_screen.dart';
 import 'create_event_screen.dart';
 import 'event_information_widgets.dart';
+import 'ticket_inventory_screen.dart';
+import '../operations/invitations_screen.dart';
 
 class EventOverviewScreen extends StatefulWidget {
   final AppEvent event;
@@ -253,6 +255,32 @@ class _EventOverviewScreenState extends State<EventOverviewScreen> {
                                 icon: Icons.groups_outlined,
                                 onPressed: () => _showAttendees(context),
                               ),
+                              if (currentUser?.isOrganizer == true ||
+                                  currentUser?.isAdmin == true) ...[
+                                const SizedBox(height: 12),
+                                OutlinedAppButton(
+                                    label: l10n.opsTickets,
+                                    icon: Icons.confirmation_number_outlined,
+                                    onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                TicketInventoryScreen(
+                                                    eventId: event.id,
+                                                    title: event.title)))),
+                                if (event.visibility == 'private') ...[
+                                  const SizedBox(height: 12),
+                                  OutlinedAppButton(
+                                      label: l10n.opsInvitations,
+                                      icon: Icons.lock_outline,
+                                      onPressed: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) => InvitationsScreen(
+                                                  eventId: event.id,
+                                                  title: event.title)))),
+                                ],
+                              ],
                               if (currentUser?.isOrganizer == true ||
                                   currentUser?.isAdmin == true) ...[
                                 const SizedBox(height: 12),

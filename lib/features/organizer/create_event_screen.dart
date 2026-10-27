@@ -146,7 +146,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           child: TextFormField(
               key: ValueKey('detail-$key-0'),
               initialValue: _details.fields[key],
-              enabled: !_busy && !(venue && _session.saved != null),
+              enabled: !_busy,
               decoration: InputDecoration(
                 labelText: label,
                 helperText: keyboard == null

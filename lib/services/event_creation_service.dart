@@ -33,8 +33,7 @@ class EventCreationService {
     for (final type in row['available_ticket_types'] as List? ?? []) {
       final ticket = TicketDraft(details)
         ..load(Map<String, dynamic>.from(type));
-      ticket.editableSaved = row['is_duplicate'] == true &&
-          (type['sold_count'] ?? 0) == 0 &&
+      ticket.editableSaved = (type['sold_count'] ?? 0) == 0 &&
           (type['reserved_count'] ?? 0) == 0 &&
           (type['refunded_count'] ?? 0) == 0;
       tickets.add(ticket);
@@ -48,7 +47,6 @@ class EventCreationService {
           body: body, idempotencyKey: _key('event', body)));
     } else {
       final update = Map<String, dynamic>.from(body)
-        ..remove('venue')
         ..remove('time_zone')
         ..remove('admission_type');
       saved = Map<String, dynamic>.from(

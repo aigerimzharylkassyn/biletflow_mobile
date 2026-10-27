@@ -10,6 +10,8 @@ import '../../shared/widgets/stat_card.dart';
 import '../../shared/widgets/event_status_badge.dart';
 import '../attendee/attendee_ui.dart';
 import 'event_attendees_screen.dart';
+import 'ticket_inventory_screen.dart';
+import '../operations/invitations_screen.dart';
 import 'management_confirmation.dart';
 
 class EventManagementScreen extends StatefulWidget {
@@ -287,6 +289,30 @@ class _EventManagementScreenState extends State<EventManagementScreen> {
                                               eventTitle: widget.title))),
                                   icon: const Icon(Icons.receipt_long_outlined),
                                   label: Text(l.managementOrders)),
+                              const SizedBox(height: 12),
+                              OutlinedButton.icon(
+                                  onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => TicketInventoryScreen(
+                                              eventId: widget.eventId,
+                                              title: widget.title))),
+                                  icon: const Icon(
+                                      Icons.confirmation_number_outlined),
+                                  label: Text(l.opsTickets)),
+                              if (events.isNotEmpty &&
+                                  events.first.visibility == 'private') ...[
+                                const SizedBox(height: 12),
+                                OutlinedButton.icon(
+                                    onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => InvitationsScreen(
+                                                eventId: widget.eventId,
+                                                title: widget.title))),
+                                    icon: const Icon(Icons.lock_outline),
+                                    label: Text(l.opsInvitations)),
+                              ],
                               const SizedBox(height: 16),
                             ],
                             Wrap(spacing: 8, runSpacing: 8, children: [

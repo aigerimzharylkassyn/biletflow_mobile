@@ -231,7 +231,7 @@ void main() {
     expect(created, hasLength(3));
   });
   testWidgets(
-      'saved draft resumes into configurable ticket step and retains venue',
+      'saved draft resumes with editable venue and configurable ticket step',
       (tester) async {
     final details = EventDraft();
     fill(details);
@@ -266,7 +266,7 @@ void main() {
 
     final venue = tester
         .widget<TextFormField>(find.byKey(const ValueKey('detail-venue-0')));
-    expect(venue.enabled, isFalse);
+    expect(venue.enabled, isTrue);
     final save = find.text('Save details & continue');
     await tester.scrollUntilVisible(save, 400,
         scrollable: find.byType(Scrollable).first);
@@ -280,7 +280,7 @@ void main() {
             .where((r) => r.method == 'POST' && r.url.path.endsWith('/events')),
         isEmpty);
     final patch = requests.firstWhere((r) => r.method == 'PATCH');
-    expect(jsonDecode(patch.body).containsKey('venue'), isFalse);
+    expect(jsonDecode(patch.body)['venue'], details.body()['venue']);
     await tester.scrollUntilVisible(find.text('Save tickets & continue'), 400,
         scrollable: find.byType(Scrollable).first);
     await tester.pumpAndSettle();

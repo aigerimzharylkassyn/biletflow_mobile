@@ -10,6 +10,7 @@ import '../../shared/widgets/category_chip.dart';
 import '../../shared/widgets/error_message.dart';
 import '../../shared/widgets/event_card.dart';
 import 'event_details_screen.dart';
+import '../operations/invitations_screen.dart';
 
 class AttendeeEventsScreen extends StatefulWidget {
   final EventCategory? initialCategory;
@@ -65,7 +66,13 @@ class _AttendeeEventsScreenState extends State<AttendeeEventsScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navEvents)),
+      appBar: AppBar(title: Text(l10n.navEvents), actions: [
+        IconButton(
+            tooltip: l10n.opsPrivateEvents,
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const InvitedEventsScreen())),
+            icon: const Icon(Icons.key_outlined))
+      ]),
       body: RefreshIndicator(
           onRefresh: data.refresh,
           child: CustomScrollView(

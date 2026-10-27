@@ -8,6 +8,7 @@ import '../../models/user.dart';
 import 'organizer_application_screen.dart';
 import 'account_screens.dart';
 import 'support_screen.dart';
+import '../operations/invitations_screen.dart';
 import '../auth/email_auth_screen.dart';
 import '../../shared/widgets/app_avatar.dart';
 import '../../shared/widgets/language_selector.dart';
@@ -102,6 +103,16 @@ class ProfileScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const NotificationsScreen())),
           ),
           const Divider(),
+          if (user?.role == UserRole.attendee) ...[
+            _ProfileRow(
+                icon: Icons.key_outlined,
+                label: l10n.opsPrivateEvents,
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const InvitedEventsScreen()))),
+            const Divider(),
+          ],
           const LanguageSettingsRow(),
           const Divider(),
           if (user?.role == UserRole.attendee ||
