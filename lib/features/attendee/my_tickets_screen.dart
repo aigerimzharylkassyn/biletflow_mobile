@@ -7,6 +7,7 @@ import '../../shared/widgets/ticket_card.dart';
 import 'attendee_ui.dart';
 import 'attendee_events_screen.dart';
 import 'order_details_screen.dart';
+import 'ticket_support_actions.dart';
 
 class MyTicketsScreen extends StatelessWidget {
   const MyTicketsScreen({super.key});
@@ -141,6 +142,13 @@ class _TicketList extends StatelessWidget {
                             child: StatusBadge(ticket.admissionStatus)),
                         const SizedBox(height: 6),
                         TicketCard(ticket: ticket),
+                        const SizedBox(height: 12),
+                        TicketSupportActions(
+                            eventId: ticket.event.id,
+                            title: ticket.event.title,
+                            orderId: ticket.orderId,
+                            ticketId: ticket.id,
+                            canRequestRefund: ticket.canRequestRefund),
                         if (ticket.orderId != null)
                           TextButton(
                               onPressed: () => Navigator.push(

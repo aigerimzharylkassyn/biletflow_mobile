@@ -24,7 +24,22 @@ class ProfileScreen extends StatelessWidget {
     final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navProfile)),
+      appBar: AppBar(title: Text(l10n.navProfile), actions: [
+        if (user?.role == UserRole.staff)
+          IconButton(
+              tooltip: l10n.refreshStatus,
+              icon: const Icon(Icons.refresh),
+              onPressed: () async {
+                try {
+                  await context.read<AuthService>().refreshUser();
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(e.toString())));
+                  }
+                }
+              }),
+      ]),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -91,13 +106,25 @@ class ProfileScreen extends StatelessWidget {
             ),
             const Divider(),
           ],
-          _ProfileRow(
-            icon: Icons.mail_outline_rounded,
-            label: l10n.profileContactUs,
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const SupportScreen())),
-          ),
-          const Divider(),
+          if (user?.role != UserRole.admin) ...[
+            _ProfileRow(
+              icon: Icons.chat_bubble_outline_rounded,
+              label: user?.role == UserRole.organizer ||
+                      user?.role == UserRole.staff
+                  ? l10n.supportContactPlatform
+                  : l10n.profileContactUs,
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => SupportScreen(
+                          flow: user?.role == UserRole.organizer ||
+                                  user?.role == UserRole.staff
+                              ? 'organizer_platform'
+                              : 'attendee',
+                          view: 'mine'))),
+            ),
+            const Divider(),
+          ],
           _ProfileRow(
             icon: Icons.logout_rounded,
             label: l10n.profileSignOut,

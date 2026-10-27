@@ -144,6 +144,8 @@ FastAPI server; exercise the app against your backend to validate the full flows
 ## Current limitations
 
 - Payment completion is simulated; real payment processing is not integrated.
+- Paid events require a written refund policy; free-event policies are optional.
+- Attendee refund requests and organizer platform conversations use separate scoped support queues. Refunds remain simulated.
 - Paid events require a completed activation checklist and manual Platform Admin approval before publication and paid checkout.
 - Camera scanning, manual credential entry and attendee search are available for check-in.
   Organizers and assigned staff can admit a valid ticket or reverse an active check-in.
@@ -218,3 +220,47 @@ Profile → Notifications includes Open event for paid-event review decisions.
 The link checks the event's current state: drafts open at Review, while published
 or cancelled events open their details. Missing/inaccessible events show an error;
 opening a notification never publishes or resubmits an event automatically.
+
+## Support queues
+
+Attendee support and platform support are separate queues. Organizer and staff
+Inbox tabs contain attendee cases only. Contact Platform Admin is available from
+their Profile pages; admins have a distinct platform inbox.
+Organizers grant event support access through Authorize support staff, then assign
+a case using its assignee selector. Staff inboxes show their assigned cases and
+refresh every 30 seconds while active, including refreshed support permissions.
+Staff can contact Platform Admin without attendee-support permission.
+Customers can view their own conversations, while handlers filter and assign cases
+within their authorized scope. Profile refresh/sign-in reloads granted capabilities.
+Attendee New chat requires an explicit destination: an event/owned booking routes
+its context to the event organizer; General app/account help routes to Platform Admin.
+The admin platform inbox includes general attendee requests alongside organizer/staff
+platform cases. Event-specific attendee cases remain in organizer/staff inboxes.
+Case status, order status and refund execution are displayed separately.
+
+The backend includes an additive support-schema migration and API documentation in
+`biletflow/docs/SUPPORT_FLOWS.md`. Notifications are in-app; email delivery is not
+implemented. Support screens poll while active and stop in inactive tabs/background.
+
+### Sample support conversations
+
+The local demo accounts each use `DemoPass123!`. From the backend directory, run
+`python -m app.dev_support_seed` (using its virtual environment) to add these
+samples. Run `python -m app.dev_seed` first only if demo accounts are missing.
+The support seed preserves existing conversations and adds no duplicates on reruns.
+
+| Sign in as | Where to open | Sample conversations |
+|---|---|---|
+| `attendee.demo@example.com` | Profile → Contact Us | Refund review (Open), missing ticket email (In Progress), accessible entrance (Waiting for Customer), ticket download (Resolved) |
+| `organizer.demo@example.com` | Inbox | All four attendee cases; open a case to reply, assign staff, or update status |
+| `staff.demo@example.com` | Inbox | Three assigned cases: ticket email, accessible entrance, and resolved download |
+| `organizer.demo@example.com` | Profile → Contact Platform Admin | Demonstration payment report question |
+| `staff.demo@example.com` | Profile → Contact Platform Admin | Camera permission help |
+| `admin.demo@example.com` | Platform support inbox | Organizer payment and staff camera conversations |
+
+All sample subjects begin with `[Demo]`. The support seed grants the demo staff
+member support access for the linked event, preserving existing permissions.
+It does not execute refunds or change ticket/payment states. To try assignment,
+open the refund case as organizer and assign Demo Check-in Staff. Sign in as staff
+and open Inbox; the active inbox refreshes within 30 seconds, or tap Refresh.
+Reply as staff, then sign in as attendee and open the same conversation.

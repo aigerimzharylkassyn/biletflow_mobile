@@ -112,6 +112,7 @@ class DataService extends ChangeNotifier {
               holderName: row['attendee_name'],
               admissionStatus: row['status'],
               orderId: row['order_id'],
+              canRequestRefund: row['can_request_refund'] == true,
               ticketTypeId: row['ticket_type_id'],
               seat: row['seat'],
               section: row['section'],

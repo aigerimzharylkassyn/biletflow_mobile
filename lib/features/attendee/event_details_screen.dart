@@ -8,6 +8,7 @@ import '../../services/data_service.dart';
 import '../../services/api_client.dart';
 import 'attendee_ui.dart';
 import 'checkout_screen.dart';
+import 'ticket_support_actions.dart';
 
 int ticketLimit(AppEvent event, Map<String, dynamic> type, {DateTime? now}) {
   final clock = (now ?? DateTime.now()).toUtc();
@@ -218,6 +219,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                               const Divider(height: 32),
                               Text(
                                   '${l.eventOrganizer}\n${event.organizerName}'),
+                              const SizedBox(height: 12),
+                              TicketSupportActions(
+                                  eventId: event.id, title: event.title),
                             ]),
                             const SizedBox(height: 16),
                             AttendeePanel(children: [

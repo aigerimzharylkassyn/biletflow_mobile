@@ -4,6 +4,7 @@ enum TicketStatus { upcoming, past }
 
 class AppTicket {
   final String id;
+  final bool canRequestRefund;
   final String admissionStatus;
   final String? orderId;
   final String? ticketTypeId;
@@ -17,6 +18,7 @@ class AppTicket {
 
   const AppTicket({
     required this.id,
+    this.canRequestRefund = false,
     this.admissionStatus = 'valid',
     this.orderId,
     this.ticketTypeId,

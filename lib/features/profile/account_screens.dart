@@ -7,6 +7,7 @@ import '../../models/event.dart';
 import '../../services/api_client.dart';
 import '../organizer/create_event_screen.dart';
 import '../organizer/event_overview_screen.dart';
+import 'support_screen.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -231,12 +232,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                               .titleMedium),
                                       const SizedBox(height: 8),
                                       Text(row['message']),
+                                      if (row['data'] is Map &&
+                                          row['data']['case_id'] != null)
+                                        TextButton(
+                                            onPressed: () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        SupportScreen(
+                                                            caseId: row['data']
+                                                                ['case_id'],
+                                                            flow: row['data']
+                                                                    ['flow'] ??
+                                                                'attendee'))),
+                                            child: Text(l.supportOpenCase)),
                                       if (row['kind'] == 'paid_event_review' &&
                                           row['data'] is Map &&
                                           row['data']['event_id'] != null &&
                                           context
                                                   .read<AuthService>()
-                                                  .currentUser?.role == UserRole.organizer)
+                                                  .currentUser
+                                                  ?.isOrganizer ==
+                                              true)
                                         TextButton.icon(
                                             onPressed: _busy != null
                                                 ? null

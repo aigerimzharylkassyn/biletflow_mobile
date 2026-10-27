@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../shared/widgets/role_shell.dart';
 import '../profile/profile_screen.dart';
+import '../profile/support_screen.dart';
 import 'admin_dashboard_screen.dart';
 import 'admin_events_screen.dart';
 import 'paid_event_applications_screen.dart';
 
-/// Admin bottom nav: Dashboard | Applications | Events | Profile.
+/// Admin bottom nav: Dashboard | Applications | Events | Inbox | Profile.
 class AdminShell extends StatelessWidget {
   const AdminShell({super.key});
 
@@ -34,6 +35,12 @@ class AdminShell extends StatelessWidget {
           activeIcon: Icons.event_rounded,
           screen: const AdminEventsScreen(),
         ),
+        RoleNavItem(
+            label: l10n.navSupportInbox,
+            icon: Icons.inbox_outlined,
+            activeIcon: Icons.inbox,
+            screen:
+                const SupportScreen(flow: 'organizer_platform', view: 'inbox')),
         RoleNavItem(
           label: l10n.navProfile,
           icon: Icons.person_outline_rounded,

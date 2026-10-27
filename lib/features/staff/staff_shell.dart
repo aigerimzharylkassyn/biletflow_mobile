@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../profile/support_screen.dart';
 
 import '../../l10n/loc_extensions.dart';
 import '../../shared/widgets/role_shell.dart';
@@ -26,6 +27,11 @@ class StaffShell extends StatelessWidget {
           activeIcon: Icons.qr_code_scanner_rounded,
           screen: const CheckinScreen(),
         ),
+        RoleNavItem(
+            label: l10n.navSupportInbox,
+            icon: Icons.inbox_outlined,
+            activeIcon: Icons.inbox,
+            screen: const SupportScreen(flow: 'attendee', view: 'inbox')),
         RoleNavItem(
           label: l10n.navProfile,
           icon: Icons.person_outline_rounded,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../features/attendee/ticket_support_actions.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -28,9 +29,19 @@ class TicketCard extends StatelessWidget {
             : onTap ??
                 () => showDialog<void>(
                     context: context,
-                    builder: (_) => AlertDialog(
+                    builder: (dialogContext) => AlertDialog(
                           scrollable: true,
                           title: Text(ticket.event.title),
+                          actions: [
+                            TicketSupportActions(
+                                eventId: ticket.event.id,
+                                title: ticket.event.title,
+                                orderId: ticket.orderId,
+                                ticketId: ticket.id,
+                                canRequestRefund: ticket.canRequestRefund,
+                                beforeOpen: () =>
+                                    Navigator.of(dialogContext).pop())
+                          ],
                           content: SingleChildScrollView(
                               child: SizedBox(
                                   width: 300,

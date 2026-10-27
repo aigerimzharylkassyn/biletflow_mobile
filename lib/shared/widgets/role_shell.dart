@@ -35,6 +35,8 @@ class _RoleShellState extends State<RoleShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Support capabilities can change while the profile tab is selected.
+    if (_index >= widget.items.length) _index = widget.items.length - 1;
     final data = context.watch<DataService>();
     if (!context.watch<AuthService>().isAuthenticated) {
       return Scaffold(
@@ -63,7 +65,11 @@ class _RoleShellState extends State<RoleShell> {
                 Expanded(
                     child: IndexedStack(
                   index: _index,
-                  children: widget.items.map((item) => item.screen).toList(),
+                  children: [
+                    for (var i = 0; i < widget.items.length; i++)
+                      TickerMode(
+                          enabled: i == _index, child: widget.items[i].screen)
+                  ],
                 )),
               ])),
       bottomNavigationBar: BottomNavigationBar(

@@ -7,7 +7,7 @@ import '../../models/event.dart';
 import '../../services/data_service.dart';
 import 'attendee_ui.dart';
 import 'my_tickets_screen.dart';
-import '../profile/support_screen.dart';
+import 'ticket_support_actions.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
   const OrderDetailsScreen({super.key, required this.orderId});
@@ -187,15 +187,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         Text(l.demoPaymentHelp),
                                     ]),
                                     const SizedBox(height: 24),
-                                    OutlinedButton.icon(
-                                        onPressed: () => Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (_) => SupportScreen(
-                                                    eventId: event.id,
-                                                    orderId: widget.orderId))),
-                                        icon: const Icon(Icons.support_agent),
-                                        label: Text(l.profileContactUs)),
+                                    TicketSupportActions(
+                                        eventId: event.id,
+                                        title: event.title,
+                                        orderId: widget.orderId,
+                                        canRequestRefund: order['status'] ==
+                                                'confirmed' &&
+                                            (order['total_minor'] as num) > 0),
+                                    const SizedBox(height: 20),
                                     Text(l.digitalTickets,
                                         style: Theme.of(context)
                                             .textTheme
