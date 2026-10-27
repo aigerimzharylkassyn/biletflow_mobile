@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../organizer/event_management_screen.dart';
 import 'package:provider/provider.dart';
 import '../../app/theme.dart';
 import '../../l10n/loc_extensions.dart';
@@ -60,6 +61,7 @@ class _AdminEventsScreenState extends State<AdminEventsScreen> {
     final all = data.events;
     final now = DateTime.now();
     final labels = {
+      OrganizerEventFilter.suspended: l.managementSuspended,
       OrganizerEventFilter.all: l.organizerEventsAll,
       OrganizerEventFilter.draft: l.eventStatusDraft,
       OrganizerEventFilter.upcoming: l.organizerEventsUpcoming,
@@ -175,35 +177,10 @@ class _AdminEventsScreenState extends State<AdminEventsScreen> {
   }
 
   void _showEventStats(BuildContext context, AppEvent event) {
-    final l = context.l10n;
-    final revenue = context.read<DataService>().eventRevenue(event.id);
-    showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: AppColors.surface,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-        builder: (_) => SafeArea(
-            child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(event.title,
-                          style: Theme.of(context).textTheme.titleLarge),
-                      const SizedBox(height: 12),
-                      EventStatusBadge(status: event.eventStatus),
-                      const SizedBox(height: 12),
-                      Text('${l.eventOrganizer}: ${event.organizerName}'),
-                      Text(event.category.localizedLabel(l)),
-                      Text(event.description),
-                      const SizedBox(height: 12),
-                      Text('${event.venue} · ${event.city}'),
-                      Text(l.organizerSoldOf(
-                          event.ticketsSold, event.ticketsTotal)),
-                      Text(
-                          '${l.adminNetSales}: ${revenue.toStringAsFixed(0)} ₸'),
-                    ]))));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) =>
+                EventManagementScreen(eventId: event.id, title: event.title)));
   }
 }

@@ -1,3 +1,6 @@
+import 'package:biletflow_mobile/features/organizer/event_management_screen.dart';
+import 'package:biletflow_mobile/features/admin/admin_operations_screen.dart';
+import 'event_management_test.dart' as management_fixtures;
 import 'package:biletflow_mobile/features/organizer/event_attendees_screen.dart';
 import 'package:biletflow_mobile/features/organizer/event_attendance_screen.dart';
 import 'dart:convert';
@@ -7,6 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:biletflow_mobile/features/staff/staff_event_status_badge.dart';
 import 'package:biletflow_mobile/models/staff_event_filter.dart';
 import 'package:biletflow_mobile/app/theme.dart';
+import 'package:biletflow_mobile/features/auth/email_auth_screen.dart';
+import 'package:biletflow_mobile/features/attendee/ticket_email_panel.dart';
 import 'package:biletflow_mobile/features/attendee/checkout_screen.dart';
 import 'package:biletflow_mobile/features/attendee/order_details_screen.dart';
 import 'package:biletflow_mobile/features/profile/account_screens.dart';
@@ -137,6 +142,41 @@ final api = ApiClient(client: MockClient((request) async {
         'record_id': null
       }
     ];
+  }
+  if (path.endsWith('/analytics')) {
+    payload = management_fixtures.analyticsFixture();
+  }
+  if (path.endsWith('/activity')) {
+    payload = management_fixtures.historyFixture();
+  }
+  if (path.endsWith('/operations/orders')) {
+    payload = {
+      'orders': [
+        {
+          'id': 'order-with-a-long-reference-for-layout-testing',
+          'event_id': 'event-id',
+          'event_title':
+              'An event with a long title for operational monitoring',
+          'attendee_name':
+              'A very long attendee name for the operations monitor',
+          'attendee_email': 'a.very.long.attendee.email.address@example.com',
+          'status': 'payment_failed',
+          'total_minor': 123456789000,
+          'created_at': '2026-10-27T10:00:00Z',
+          'payments': [
+            {
+              'status': 'failed',
+              'amount_minor': 123456789000,
+              'reference':
+                  'sim_payment_with_a_long_provider_reference_for_testing'
+            }
+          ],
+          'refunds': [],
+        }
+      ],
+      'activation_fee_minor': 100000,
+      'processing_fee_bps': 300
+    };
   }
   if (path.endsWith('/ticket-types')) payload = [type];
   if (path.endsWith('/events/event-id/orders')) {
@@ -286,6 +326,19 @@ void main() {
     'admin shell': () => const AdminShell(),
     'login': () => const LoginScreen(),
     'register': () => const RegisterScreen(),
+    'verify email demo': () => const EmailAuthScreen(),
+    'password reset demo': () => const EmailAuthScreen(
+        resetPassword: true, initialEmail: 'demo@example.com'),
+    'ticket email demo': () => Scaffold(
+            body: ListView(children: [
+          TicketEmailPanel(
+              orderId: 'order-123',
+              email: 'demo@example.com',
+              attendeeName: 'Example Guest',
+              totalMinor: 125000,
+              event: event,
+              ticketIds: const ['ticket-12345678-long-id']),
+        ])),
     'home': () => const AttendeeHomeScreen(),
     'events': () => const AttendeeEventsScreen(),
     'event details': () => EventDetailsScreen(event: event),
@@ -299,6 +352,15 @@ void main() {
               trailingBadge: const PaidEventReviewBadge(status: 'approved'))
         ])),
     'create event': () => const CreateEventScreen(),
+    'admin event controls': () => const EventManagementScreen(
+        eventId: 'event-id', title: 'A long event title for operations'),
+    'event analytics': () => const EventManagementScreen(
+        eventId: 'event-id', title: 'A long event title for analytics'),
+    'event activity history': () => const EventManagementScreen(
+        eventId: 'event-id',
+        title: 'A long event title for activity',
+        historyOnly: true),
+    'operations monitor': () => const AdminOperationsScreen(),
     'event overview': () => EventOverviewScreen(event: event),
     'event attendees': () => const EventAttendeesScreen(
         eventId: 'event-id', eventTitle: 'An event with a long title'),
@@ -374,7 +436,13 @@ void main() {
           tester.view.physicalSize = config.size;
           tester.view.viewInsets = FakeViewPadding(bottom: config.keyboard);
           addTearDown(tester.view.reset);
-          final auth = LayoutAuth();
+          final auth = LayoutAuth(
+              role: screen.key == 'admin event controls'
+                  ? UserRole.admin
+                  : ['event overview', 'event attendees', 'event analytics']
+                          .contains(screen.key)
+                      ? UserRole.organizer
+                      : UserRole.attendee);
           await tester.pumpWidget(MultiProvider(
               providers: [
                 ChangeNotifierProvider<AuthService>.value(value: auth),
@@ -396,8 +464,44 @@ void main() {
           await tester.pumpAndSettle();
           expect(tester.takeException(), isNull);
           expectTranslatedLabelsFit(tester, labels);
+          if (screen.key == 'operations monitor') {
+            final l = AppLocalizations.of(
+                tester.element(find.byType(AdminOperationsScreen)));
+            await tester.scrollUntilVisible(find.text(l.operationsDetails), 200,
+                scrollable: find.byType(Scrollable).first);
+            await tester.pumpAndSettle();
+            await tester.tap(find.text(l.operationsDetails));
+            await tester.pumpAndSettle();
+            expect(tester.takeException(), isNull);
+          }
+          if (screen.key == 'password reset demo') {
+            final l = AppLocalizations.of(
+                tester.element(find.byType(EmailAuthScreen)));
+            await tester.scrollUntilVisible(
+                find.text(l.passwordSendDemoCode), 180,
+                scrollable: find.byType(Scrollable).first);
+            await tester.pumpAndSettle();
+            await tester.tap(find.text(l.passwordSendDemoCode));
+            await tester.pumpAndSettle();
+            expect(tester.takeException(), isNull);
+            expect(
+                find.byKey(const ValueKey('email-demo-code')), findsOneWidget);
+          }
+          if (screen.key == 'ticket email demo') {
+            final l = AppLocalizations.of(
+                tester.element(find.byType(TicketEmailPanel)));
+            await tester.ensureVisible(find.text(l.emailPreviewAction));
+            await tester.pumpAndSettle();
+            await tester.tap(find.text(l.emailPreviewAction));
+            await tester.pumpAndSettle();
+            expect(tester.takeException(), isNull);
+          }
           // Inspect content further down each scrollable page as well.
-          final scroll = find.byType(Scrollable);
+          final scroll = screen.key == 'ticket email demo'
+              ? find.descendant(
+                  of: find.byType(BottomSheet),
+                  matching: find.byType(Scrollable))
+              : find.byType(Scrollable);
           if (scroll.evaluate().isNotEmpty) {
             await tester.drag(scroll.first, const Offset(0, -900));
             await tester.pumpAndSettle();

@@ -17,10 +17,10 @@ String statusLabel(BuildContext context, String status) {
     'checked_in' => l.statusCheckedIn,
     'cancelled' => l.statusCancelled,
     'refunded' => l.statusRefunded,
-    'confirmed' => l.statusConfirmed,
+    'confirmed' || 'succeeded' => l.statusConfirmed,
     'pending' => l.statusPending,
     'expired' => l.statusExpired,
-    'payment_failed' => l.statusFailed,
+    'payment_failed' || 'failed' => l.statusFailed,
     'partially_refunded' => l.statusPartialRefund,
     _ => status.replaceAll('_', ' '),
   };

@@ -14,6 +14,8 @@ import '../../shared/widgets/stat_card.dart';
 import '../../shared/widgets/event_status_badge.dart';
 import '../../shared/widgets/responsive_cards.dart';
 import 'checkin_screen.dart';
+import 'event_management_screen.dart';
+import 'management_confirmation.dart';
 import 'assign_staff_dialog.dart';
 import 'event_attendance_screen.dart';
 import 'create_event_screen.dart';
@@ -31,6 +33,35 @@ class _EventOverviewScreenState extends State<EventOverviewScreen> {
   AppEvent? _updatedEvent;
   bool _cancelling = false;
   AppEvent get event => _updatedEvent ?? widget.event;
+
+  Future<void> _duplicate() async {
+    final reason = await managementReason(context,
+        context.l10n.managementDuplicate, context.l10n.managementDuplicateHelp,
+        requireReason: false);
+    if (reason == null || !mounted) return;
+    setState(() => _cancelling = true);
+    try {
+      final result = await context
+          .read<DataService>()
+          .api
+          .request('POST', '/events/${event.id}/duplicate');
+      if (!mounted) return;
+      await context.read<DataService>().refresh();
+      if (!mounted) return;
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) =>
+                  CreateEventScreen(draftId: result['id'] as String)));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    } finally {
+      if (mounted) setState(() => _cancelling = false);
+    }
+  }
 
   Future<void> _editEvent() async {
     if (_cancelling) return;
@@ -118,10 +149,12 @@ class _EventOverviewScreenState extends State<EventOverviewScreen> {
             .where((e) => e.id == this.event.id)
             .firstOrNull ??
         this.event;
+    final currentUser = context.watch<AuthService>().currentUser;
     final cancelled = event.eventStatus == 'cancelled';
     final canCancel =
         context.watch<AuthService>().currentUser?.isOrganizer == true &&
             !cancelled &&
+            event.eventStatus != 'suspended' &&
             event.eventStatus != 'completed';
     final dateFormat = DateFormat('EEE, d MMM yyyy · HH:mm',
         Localizations.localeOf(context).languageCode);
@@ -189,7 +222,8 @@ class _EventOverviewScreenState extends State<EventOverviewScreen> {
                             title: l10n.eventManageSection,
                             icon: Icons.tune_outlined,
                             children: [
-                              if (!cancelled)
+                              if (!cancelled &&
+                                  event.eventStatus != 'suspended')
                                 PrimaryButton(
                                   label: l10n.organizerCheckinTitle,
                                   icon: Icons.qr_code_scanner_rounded,
@@ -200,7 +234,8 @@ class _EventOverviewScreenState extends State<EventOverviewScreen> {
                                   ),
                                 ),
                               const SizedBox(height: 12),
-                              if (!cancelled)
+                              if (!cancelled &&
+                                  event.eventStatus != 'suspended')
                                 OutlinedAppButton(
                                   label: l10n.organizerAssignStaff,
                                   icon: Icons.person_add_alt_outlined,
@@ -218,6 +253,27 @@ class _EventOverviewScreenState extends State<EventOverviewScreen> {
                                 icon: Icons.groups_outlined,
                                 onPressed: () => _showAttendees(context),
                               ),
+                              if (currentUser?.isOrganizer == true ||
+                                  currentUser?.isAdmin == true) ...[
+                                const SizedBox(height: 12),
+                                OutlinedAppButton(
+                                    label: l10n.managementTitle,
+                                    icon: Icons.insights_outlined,
+                                    onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                EventManagementScreen(
+                                                    eventId: event.id,
+                                                    title: event.title)))),
+                              ],
+                              if (currentUser?.isOrganizer == true) ...[
+                                const SizedBox(height: 12),
+                                OutlinedButton.icon(
+                                    onPressed: _cancelling ? null : _duplicate,
+                                    icon: const Icon(Icons.copy_outlined),
+                                    label: Text(l10n.managementDuplicate)),
+                              ],
                               if (cancelled) ...[
                                 const SizedBox(height: 20),
                                 Text(l10n.organizerCancelledEventHelp,

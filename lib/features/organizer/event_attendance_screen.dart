@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../services/data_service.dart';
 import '../attendee/attendee_ui.dart';
+import 'event_management_screen.dart';
 
 class EventAttendanceScreen extends StatelessWidget {
   const EventAttendanceScreen(
@@ -11,7 +12,18 @@ class EventAttendanceScreen extends StatelessWidget {
   final String eventTitle;
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text(eventTitle)),
+        appBar: AppBar(title: Text(eventTitle), actions: [
+          IconButton(
+              tooltip: context.l10n.managementHistory,
+              icon: const Icon(Icons.history),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => EventManagementScreen(
+                          eventId: eventId,
+                          title: eventTitle,
+                          historyOnly: true))))
+        ]),
         body: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: AttendancePanel(eventId: eventId)),

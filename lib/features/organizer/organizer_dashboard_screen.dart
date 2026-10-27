@@ -12,6 +12,7 @@ import '../../shared/widgets/stat_card.dart';
 import '../../shared/widgets/responsive_cards.dart';
 import 'create_event_screen.dart';
 import 'event_overview_screen.dart';
+import 'event_management_screen.dart';
 
 class OrganizerDashboardScreen extends StatelessWidget {
   const OrganizerDashboardScreen({super.key});
@@ -23,7 +24,10 @@ class OrganizerDashboardScreen extends StatelessWidget {
     final data = context.watch<DataService>();
     final myEvents = data.eventsByOrganizer(user?.name ?? '');
     final sold = myEvents.fold(0, (sum, e) => sum + e.ticketsSold);
-    final attendees = sold; // One admission per ticket.
+    final remaining = myEvents.fold(
+        0,
+        (sum, e) =>
+            sum + (e.ticketsTotal - e.ticketsSold).clamp(0, e.ticketsTotal));
     final revenue = data.totalRevenue;
 
     return Scaffold(
@@ -50,8 +54,8 @@ class OrganizerDashboardScreen extends StatelessWidget {
                 icon: Icons.confirmation_number_rounded,
               ),
               StatCard(
-                label: l10n.organizerAttendees,
-                value: attendees.toString(),
+                label: l10n.managementRemaining,
+                value: remaining.toString(),
                 icon: Icons.groups_rounded,
                 color: AppColors.success,
               ),
@@ -70,6 +74,18 @@ class OrganizerDashboardScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
+          if (myEvents.isNotEmpty) ...[
+            OutlinedButton.icon(
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => EventManagementScreen(
+                            eventId: myEvents.first.id,
+                            title: myEvents.first.title))),
+                icon: const Icon(Icons.insights_outlined),
+                label: Text(l10n.managementAnalytics)),
+            const SizedBox(height: 16),
+          ],
           Text(l10n.organizerMyEvents,
               style: const TextStyle(
                   fontSize: 18,

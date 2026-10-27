@@ -26,6 +26,11 @@ class StaffEventStatusBadge extends StatelessWidget {
           Icons.history_rounded,
           AppColors.textSecondary
         ),
+      StaffEventFilter.suspended => (
+          l.managementSuspended,
+          Icons.pause_circle_outline,
+          const Color(0xFFB52C2C)
+        ),
       StaffEventFilter.cancelled => (
           l.eventStatusCancelled,
           Icons.event_busy_outlined,

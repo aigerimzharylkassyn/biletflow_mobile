@@ -277,3 +277,55 @@ Profile → Notifications includes Open event for paid-event review decisions.
 The link checks the event's current state: drafts open at Review, while published
 or cancelled events open their details. Missing/inaccessible events show an error;
 opening a notification never publishes or resubmits an event automatically.
+
+## Email UI demos
+
+Verification, password recovery, confirmation-email previews, and simulated ticket
+email delivery are available as **frontend-only demos**. Use code `123456` in the
+verification/reset screens. No email is sent and no real password or verification
+status changes. Existing account registration, login, booking and ticket PDF
+features continue to use the backend normally.
+
+Open Forgot your password, Profile → Try email verification, or a confirmed
+order's Ticket email section. For integration boundaries and backend handoff, see
+[Email UI demo](docs/EMAIL_DEMO_HANDOFF.md).
+
+
+## Event management and operations
+
+Organizer Dashboard → Analytics opens the event workspace. The event selector
+switches between managed events. Analytics uses database orders, tickets and
+refunds, with order-date (UTC) and ticket-type filters, current inventory,
+attendance, daily sales, ticket comparisons and campaign attribution. Financial
+figures remain simulated; net revenue includes processing fees and subtracts
+completed refunds once. Date filters select order cohorts, not refund posting dates.
+
+Event details → Event workspace provides Orders & registrations and Activity
+history. Organizer and administrator order actions require a reason: full paid
+refunds invalidate all order tickets; cancellation of a confirmed free registration
+invalidates its tickets and releases inventory. Checked-in free registrations must
+have admission reversed first. Staff cannot perform these financial/order actions;
+their attendance page links to read-only event activity. New support changes and
+checkout outcomes also enter the audit timeline. Historical records are retained;
+no timeline mutation or rollback endpoint is exposed.
+
+Event details → Duplicate event creates a new draft with event information and
+copied ticket types, without orders, tickets, staff assignments, campaigns, fees or
+approvals. Update the dates before publication. Unsold copied ticket types remain
+editable; sales windows outside the updated registration period are aligned with
+that period. The original event and ticket types remain unchanged.
+
+Admin Events → an event → Platform controls suspends/restores the whole event or
+paid sales separately. Whole-event suspension blocks discovery, purchases and
+admission without deleting existing tickets; paid-sales suspension preserves
+existing admission and free registration. Restoring sales never grants an approval:
+changed/unapproved events return to the review flow. The organizer receives an
+in-app notification with the reason. Cancelled/completed events cannot be restored
+through suspension controls.
+
+Admin Dashboard → Operations monitor searches orders/payment references, shows
+failed payments and refunds, displays configured fees and shares filtered orders
+as CSV. User management supports suspension/restoration with reasons. These flows
+use the backend in the sibling `biletflow` folder; restart that server after updating
+its code. No new database columns are required for these management features.
+The separate email screens remain frontend-only demos.

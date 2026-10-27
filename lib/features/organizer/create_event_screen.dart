@@ -191,14 +191,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   ],
                   onChanged: _busy ||
                           _session.tickets.any((ticket) =>
-                              ticket.savedId != null &&
+                              !ticket.canEdit &&
                               ticket.fields['kind'] == 'paid')
                       ? null
                       : (value) => setState(() {
                             _details.freeOnly = value!;
                             if (value) {
                               for (final ticket in _session.tickets
-                                  .where((ticket) => ticket.savedId == null)) {
+                                  .where((ticket) => ticket.canEdit)) {
                                 ticket.fields['kind'] = 'free';
                                 ticket.fields['price'] = '0';
                               }
@@ -342,7 +342,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   ? '0'
                   : ticket.fields[key],
               enabled: !_busy &&
-                  ticket.savedId == null &&
+                  ticket.canEdit &&
                   !(freePrice && ticket.fields['kind'] == 'free'),
               decoration: InputDecoration(
                 labelText: label,
@@ -408,7 +408,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   if (ticket.savedId != null)
                     Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Text(l.creationSavedType))
+                        child: Text(ticket.editableSaved
+                            ? l.managementCopiedTypeHelp
+                            : l.creationSavedType))
                   else
                     Align(
                         alignment: Alignment.centerRight,
@@ -431,9 +433,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         DropdownMenuItem(
                             value: 'paid', child: Text(l.creationPaid))
                       ],
-                      onChanged: _busy ||
-                              ticket.savedId != null ||
-                              _details.freeOnly
+                      onChanged: _busy || !ticket.canEdit || _details.freeOnly
                           ? null
                           : (v) => setState(() => ticket.fields['kind'] = v!)),
                   const SizedBox(height: 16),
@@ -447,12 +447,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   CreationDateField(
                       label: l.creationSalesStart,
                       value: ticket.start,
-                      enabled: !_busy && ticket.savedId == null,
+                      enabled: !_busy && ticket.canEdit,
                       onChanged: (v) => setState(() => ticket.start = v)),
                   CreationDateField(
                       label: l.creationSalesEnd,
                       value: ticket.end,
-                      enabled: !_busy && ticket.savedId == null,
+                      enabled: !_busy && ticket.canEdit,
                       onChanged: (v) => setState(() => ticket.end = v)),
                   _ticketField(ticket, 'maximum', l.creationMaximum,
                       min: 1, keyboard: TextInputType.number),

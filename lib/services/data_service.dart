@@ -266,13 +266,12 @@ class DataService extends ChangeNotifier {
     await refresh();
   }
 
-  Future<void> toggleUserActive(String userId) async {
+  Future<void> toggleUserActive(String userId,
+      {String reason = 'Access reviewed by administrator'}) async {
     final row = _adminUsers.firstWhere((r) => r.user.id == userId);
-    if (!row.active) {
-      throw const ApiException(
-          'The backend does not support reactivating suspended accounts.');
-    }
-    await api.request('POST', '/admin/users/$userId/suspend');
+    await api.request(
+        'POST', '/admin/users/$userId/${row.active ? 'suspend' : 'restore'}',
+        body: {'reason': reason});
     await refresh();
   }
 

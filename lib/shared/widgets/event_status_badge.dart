@@ -8,6 +8,7 @@ class EventStatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = context.l10n;
     final (label, color) = switch (status) {
+      'suspended' => (l.managementSuspended, const Color(0xFFB52C2C)),
       'draft' => (l.eventStatusDraft, const Color(0xFF865500)),
       'published' => (l.eventStatusPublished, const Color(0xFF237642)),
       'completed' => (l.eventStatusCompleted, const Color(0xFF425D9B)),

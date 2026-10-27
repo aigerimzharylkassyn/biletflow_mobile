@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../services/data_service.dart';
+import '../../services/auth_service.dart';
+import 'management_confirmation.dart';
 import '../attendee/attendee_ui.dart';
 
 /// Uses event orders, matching the web: one row may cover multiple admission tickets.
@@ -20,6 +22,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
   bool _loading = true;
   String? _error;
   String _status = '';
+  bool _busy = false;
   @override
   void initState() {
     super.initState();
@@ -53,9 +56,38 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     }
   }
 
+  Future<void> _manage(Map<String, dynamic> order, bool refund) async {
+    final l = context.l10n;
+    final reason = await managementReason(
+        context,
+        refund ? l.managementRefund : l.managementCancelRegistration,
+        '${order['attendee_name']} · ${money(order['total_minor'] as num)}\n\n${refund ? l.managementRefundHelp : l.managementCancelHelp}');
+    if (reason == null || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      await context.read<DataService>().api.request('POST',
+          '/orders/${order['id']}/${refund ? 'refunds' : 'cancel-registration'}',
+          body: {'reason': reason});
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l.managementSuccess)));
+      await _load();
+      if (mounted) await context.read<DataService>().refresh();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
+    final user = context.watch<AuthService>().currentUser;
+    final canManage = user?.isOrganizer == true || user?.isAdmin == true;
     final query = _search.text.trim().toLowerCase();
     final rows = _orders
         .where((order) =>
@@ -74,7 +106,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
       'payment_failed'
     ];
     return Scaffold(
-      appBar: AppBar(title: Text(l.organizerViewAttendees), actions: [
+      appBar: AppBar(title: Text(l.managementOrders), actions: [
         IconButton(
             tooltip: l.refreshStatus,
             onPressed: _loading ? null : _load,
@@ -196,6 +228,27 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleMedium),
+                                      if (canManage &&
+                                          order['status'] == 'confirmed' &&
+                                          ((order['total_minor'] as num) > 0 ||
+                                              order['can_cancel_registration'] ==
+                                                  true)) ...[
+                                        const SizedBox(height: 16),
+                                        OutlinedButton.icon(
+                                            onPressed: _busy || _loading
+                                                ? null
+                                                : () => _manage(
+                                                    order,
+                                                    (order['total_minor']
+                                                            as num) >
+                                                        0),
+                                            icon: const Icon(Icons.undo),
+                                            label: Text((order['total_minor']
+                                                        as num) >
+                                                    0
+                                                ? l.managementRefund
+                                                : l.managementCancelRegistration)),
+                                      ],
                                     ]),
                               )));
                     },

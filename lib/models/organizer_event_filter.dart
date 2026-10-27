@@ -7,11 +7,13 @@ enum OrganizerEventFilter {
   active,
   past,
   completed,
+  suspended,
   cancelled;
 
   bool matches(AppEvent event, DateTime now) {
     if (this == all) return true;
     if (event.eventStatus == 'draft') return this == draft;
+    if (event.eventStatus == 'suspended') return this == suspended;
     if (event.eventStatus == 'cancelled') return this == cancelled;
     if (event.eventStatus == 'completed') return this == completed;
     if (event.eventStatus != 'published') return false;

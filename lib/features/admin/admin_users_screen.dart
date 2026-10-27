@@ -7,10 +7,17 @@ import '../../l10n/loc_extensions.dart';
 import '../../models/user.dart';
 import '../../services/data_service.dart';
 import '../../shared/widgets/app_avatar.dart';
+import '../organizer/management_confirmation.dart';
 
-class AdminUsersScreen extends StatelessWidget {
+class AdminUsersScreen extends StatefulWidget {
   const AdminUsersScreen({super.key});
 
+  @override
+  State<AdminUsersScreen> createState() => _AdminUsersScreenState();
+}
+
+class _AdminUsersScreenState extends State<AdminUsersScreen> {
+  bool _busy = false;
   String _roleLabel(AppLocalizations l10n, UserRole role) => switch (role) {
         UserRole.attendee => l10n.adminRoleAttendee,
         UserRole.organizer => l10n.adminRoleOrganizer,
@@ -47,20 +54,31 @@ class AdminUsersScreen extends StatelessWidget {
               Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: row.active
-                        ? () async {
+                    onPressed: _busy
+                        ? null
+                        : () async {
+                            final reason = await managementReason(
+                                context,
+                                row.active
+                                    ? l10n.adminSuspendUser
+                                    : l10n.adminActivateUser,
+                                l10n.managementUserHelp);
+                            if (reason == null || !context.mounted) return;
+                            setState(() => _busy = true);
                             try {
                               await context
                                   .read<DataService>()
-                                  .toggleUserActive(row.user.id);
+                                  .toggleUserActive(row.user.id,
+                                      reason: reason);
                             } catch (error) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text(error.toString())));
                               }
+                            } finally {
+                              if (mounted) setState(() => _busy = false);
                             }
-                          }
-                        : null,
+                          },
                     child: Text(
                         row.active
                             ? l10n.adminSuspendUser

@@ -6,6 +6,7 @@ import '../../l10n/loc_extensions.dart';
 import '../../services/auth_service.dart';
 import '../../shared/widgets/app_text_field.dart';
 import '../../shared/widgets/primary_button.dart';
+import 'email_auth_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -33,13 +34,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final auth = context.read<AuthService>();
-    final success = await auth.register(name: _nameController.text.trim(), email: _emailController.text.trim(), password: _passwordController.text);
+    final success = await auth.register(
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text);
     if (!mounted) return;
     if (!success) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(auth.errorMessage ?? "Registration failed")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(auth.errorMessage ?? "Registration failed")));
       return;
     }
-    Navigator.of(context).pushNamedAndRemoveUntil('/attendee', (r) => false);
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (_) => const EmailAuthScreen(newRegistration: true)),
+        (_) => false);
   }
 
   @override
@@ -61,7 +69,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   label: l10n.authNameLabel,
                   hint: l10n.authNameHint,
                   controller: _nameController,
-                  validator: (v) => (v == null || v.trim().isEmpty) ? l10n.authValidationNameRequired : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? l10n.authValidationNameRequired
+                      : null,
                 ),
                 const SizedBox(height: 20),
                 AppTextField(
@@ -70,8 +80,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return l10n.authValidationEmailRequired;
-                    if (!v.contains('@') || !v.contains('.')) return l10n.authValidationEmailInvalid;
+                    if (v == null || v.trim().isEmpty) {
+                      return l10n.authValidationEmailRequired;
+                    }
+                    if (!v.contains('@') || !v.contains('.')) {
+                      return l10n.authValidationEmailInvalid;
+                    }
                     return null;
                   },
                 ),
@@ -82,8 +96,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _passwordController,
                   obscureText: true,
                   validator: (v) {
-                    if (v == null || v.isEmpty) return l10n.authValidationPasswordRequired;
-                    if (v.length < 8) return "Use at least 8 characters";
+                    if (v == null || v.isEmpty) {
+                      return l10n.authValidationPasswordRequired;
+                    }
+                    if (v.runes.length < 8 || v.runes.length > 128) {
+                      return l10n.passwordMinLength;
+                    }
                     return null;
                   },
                 ),
@@ -96,18 +114,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _submit(),
                   validator: (v) {
-                    if (v != _passwordController.text) return l10n.authValidationPasswordMismatch;
+                    if (v != _passwordController.text) {
+                      return l10n.authValidationPasswordMismatch;
+                    }
                     return null;
                   },
                 ),
                 const SizedBox(height: 28),
-                PrimaryButton(label: l10n.authRegisterButton, onPressed: _submit, isLoading: isLoading),
+                PrimaryButton(
+                    label: l10n.authRegisterButton,
+                    onPressed: _submit,
+                    isLoading: isLoading),
                 const SizedBox(height: 16),
                 Wrap(
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Text(l10n.authAlreadyHaveAccount, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                    Text(l10n.authAlreadyHaveAccount,
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 14)),
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text(l10n.authLoginButton),

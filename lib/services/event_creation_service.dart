@@ -31,7 +31,13 @@ class EventCreationService {
     details.freeOnly = !(row['available_ticket_types'] as List? ?? [])
         .any((type) => type['kind'] == 'paid');
     for (final type in row['available_ticket_types'] as List? ?? []) {
-      tickets.add(TicketDraft(details)..load(Map<String, dynamic>.from(type)));
+      final ticket = TicketDraft(details)
+        ..load(Map<String, dynamic>.from(type));
+      ticket.editableSaved = row['is_duplicate'] == true &&
+          (type['sold_count'] ?? 0) == 0 &&
+          (type['reserved_count'] ?? 0) == 0 &&
+          (type['refunded_count'] ?? 0) == 0;
+      tickets.add(ticket);
     }
   }
 
@@ -47,6 +53,14 @@ class EventCreationService {
         ..remove('admission_type');
       saved = Map<String, dynamic>.from(
           await api.request('PATCH', '/events/$id', body: update));
+    }
+    for (final ticket in tickets.where((t) => t.editableSaved)) {
+      if (ticket.start!.isBefore(details.dates['opens']!) ||
+          ticket.end!.isAfter(details.dates['closes']!) ||
+          !ticket.end!.isAfter(details.dates['opens']!)) {
+        ticket.start = details.dates['opens'];
+        ticket.end = details.dates['closes'];
+      }
     }
     final banner = details.fields['banner']!.trim();
     bannerFailed = false;
@@ -79,7 +93,14 @@ class EventCreationService {
     }
     for (var i = 0; i < tickets.length; i++) {
       final ticket = tickets[i];
-      if (ticket.savedId != null) continue;
+      if (ticket.savedId != null) {
+        if (ticket.editableSaved) {
+          await api.request(
+              'PATCH', '/events/$id/ticket-types/${ticket.savedId}',
+              body: bodies[i]);
+        }
+        continue;
+      }
       final row = await api.request('POST', '/events/$id/ticket-types',
           body: bodies[i], idempotencyKey: _key(ticket.key, bodies[i]));
       ticket.savedId = row['id'];

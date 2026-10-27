@@ -145,6 +145,8 @@ class TicketDraft {
   }
   final String key = creationKey();
   String? savedId;
+  bool editableSaved = false;
+  bool get canEdit => savedId == null || editableSaved;
   final fields = <String, String>{};
   DateTime? start, end;
   Map<String, dynamic> body(EventDraft event) {

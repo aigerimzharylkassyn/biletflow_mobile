@@ -6,6 +6,7 @@ import '../../l10n/loc_extensions.dart';
 import '../../models/event.dart';
 import '../../services/data_service.dart';
 import 'attendee_ui.dart';
+import 'ticket_email_panel.dart';
 import 'my_tickets_screen.dart';
 import 'ticket_support_actions.dart';
 
@@ -190,6 +191,32 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                       if ((order['total_minor'] as num) > 0)
                                         Text(l.demoPaymentHelp),
                                     ]),
+                                    if (order['status'] == 'confirmed' &&
+                                        event.eventStatus != 'cancelled' &&
+                                        _tickets.any((t) => [
+                                              'valid',
+                                              'checked_in'
+                                            ].contains(t['status']))) ...[
+                                      const SizedBox(height: 16),
+                                      TicketEmailPanel(
+                                          orderId: widget.orderId,
+                                          email: order['attendee_email']
+                                                  as String? ??
+                                              '',
+                                          attendeeName: order['attendee_name']
+                                                  as String? ??
+                                              '',
+                                          totalMinor:
+                                              order['total_minor'] as num? ?? 0,
+                                          event: event,
+                                          ticketIds: _tickets
+                                              .where((t) => [
+                                                    'valid',
+                                                    'checked_in'
+                                                  ].contains(t['status']))
+                                              .map((t) => t['id'] as String)
+                                              .toList()),
+                                    ],
                                     const SizedBox(height: 24),
                                     TicketSupportActions(
                                         eventId: event.id,

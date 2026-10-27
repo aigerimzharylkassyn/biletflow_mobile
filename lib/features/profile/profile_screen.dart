@@ -8,6 +8,7 @@ import '../../models/user.dart';
 import 'organizer_application_screen.dart';
 import 'account_screens.dart';
 import 'support_screen.dart';
+import '../auth/email_auth_screen.dart';
 import '../../shared/widgets/app_avatar.dart';
 import '../../shared/widgets/language_selector.dart';
 
@@ -85,6 +86,13 @@ class ProfileScreen extends StatelessWidget {
             label: l10n.profileEdit,
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const EditProfileScreen())),
+          ),
+          const Divider(),
+          _ProfileRow(
+            icon: Icons.mark_email_unread_outlined,
+            label: l10n.emailPreviewVerification,
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const EmailAuthScreen())),
           ),
           const Divider(),
           _ProfileRow(

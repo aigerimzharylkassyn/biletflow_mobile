@@ -43,6 +43,7 @@ class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> {
     final all = data.eventsByOrganizer(user?.name ?? '');
     final now = DateTime.now();
     final labels = {
+      OrganizerEventFilter.suspended: l.managementSuspended,
       OrganizerEventFilter.all: l.organizerEventsAll,
       OrganizerEventFilter.draft: l.eventStatusDraft,
       OrganizerEventFilter.upcoming: l.organizerEventsUpcoming,

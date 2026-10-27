@@ -40,6 +40,7 @@ class _StaffEventsScreenState extends State<StaffEventsScreen> {
     final all = sortedStaffEvents(data.events);
     final events = all.where((event) => _filter.matches(event, now)).toList();
     final labels = {
+      StaffEventFilter.suspended: l.managementSuspended,
       StaffEventFilter.all: l.organizerEventsAll,
       StaffEventFilter.upcoming: l.organizerEventsUpcoming,
       StaffEventFilter.live: l.staffEventsLive,
