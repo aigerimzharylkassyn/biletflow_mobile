@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../features/attendee/ticket_support_actions.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import '../../services/auth_service.dart';
-import '../../services/api_client.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../app/theme.dart';
 import '../../l10n/loc_extensions.dart';
@@ -17,20 +16,56 @@ class TicketCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPast = ticket.status == TicketStatus.past;
-    final dateLabel = DateFormat('EEE, d MMM yyyy').format(ticket.event.date);
+    final dateLabel = DateFormat(
+            'EEE, d MMM yyyy', Localizations.localeOf(context).languageCode)
+        .format(ticket.event.date);
 
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(AppRadius.card),
       child: InkWell(
-        onTap: onTap ?? () => showDialog<void>(context: context, builder: (_) => AlertDialog(
-          title: Text(ticket.event.title),
-          content: SizedBox(width: 300, child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Image.network('${ApiClient.baseUrl}/tickets/${ticket.id}/qr', headers: context.read<AuthService>().api.headers,
-              errorBuilder: (_, __, ___) => const Text('Unable to load QR. Please retry.')),
-            SelectableText(ticket.ticketCode),
-          ])),
-        )),
+        onTap: !ticket.canShowQr
+            ? null
+            : onTap ??
+                () => showDialog<void>(
+                    context: context,
+                    builder: (dialogContext) => AlertDialog(
+                          scrollable: true,
+                          title: Text(ticket.event.title),
+                          actions: [
+                            TicketSupportActions(
+                                eventId: ticket.event.id,
+                                title: ticket.event.title,
+                                orderId: ticket.orderId,
+                                ticketId: ticket.id,
+                                canRequestRefund: ticket.canRequestRefund,
+                                beforeOpen: () =>
+                                    Navigator.of(dialogContext).pop())
+                          ],
+                          content: SingleChildScrollView(
+                              child: SizedBox(
+                                  width: 300,
+                                  child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(
+                                            height: (MediaQuery.sizeOf(context)
+                                                        .width -
+                                                    128)
+                                                .clamp(0.0, 260.0),
+                                            child: !ticket.canShowQr
+                                                ? const Icon(Icons.block)
+                                                : QrImageView(
+                                                    data: ticket.ticketCode,
+                                                    size: 260,
+                                                    backgroundColor:
+                                                        Colors.white)),
+                                        const SizedBox(height: 12),
+                                        Text(context.l10n.ticketQrHelp),
+                                        const SizedBox(height: 12),
+                                        SelectableText(ticket.ticketCode),
+                                      ]))),
+                        )),
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: Opacity(
           opacity: isPast ? 0.6 : 1,
@@ -39,7 +74,10 @@ class TicketCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppRadius.card),
               boxShadow: const [
-                BoxShadow(color: Color(0x1F1D1D1D), blurRadius: 4, offset: Offset(0, 0)),
+                BoxShadow(
+                    color: Color(0x1F1D1D1D),
+                    blurRadius: 4,
+                    offset: Offset(0, 0)),
               ],
             ),
             child: Row(
@@ -59,16 +97,20 @@ class TicketCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      Text(dateLabel, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                      Text(dateLabel,
+                          style: const TextStyle(
+                              fontSize: 13, color: AppColors.textSecondary)),
                       const SizedBox(height: 2),
                       Text(
                         '${ticket.event.venue}, ${ticket.event.city}',
-                        style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                        style: const TextStyle(
+                            fontSize: 13, color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         '${context.l10n.ticketsCode}: ${ticket.id.substring(0, 8)}',
-                        style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
+                        style: const TextStyle(
+                            fontSize: 12, color: AppColors.textTertiary),
                       ),
                     ],
                   ),
@@ -83,7 +125,13 @@ class TicketCard extends StatelessWidget {
                     border: Border.all(color: AppColors.divider),
                   ),
                   alignment: Alignment.center,
-                  child: Image.network('${ApiClient.baseUrl}/tickets/${ticket.id}/qr', headers: context.read<AuthService>().api.headers, errorBuilder: (_, __, ___) => const Icon(Icons.error_outline)),
+                  child: !ticket.canShowQr
+                      ? const Icon(Icons.block)
+                      : QrImageView(
+                          data: ticket.ticketCode,
+                          size: 64,
+                          padding: const EdgeInsets.all(4),
+                          backgroundColor: Colors.white),
                 ),
               ],
             ),

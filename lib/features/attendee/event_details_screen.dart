@@ -1,334 +1,396 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-import '../../app/theme.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../models/event.dart';
-import '../../services/api_client.dart';
 import '../../services/data_service.dart';
-import '../../shared/widgets/primary_button.dart';
-import 'my_tickets_screen.dart';
+import '../../services/api_client.dart';
+import 'attendee_ui.dart';
+import '../profile/support_screen.dart';
+import '../../models/user.dart';
+import '../../services/auth_service.dart';
+import 'checkout_screen.dart';
+import 'ticket_support_actions.dart';
+
+int ticketLimit(AppEvent event, Map<String, dynamic> type, {DateTime? now}) {
+  final clock = (now ?? DateTime.now()).toUtc();
+  bool before(DateTime? v) => v != null && clock.isBefore(v.toUtc());
+  bool after(DateTime? v) => v != null && !clock.isBefore(v.toUtc());
+  DateTime? date(dynamic value) => value is String ? parseApiDate(value) : null;
+  if (event.eventStatus != 'published' ||
+      type['is_hidden'] == true ||
+      before(event.registrationOpensAt) ||
+      after(event.registrationClosesAt) ||
+      before(date(type['sales_start'])) ||
+      after(date(type['sales_end']))) {
+    return 0;
+  }
+  if (type['kind'] == 'paid' && event.paidSalesStatus != 'active') return 0;
+  final remaining = (type['quantity'] as int? ?? 0) -
+      (type['sold_count'] as int? ?? 0) -
+      (type['reserved_count'] as int? ?? 0);
+  return remaining.clamp(0, type['max_per_order'] as int? ?? 10);
+}
 
 class EventDetailsScreen extends StatefulWidget {
-  final AppEvent event;
   const EventDetailsScreen({super.key, required this.event});
-
+  final AppEvent event;
   @override
   State<EventDetailsScreen> createState() => _EventDetailsScreenState();
 }
 
 class _EventDetailsScreenState extends State<EventDetailsScreen> {
-  bool _purchasing = false;
-
-  Future<void> _getTicket() async {
-    final l10n = context.l10n;
-    setState(() => _purchasing = true);
-    final data = context.read<DataService>();
-    Map<String, dynamic> confirmed;
-    try {
-      final types = await data.ticketTypes(widget.event);
-      if (!mounted) return;
-      if (types.isEmpty) throw ApiException(l10n.checkoutNoTickets);
-      final type = await showDialog<Map<String, dynamic>>(context: context, builder: (dialogContext) => SimpleDialog(
-        title: Text(l10n.checkoutChooseTicket),
-        children: types.map((t) => SimpleDialogOption(
-          onPressed: () => Navigator.pop(dialogContext, t),
-          child: Text('${t['name']} — ${kzt(t['price_minor'] as num)}'),
-        )).toList(),
-      ));
-      if (type == null || !mounted) return;
-      // Returns the applied promo code ('' for none), or null when the attendee backs out.
-      final promoCode = await showDialog<String>(
-        context: context,
-        builder: (_) => _QuoteDialog(event: widget.event, ticketType: type),
-      );
-      if (promoCode == null || !mounted) return;
-      final order = await data.checkout(widget.event, type['id'], promoCode: promoCode);
-      if (!mounted) return;
-      final confirm = await showDialog<bool>(context: context, builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.checkoutConfirmTitle),
-        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _Totals(totals: order),
-          const SizedBox(height: 12),
-          Text(l10n.checkoutSimulatedNote, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-        ]),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
-          TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(l10n.checkoutConfirm)),
-        ],
-      ));
-      if (confirm != true) { await data.cancelCheckout(order['id']); return; }
-      confirmed = await data.completeCheckout(order['id']);
-    } catch (error) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
-      return;
-    } finally {
-      if (mounted) setState(() => _purchasing = false);
-    }
-
-    if (!mounted) return;
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        icon: const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 40),
-        title: Text(l10n.eventTicketConfirmedTitle, textAlign: TextAlign.center),
-        content: Text(
-          '${l10n.eventTicketConfirmedBody}\n\n${l10n.eventTicketsEmailed(confirmed['attendee_email'] as String)}',
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.commonOk),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MyTicketsScreen()));
-            },
-            child: Text(l10n.eventViewTicket),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final event = widget.event;
-    final dateLabel = DateFormat('EEEE, d MMMM yyyy').format(event.date);
-
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 220,
-            backgroundColor: event.accentColor,
-            iconTheme: const IconThemeData(color: Colors.white),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                color: event.accentColor,
-                alignment: Alignment.center,
-                child: Icon(event.icon, size: 72, color: Colors.white.withValues(alpha: 0.9)),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    event.title,
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-                  ),
-                  const SizedBox(height: 16),
-                  _InfoRow(icon: Icons.calendar_today_rounded, label: l10n.eventDate, value: dateLabel),
-                  _InfoRow(icon: Icons.access_time_rounded, label: l10n.eventTime, value: '${event.startTime} - ${event.endTime}'),
-                  _InfoRow(icon: Icons.location_on_outlined, label: l10n.eventLocation, value: '${event.venue}, ${event.city}'),
-                  _InfoRow(icon: Icons.person_outline_rounded, label: l10n.eventOrganizer, value: event.organizerName),
-                  const SizedBox(height: 20),
-                  Text(l10n.eventDescription,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                  const SizedBox(height: 8),
-                  Text(event.description, style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.5)),
-                  const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(AppRadius.card),
-                      border: Border.all(color: AppColors.divider),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(l10n.eventTicketInfo, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-                              const SizedBox(height: 4),
-                              Text(
-                                event.isFree ? l10n.eventFree : '${event.price.toStringAsFixed(0)} ₸',
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.primary),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          '${event.ticketsTotal - event.ticketsSold}',
-                          style: const TextStyle(fontSize: 13, color: AppColors.textTertiary),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-          child: PrimaryButton(
-            label: event.isFree ? l10n.eventGetTicket : l10n.eventBuyTicket,
-            onPressed: _getTicket,
-            isLoading: _purchasing,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  const _InfoRow({required this.icon, required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 18, color: AppColors.textSecondary),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-String kzt(num minor) => '${NumberFormat.decimalPattern().format(minor / 100)} ₸';
-
-/// Server-priced totals; the discount line appears only when a promo code applied.
-class _Totals extends StatelessWidget {
-  final Map<String, dynamic> totals;
-  const _Totals({required this.totals});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final discount = totals['discount_minor'] as num? ?? 0;
-    Widget line(String label, String value, {bool bold = false}) {
-      final style = TextStyle(fontSize: bold ? 16 : 14, fontWeight: bold ? FontWeight.w700 : FontWeight.w400);
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 3),
-        child: Row(children: [Expanded(child: Text(label, style: style)), Text(value, style: style)]),
-      );
-    }
-    return Column(mainAxisSize: MainAxisSize.min, children: [
-      line(l10n.checkoutSubtotal, kzt(totals['subtotal_minor'] as num)),
-      if (discount > 0) line(l10n.checkoutDiscount(totals['promo_code'] as String? ?? ''), '−${kzt(discount)}'),
-      line(l10n.checkoutFee, kzt(totals['processing_fee_minor'] as num)),
-      const Divider(),
-      line(l10n.checkoutTotal, kzt(totals['total_minor'] as num), bold: true),
-    ]);
-  }
-}
-
-class _QuoteDialog extends StatefulWidget {
-  final AppEvent event;
-  final Map<String, dynamic> ticketType;
-  const _QuoteDialog({required this.event, required this.ticketType});
-
-  @override
-  State<_QuoteDialog> createState() => _QuoteDialogState();
-}
-
-class _QuoteDialogState extends State<_QuoteDialog> {
-  final _code = TextEditingController();
+  late AppEvent _event;
+  List<Map<String, dynamic>> _types = [];
+  final Map<String, int> _quantities = {};
+  final _promo = TextEditingController();
+  String _appliedPromo = '';
   Map<String, dynamic>? _quote;
-  String _applied = '';
-  String? _error;
-  bool _busy = true;
-
+  String? _error, _quoteError;
+  bool _loading = true, _quoting = false;
+  bool _quoteUnavailable = false;
+  int _quoteGeneration = 0;
+  Timer? _availabilityClock;
   @override
   void initState() {
     super.initState();
-    _load('');
+    _event = widget.event;
+    _load();
+    _availabilityClock = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
-  void dispose() { _code.dispose(); super.dispose(); }
+  void dispose() {
+    _availabilityClock?.cancel();
+    _promo.dispose();
+    super.dispose();
+  }
 
-  /// Keeps the last valid quote when a code is rejected, and shows the backend's reason.
-  Future<void> _load(String code) async {
-    setState(() { _busy = true; _error = null; });
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    final data = context.read<DataService>();
     try {
-      final quote = await context.read<DataService>().quote(widget.event, widget.ticketType['id'], promoCode: code);
+      final event = await data.eventDetails(widget.event.id);
+      final types = event.eventStatus == 'published'
+          ? await data.allTicketTypes(event.id)
+          : <Map<String, dynamic>>[];
       if (!mounted) return;
-      setState(() { _quote = quote; _applied = code.trim().toUpperCase(); });
-    } on ApiException catch (error) {
-      if (mounted) setState(() => _error = error.message);
+      setState(() {
+        _event = event;
+        _types = types;
+        _quote = null;
+        _quantities.clear();
+        _appliedPromo = '';
+      });
+    } catch (e) {
+      if (mounted) setState(() => _error = e.toString());
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) setState(() => _loading = false);
     }
+  }
+
+  List<Map<String, dynamic>> get _items => [
+        for (final t in _types)
+          if ((_quantities[t['id']] ?? 0) > 0)
+            {'ticket_type_id': t['id'], 'quantity': _quantities[t['id']]}
+      ];
+  int get _subtotal => _types.fold(
+      0,
+      (sum, t) =>
+          sum + (t['price_minor'] as int) * (_quantities[t['id']] ?? 0));
+  bool get _valid =>
+      _items.isNotEmpty &&
+      _types
+          .every((t) => (_quantities[t['id']] ?? 0) <= ticketLimit(_event, t));
+  Future<void> _applyPromo() async {
+    if (!_valid || _quoting) return;
+    final generation = ++_quoteGeneration;
+    setState(() {
+      _quoting = true;
+      _quoteError = null;
+      _quote = null;
+      _appliedPromo = '';
+    });
+    try {
+      final code = _promo.text.trim().toUpperCase();
+      final quote =
+          await context.read<DataService>().quote(_event.id, _items, code);
+      if (mounted && generation == _quoteGeneration) {
+        setState(() {
+          _quote = quote;
+          _appliedPromo = code;
+        });
+      }
+    } on ApiException catch (e) {
+      if (mounted && generation == _quoteGeneration) {
+        setState(() {
+          _quoteUnavailable = e.status == 404 || e.status == 405;
+          _quoteError = _quoteUnavailable ? null : e.toString();
+        });
+      }
+    } catch (e) {
+      if (mounted && generation == _quoteGeneration) {
+        setState(() => _quoteError = e.toString());
+      }
+    } finally {
+      if (mounted && generation == _quoteGeneration) {
+        setState(() => _quoting = false);
+      }
+    }
+  }
+
+  void _changeQuantity(String id, int quantity) {
+    setState(() {
+      _quantities[id] = quantity;
+      _quote = null;
+      _appliedPromo = '';
+      _quoteError = null;
+    });
+  }
+
+  Future<void> _checkout() async {
+    if (!_valid || _quoting) return;
+    if (_promo.text.trim().isNotEmpty &&
+        _appliedPromo != _promo.text.trim().toUpperCase()) {
+      await _applyPromo();
+      if (!mounted || (_quote == null && !_quoteUnavailable)) return;
+    }
+    if (!mounted) return;
+    await Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => CheckoutScreen(
+            event: _event,
+            items: _items,
+            types: _types,
+            promo: _quoteUnavailable
+                ? _promo.text.trim().toUpperCase()
+                : _appliedPromo)));
+    if (mounted) await _load();
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final quote = _quote;
-    return AlertDialog(
-      title: Text(widget.ticketType['name'] as String),
-      content: SingleChildScrollView(
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(
-              child: TextField(
-                controller: _code,
-                enabled: !_busy,
-                textCapitalization: TextCapitalization.characters,
-                decoration: InputDecoration(
-                  labelText: l10n.checkoutPromoLabel,
-                  errorText: quote == null ? null : _error,
-                  errorMaxLines: 3,
-                ),
-                onSubmitted: (value) => _load(value),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: TextButton(
-                onPressed: _busy ? null : () => _load(_code.text),
-                child: Text(l10n.checkoutPromoApply),
-              ),
-            ),
-          ]),
-          if (_applied.isNotEmpty)
-            TextButton(
-              onPressed: _busy ? null : () { _code.clear(); _load(''); },
-              child: Text(l10n.checkoutPromoRemove),
-            ),
-          if (quote == null && _error != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(_error!, style: const TextStyle(color: AppColors.error)),
-            ),
+    final l = context.l10n;
+    final event = _event;
+    return Scaffold(
+        appBar: AppBar(title: Text(l.eventTicketInfo)),
+        body: RefreshIndicator(
+            onRefresh: _load,
+            child: ListView(padding: const EdgeInsets.all(20), children: [
+              Center(
+                  child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 900),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: SizedBox(
+                                    height: 190,
+                                    child: event.imageUrl != null
+                                        ? Image.network(event.imageUrl!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) =>
+                                                _banner(event))
+                                        : _banner(event))),
+                            const SizedBox(height: 20),
+                            Text(event.title,
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium),
+                            const SizedBox(height: 12),
+                            if (event.eventStatus == 'cancelled') ...[
+                              Text(l.eventCancelled,
+                                  style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.error)),
+                              const SizedBox(height: 12)
+                            ],
+                            Text(
+                                '${DateFormat.yMMMMEEEEd(Localizations.localeOf(context).languageCode).format(event.date)}\n${event.startTime} – ${event.endTime} · ${event.date.timeZoneName}'),
+                            const SizedBox(height: 20),
+                            AttendeePanel(children: [
+                              Text(l.eventDescription,
+                                  style:
+                                      Theme.of(context).textTheme.titleLarge),
+                              const SizedBox(height: 12),
+                              Text(event.description),
+                              const Divider(height: 32),
+                              Text(
+                                  '${l.eventOrganizer}\n${event.organizerName}'),
+                              const SizedBox(height: 12),
+                              TicketSupportActions(
+                                  eventId: event.id, title: event.title),
+                            ]),
+                            const SizedBox(height: 16),
+                            AttendeePanel(children: [
+                              Text(l.eventLocation,
+                                  style:
+                                      Theme.of(context).textTheme.titleLarge),
+                              const SizedBox(height: 8),
+                              Text(
+                                  '${event.venue}\n${event.address}\n${event.city}'),
+                              TextButton.icon(
+                                  onPressed: () => runAttendeeAction(
+                                      context, () => openEventMap(event)),
+                                  icon: const Icon(Icons.map_outlined),
+                                  label: Text(l.viewMap)),
+                              const Divider(),
+                              Text(l.refundPolicy,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium),
+                              const SizedBox(height: 8),
+                              Text(event.refundPolicy.isEmpty
+                                  ? l.noRefundPolicy
+                                  : event.refundPolicy),
+                              OutlinedButton.icon(
+                                  onPressed: () => runAttendeeAction(context,
+                                      () => shareCalendar(context, event)),
+                                  icon: const Icon(Icons.calendar_month),
+                                  label: Text(l.addCalendar)),
+                              if (context
+                                      .read<AuthService>()
+                                      .currentUser
+                                      ?.role ==
+                                  UserRole.attendee) ...[
+                                const SizedBox(height: 12),
+                                OutlinedButton.icon(
+                                    onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => SupportScreen(
+                                                eventId: event.id,
+                                                subject: event.title,
+                                                initialCategory: 'report_event',
+                                                startNew: true,
+                                                view: 'mine'))),
+                                    icon: const Icon(Icons.flag_outlined),
+                                    label: Text(l.opsReportEvent)),
+                              ],
+                            ]),
+                            const SizedBox(height: 20),
+                            Text(l.chooseTickets,
+                                style: Theme.of(context).textTheme.titleLarge),
+                            const SizedBox(height: 12),
+                            if (_loading)
+                              const Center(child: CircularProgressIndicator())
+                            else if (_error != null) ...[
+                              Text(_error!,
+                                  style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.error)),
+                              OutlinedButton(
+                                  onPressed: _load, child: Text(l.commonRetry))
+                            ] else ...[
+                              if (_types.isEmpty) Text(l.ticketsUnavailable),
+                              for (final type in _types)
+                                _typeCard(context, type),
+                              if (_types.isNotEmpty)
+                                AttendeePanel(children: [
+                                  TextField(
+                                      controller: _promo,
+                                      enabled: !_quoting,
+                                      decoration: InputDecoration(
+                                          labelText: l.promoCode),
+                                      onChanged: (_) => setState(() {
+                                            _quote = null;
+                                            _appliedPromo = '';
+                                            _quoteError = null;
+                                          })),
+                                  const SizedBox(height: 12),
+                                  OutlinedButton(
+                                      onPressed: !_valid || _quoting
+                                          ? null
+                                          : _applyPromo,
+                                      child: Text(_quoting
+                                          ? l.commonLoading
+                                          : l.applyPromo)),
+                                  if (_quoteError != null)
+                                    Text(_quoteError!,
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .error)),
+                                  if (_appliedPromo.isNotEmpty)
+                                    Text('${l.promoApplied}: $_appliedPromo'),
+                                  const SizedBox(height: 16),
+                                  if (_quote != null)
+                                    MoneySummary(order: _quote!)
+                                  else ...[
+                                    Text(
+                                        '${l.estimatedTotal}: ${money(_subtotal)}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium),
+                                    const SizedBox(height: 8),
+                                    Text(l.finalTotalHelp),
+                                  ],
+                                  const SizedBox(height: 16),
+                                  FilledButton(
+                                      onPressed: _valid && !_quoting
+                                          ? _checkout
+                                          : null,
+                                      child: Text(l.proceedCheckout)),
+                                ]),
+                            ],
+                          ]))),
+            ])));
+  }
+
+  Widget _banner(AppEvent event) => Container(
+      color: event.accentColor,
+      child: Icon(event.icon, color: Colors.white, size: 72));
+  Widget _typeCard(BuildContext context, Map<String, dynamic> type) {
+    final l = context.l10n;
+    final id = type['id'] as String;
+    final count = _quantities[id] ?? 0;
+    final limit = ticketLimit(_event, type);
+    final remaining = ((type['quantity'] as int) -
+            (type['sold_count'] as int? ?? 0) -
+            (type['reserved_count'] as int? ?? 0))
+        .clamp(0, 100000000);
+    return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: AttendeePanel(children: [
+          Text(type['name'] as String,
+              style: Theme.of(context).textTheme.titleMedium),
+          if ((type['description'] as String? ?? '').isNotEmpty)
+            Text(type['description']),
           const SizedBox(height: 12),
-          if (quote != null) _Totals(totals: quote) else if (_busy) const Center(child: CircularProgressIndicator()),
-        ]),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
-        TextButton(
-          onPressed: _busy || quote == null ? null : () => Navigator.pop(context, _applied),
-          child: Text(l10n.checkoutContinue),
-        ),
-      ],
-    );
+          Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 16,
+              children: [
+                Text(
+                    (type['price_minor'] as num) == 0
+                        ? l.eventFree
+                        : money(type['price_minor']),
+                    style: Theme.of(context).textTheme.titleLarge),
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  IconButton(
+                      tooltip: '${l.commonCancel} ${type['name']}',
+                      onPressed: count > 0 && !_quoting
+                          ? () => _changeQuantity(id, count - 1)
+                          : null,
+                      icon: const Icon(Icons.remove_circle_outline)),
+                  Semantics(liveRegion: true, child: Text('$count')),
+                  IconButton(
+                      tooltip: '${l.chooseTickets} ${type['name']}',
+                      onPressed: count < limit && !_quoting
+                          ? () => _changeQuantity(id, count + 1)
+                          : null,
+                      icon: const Icon(Icons.add_circle_outline)),
+                ]),
+              ]),
+          const SizedBox(height: 8),
+          Text(limit == 0
+              ? (remaining == 0 ? l.soldOut : l.salesUnavailable)
+              : '${l.remainingLabel}: $remaining · ${l.maximumLabel}: ${type['max_per_order'] ?? 10}'),
+        ]));
   }
 }

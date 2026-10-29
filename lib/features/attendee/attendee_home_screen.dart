@@ -10,6 +10,7 @@ import '../../services/data_service.dart';
 import '../../shared/widgets/app_avatar.dart';
 import '../../shared/widgets/category_chip.dart';
 import '../../shared/widgets/event_card.dart';
+import '../../shared/widgets/responsive_cards.dart';
 import '../profile/profile_screen.dart';
 import 'attendee_events_screen.dart';
 import 'event_details_screen.dart';
@@ -24,7 +25,13 @@ class AttendeeHomeScreen extends StatelessWidget {
     final user = context.watch<AuthService>().currentUser;
     final data = context.watch<DataService>();
     final featured = data.featuredEvents;
-    final upcoming = data.events.where((e) => !e.featured).take(4).toList();
+    final upcoming = data.events
+        .where((e) =>
+            e.date.isAfter(DateTime.now()) &&
+            e.eventStatus == 'published' &&
+            e.visibility == 'public')
+        .take(4)
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -42,86 +49,96 @@ class AttendeeHomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-        children: [
-          _SearchBar(onTap: () => _openEvents(context)),
-          const SizedBox(height: 24),
-          _SectionHeader(title: l10n.homeCategories),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 40,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                for (final entry in _categoryEntries(l10n))
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: CategoryChip(
-                      label: entry.value,
-                      selected: false,
-                      onTap: () => _openEvents(context, category: entry.key),
+      body: RefreshIndicator(
+          onRefresh: data.refresh,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+            children: [
+              Text(l10n.discoverTitle,
+                  style: Theme.of(context).textTheme.headlineMedium),
+              const SizedBox(height: 8),
+              Text(l10n.discoverSubtitle),
+              const SizedBox(height: 20),
+              if (data.isLoading) const LinearProgressIndicator(),
+              if (data.errorMessage != null)
+                TextButton(
+                    onPressed: data.refresh,
+                    child: Text('${data.errorMessage} · ${l10n.commonRetry}')),
+              if (!data.isLoading && data.events.isEmpty)
+                Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Text(l10n.homeNoEvents)),
+              _SearchBar(onTap: () => _openEvents(context)),
+              const SizedBox(height: 24),
+              _SectionHeader(title: l10n.homeCategories),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final entry in _categoryEntries(l10n))
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: CategoryChip(
+                        label: entry.value,
+                        selected: false,
+                        onTap: () => _openEvents(context, category: entry.key),
+                      ),
                     ),
-                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _SectionHeader(
+                title: l10n.homeFeaturedEvents,
+                onSeeAll: () => _openEvents(context),
+              ),
+              const SizedBox(height: 12),
+              ResponsiveCards(
+                minimumWidth: 300,
+                children: [
+                  for (final event in featured)
+                    EventCard(
+                        event: event,
+                        onTap: () => _openDetails(context, event)),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _SectionHeader(
+                title: l10n.homeUpcomingEvents,
+                onSeeAll: () => _openEvents(context),
+              ),
+              const SizedBox(height: 12),
+              for (final event in upcoming) ...[
+                EventCard(
+                    event: event, onTap: () => _openDetails(context, event)),
+                const SizedBox(height: 12),
               ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          _SectionHeader(
-            title: l10n.homeFeaturedEvents,
-            onSeeAll: () => _openEvents(context),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 122,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: featured.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                final event = featured[index];
-                return SizedBox(
-                  width: 300,
-                  child: EventCard(event: event, onTap: () => _openDetails(context, event)),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 24),
-          _SectionHeader(
-            title: l10n.homeUpcomingEvents,
-            onSeeAll: () => _openEvents(context),
-          ),
-          const SizedBox(height: 12),
-          for (final event in upcoming) ...[
-            EventCard(event: event, onTap: () => _openDetails(context, event)),
-            const SizedBox(height: 12),
-          ],
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const MyTicketsScreen()),
-            ),
-            icon: const Icon(Icons.confirmation_number_outlined, size: 18),
-            label: Text(l10n.navMyTickets),
-          ),
-        ],
-      ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const MyTicketsScreen()),
+                ),
+                icon: const Icon(Icons.confirmation_number_outlined, size: 18),
+                label: Text(l10n.navMyTickets),
+              ),
+            ],
+          )),
     );
   }
 
-  List<MapEntry<EventCategory?, String>> _categoryEntries(AppLocalizations l10n) => [
+  List<MapEntry<EventCategory?, String>> _categoryEntries(
+          AppLocalizations l10n) =>
+      [
         MapEntry(null, l10n.categoryAll),
-        MapEntry(EventCategory.music, l10n.categoryMusic),
-        MapEntry(EventCategory.sport, l10n.categorySport),
-        MapEntry(EventCategory.business, l10n.categoryBusiness),
-        MapEntry(EventCategory.art, l10n.categoryArt),
-        MapEntry(EventCategory.food, l10n.categoryFood),
+        for (final category in EventCategory.values)
+          MapEntry(category, category.localizedLabel(l10n)),
       ];
 
   void _openEvents(BuildContext context, {EventCategory? category}) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => AttendeeEventsScreen(initialCategory: category)),
+      MaterialPageRoute(
+          builder: (_) => AttendeeEventsScreen(initialCategory: category)),
     );
   }
 
@@ -150,9 +167,13 @@ class _SearchBar extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.search_rounded, color: AppColors.textTertiary, size: 20),
+            const Icon(Icons.search_rounded,
+                color: AppColors.textTertiary, size: 20),
             const SizedBox(width: 10),
-            Text(context.l10n.homeSearchHint, style: const TextStyle(color: AppColors.inputHint, fontSize: 14)),
+            Expanded(
+                child: Text(context.l10n.homeSearchHint,
+                    style: const TextStyle(
+                        color: AppColors.inputHint, fontSize: 14))),
           ],
         ),
       ),
@@ -167,12 +188,19 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 12,
       children: [
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+        Text(title,
+            style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary)),
         if (onSeeAll != null)
-          TextButton(onPressed: onSeeAll, child: Text(context.l10n.commonSeeAll)),
+          TextButton(
+              onPressed: onSeeAll, child: Text(context.l10n.commonSeeAll)),
       ],
     );
   }

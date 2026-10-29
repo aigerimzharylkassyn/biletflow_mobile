@@ -35,22 +35,49 @@ class _RoleShellState extends State<RoleShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Support capabilities can change while the profile tab is selected.
+    if (_index >= widget.items.length) _index = widget.items.length - 1;
     final data = context.watch<DataService>();
     if (!context.watch<AuthService>().isAuthenticated) {
-      return Scaffold(body: Center(child: TextButton(onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil("/login", (_) => false), child: const Text("Session ended. Sign in again."))));
+      return Scaffold(
+          body: Center(
+              child: TextButton(
+                  onPressed: () => Navigator.of(context)
+                      .pushNamedAndRemoveUntil("/login", (_) => false),
+                  child: const Text("Session ended. Sign in again."))));
     }
     return Scaffold(
-      body: Column(children: [
-        if (data.isLoading) const LinearProgressIndicator(),
-        if (data.errorMessage != null) MaterialBanner(content: Text(data.errorMessage!), actions: [TextButton(onPressed: data.refresh, child: const Text("Retry"))]),
-        Expanded(child: IndexedStack(
-        index: _index,
-        children: widget.items.map((item) => item.screen).toList(),
-      )),
-      ]),
+      body: LayoutBuilder(
+          builder: (context, constraints) => Column(children: [
+                if (data.isLoading) const LinearProgressIndicator(),
+                if (data.errorMessage != null)
+                  ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxHeight: constraints.maxHeight * 0.3),
+                      child: SingleChildScrollView(
+                          child: MaterialBanner(
+                              content: Text(data.errorMessage!),
+                              actions: [
+                            TextButton(
+                                onPressed: data.refresh,
+                                child: const Text("Retry"))
+                          ]))),
+                Expanded(
+                    child: IndexedStack(
+                  index: _index,
+                  children: [
+                    for (var i = 0; i < widget.items.length; i++)
+                      TickerMode(
+                          enabled: i == _index, child: widget.items[i].screen)
+                  ],
+                )),
+              ])),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
-        onTap: (i) { setState(() => _index = i); data.refresh(); },
+        onTap: (i) {
+          setState(() => _index = i);
+          data.refresh();
+        },
         items: widget.items
             .map(
               (item) => BottomNavigationBarItem(

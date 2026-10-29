@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../shared/widgets/role_shell.dart';
 import '../profile/profile_screen.dart';
+import '../profile/support_screen.dart';
 import 'checkin_screen.dart';
 import 'organizer_dashboard_screen.dart';
 import 'organizer_events_screen.dart';
 
-/// Organizer bottom nav: Dashboard | Events | Check-in | Profile.
+/// Organizer bottom nav: Dashboard | Events | Check-in | Inbox | Profile.
 class OrganizerShell extends StatelessWidget {
   const OrganizerShell({super.key});
 
@@ -34,6 +35,11 @@ class OrganizerShell extends StatelessWidget {
           activeIcon: Icons.qr_code_scanner_rounded,
           screen: const CheckinScreen(),
         ),
+        RoleNavItem(
+            label: l10n.navSupportInbox,
+            icon: Icons.inbox_outlined,
+            activeIcon: Icons.inbox,
+            screen: const SupportScreen(flow: 'attendee', view: 'inbox')),
         RoleNavItem(
           label: l10n.navProfile,
           icon: Icons.person_outline_rounded,

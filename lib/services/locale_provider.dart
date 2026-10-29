@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Holds the app's current [Locale] and persists the user's choice locally,
 /// so the language sticks after the app is reopened.
 ///
-/// Kazakh (Latin script) is the default/initial language, per BiletFlow spec.
+/// Kazakh (Cyrillic script) is the default/initial language.
 class LocaleProvider extends ChangeNotifier {
   static const String _prefsKey = 'biletflow_locale';
   static const Locale defaultLocale = Locale('kk');
@@ -23,7 +23,8 @@ class LocaleProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final saved = prefs.getString(_prefsKey);
-      if (saved != null && supportedLocales.any((l) => l.languageCode == saved)) {
+      if (saved != null &&
+          supportedLocales.any((l) => l.languageCode == saved)) {
         _locale = Locale(saved);
         notifyListeners();
       }

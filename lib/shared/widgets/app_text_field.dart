@@ -56,11 +56,15 @@ class _AppTextFieldState extends State<AppTextField> {
           style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: widget.hint,
+            hintMaxLines: 3,
+            errorMaxLines: 4,
             prefixIcon: widget.prefixIcon,
             suffixIcon: widget.obscureText
                 ? IconButton(
                     icon: Icon(
-                      _obscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      _obscured
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
                       color: AppColors.textTertiary,
                       size: 20,
                     ),

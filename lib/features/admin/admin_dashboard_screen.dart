@@ -7,7 +7,13 @@ import '../../services/auth_service.dart';
 import '../../services/data_service.dart';
 import '../../shared/widgets/outlined_app_button.dart';
 import '../../shared/widgets/stat_card.dart';
+import '../../shared/widgets/responsive_cards.dart';
 import 'admin_reports_screen.dart';
+import 'admin_operations_screen.dart';
+import '../operations/payouts_screen.dart';
+import 'platform_settings_screen.dart';
+import 'admin_users_screen.dart';
+import 'organizer_applications_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -19,19 +25,19 @@ class AdminDashboardScreen extends StatelessWidget {
     final data = context.watch<DataService>();
 
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false, title: Text(l10n.adminWelcome(user?.name.split(' ').first ?? ''))),
+      appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(l10n.adminWelcome(user?.name.split(' ').first ?? ''))),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Text(l10n.adminOverview, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+          Text(l10n.adminOverview,
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary)),
           const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.5,
+          ResponsiveCards(
             children: [
               StatCard(
                 label: l10n.adminTotalUsers,
@@ -59,6 +65,42 @@ class AdminDashboardScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
+          OutlinedAppButton(
+              label: l10n.managementMonitor,
+              icon: Icons.monitor_heart_outlined,
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const AdminOperationsScreen()))),
+          const SizedBox(height: 12),
+          OutlinedAppButton(
+              label: l10n.opsSettings,
+              icon: Icons.tune_rounded,
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const PlatformSettingsScreen()))),
+          const SizedBox(height: 12),
+          OutlinedAppButton(
+              label: l10n.opsPayouts,
+              icon: Icons.account_balance_wallet_outlined,
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const PayoutsScreen()))),
+          const SizedBox(height: 12),
+          OutlinedAppButton(
+              label: l10n.adminManageUsers,
+              icon: Icons.groups_outlined,
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const AdminUsersScreen()))),
+          const SizedBox(height: 12),
+          OutlinedAppButton(
+            label: l10n.organizerApplications,
+            icon: Icons.person_add_alt_1_outlined,
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => const OrganizerApplicationsScreen(),
+            )),
+          ),
+          const SizedBox(height: 12),
           OutlinedAppButton(
             label: l10n.adminViewReports,
             icon: Icons.bar_chart_rounded,

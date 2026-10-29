@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../app/theme.dart';
 import '../../models/event.dart';
+import '../../l10n/loc_extensions.dart';
 
 /// The "Event Card" component from the Figma design system.
 /// Since real event photography isn't available for this prototype,
@@ -26,7 +27,9 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateLabel = DateFormat('EEE, d MMM yyyy').format(event.date);
+    final dateLabel = DateFormat(
+            'EEE, d MMM yyyy', Localizations.localeOf(context).languageCode)
+        .format(event.date);
 
     return Material(
       color: AppColors.surface,
@@ -39,7 +42,10 @@ class EventCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadius.card),
             boxShadow: const [
-              BoxShadow(color: Color(0x1F1D1D1D), blurRadius: 4, offset: Offset(0, 0)),
+              BoxShadow(
+                  color: Color(0x1F1D1D1D),
+                  blurRadius: 4,
+                  offset: Offset(0, 0)),
             ],
           ),
           child: Row(
@@ -53,24 +59,29 @@ class EventCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 alignment: Alignment.center,
-                child: Icon(event.icon, color: event.accentColor, size: 32),
+                child: event.imageUrl == null
+                    ? Icon(event.icon, color: event.accentColor, size: 32)
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: Image.network(event.imageUrl!,
+                            width: 84,
+                            height: 96,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(event.icon,
+                                color: event.accentColor, size: 32))),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            dateLabel,
-                            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
-                          ),
-                        ),
-                        if (trailingBadge != null) trailingBadge!,
-                      ],
-                    ),
+                    Text(dateLabel,
+                        style: const TextStyle(
+                            fontSize: 13, color: AppColors.textSecondary)),
+                    if (trailingBadge != null)
+                      Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: trailingBadge!),
                     const SizedBox(height: 2),
                     Text(
                       event.title,
@@ -83,27 +94,40 @@ class EventCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
+                    Text(
+                        event.isFree
+                            ? context.l10n.eventFree
+                            : '${event.price.toStringAsFixed(0)} ₸',
+                        style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.access_time_rounded, size: 13, color: AppColors.textSecondary),
+                        const Icon(Icons.access_time_rounded,
+                            size: 13, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
-                        Text(
+                        Expanded(
+                            child: Text(
                           '${event.startTime} - ${event.endTime}',
-                          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                        ),
+                          style: const TextStyle(
+                              fontSize: 12, color: AppColors.textSecondary),
+                        )),
                       ],
                     ),
                     const SizedBox(height: 3),
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined, size: 13, color: AppColors.textSecondary),
+                        const Icon(Icons.location_on_outlined,
+                            size: 13, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             '${event.venue}, ${event.city}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                            style: const TextStyle(
+                                fontSize: 12, color: AppColors.textSecondary),
                           ),
                         ),
                       ],

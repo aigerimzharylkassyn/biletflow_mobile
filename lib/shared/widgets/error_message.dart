@@ -20,7 +20,8 @@ class AppErrorMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return SingleChildScrollView(
+        child: Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -31,15 +32,17 @@ class AppErrorMessage extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+              style:
+                  const TextStyle(color: AppColors.textSecondary, fontSize: 14),
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 16),
-              OutlinedAppButton(label: context.l10n.commonRetry, onPressed: onRetry),
+              OutlinedAppButton(
+                  label: context.l10n.commonRetry, onPressed: onRetry),
             ],
           ],
         ),
       ),
-    );
+    ));
   }
 }

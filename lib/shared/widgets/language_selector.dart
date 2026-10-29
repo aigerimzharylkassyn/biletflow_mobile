@@ -32,11 +32,13 @@ Future<void> showLanguageSheet(BuildContext context) {
   return showModalBottomSheet(
     context: context,
     backgroundColor: AppColors.surface,
+    showDragHandle: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
     builder: (sheetContext) {
-      return SafeArea(
+      return SingleChildScrollView(
+          child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(
@@ -47,31 +49,50 @@ Future<void> showLanguageSheet(BuildContext context) {
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
                 child: Text(
                   sheetContext.l10n.languageTitle,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary),
                 ),
               ),
               ..._languageOptions.map((option) {
-                final selected = localeProvider.locale.languageCode == option.code;
-                return ListTile(
-                  title: Text(
-                    option.label,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textPrimary,
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                final selected =
+                    localeProvider.locale.languageCode == option.code;
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                  child: ListTile(
+                    selected: selected,
+                    selectedTileColor: AppColors.primarySoft,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    title: Text(
+                      option.label,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: selected
+                            ? AppColors.primaryInk
+                            : AppColors.textPrimary,
+                        fontWeight:
+                            selected ? FontWeight.w600 : FontWeight.w400,
+                      ),
                     ),
+                    trailing: selected
+                        ? const Icon(Icons.check_rounded,
+                            color: AppColors.primary)
+                        : null,
+                    onTap: () {
+                      localeProvider.setLocale(Locale(option.code));
+                      Navigator.of(sheetContext).pop();
+                    },
                   ),
-                  trailing: selected ? const Icon(Icons.check_rounded, color: AppColors.primary) : null,
-                  onTap: () {
-                    localeProvider.setLocale(Locale(option.code));
-                    Navigator.of(sheetContext).pop();
-                  },
                 );
               }),
             ],
           ),
         ),
-      );
+      ));
     },
   );
 }
@@ -83,14 +104,19 @@ class LanguageIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.language_rounded),
+      style: IconButton.styleFrom(
+        backgroundColor: AppColors.primarySoft,
+        foregroundColor: AppColors.primaryInk,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      icon: const Icon(Icons.language_rounded, size: 22),
       tooltip: context.l10n.languageTitle,
       onPressed: () => showLanguageSheet(context),
     );
   }
 }
 
-/// Settings-style row used on the Profile screen: "Language  Қазақша  >"
+/// Profile row with the current language aligned beside the trailing chevron.
 class LanguageSettingsRow extends StatelessWidget {
   const LanguageSettingsRow({super.key});
 
@@ -102,17 +128,26 @@ class LanguageSettingsRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            const Icon(Icons.language_rounded, color: AppColors.textPrimary, size: 22),
+            const Icon(Icons.language_rounded,
+                color: AppColors.textPrimary, size: 22),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                context.l10n.languageTitle,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-              ),
+              child: Text(context.l10n.languageTitle,
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary)),
             ),
-            Text(currentLanguageLabel(context), style: const TextStyle(fontSize: 14, color: AppColors.textTertiary)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(currentLanguageLabel(context),
+                  textAlign: TextAlign.end,
+                  style: const TextStyle(
+                      fontSize: 14, color: AppColors.textSecondary)),
+            ),
             const SizedBox(width: 4),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
+            const Icon(Icons.chevron_right_rounded,
+                color: AppColors.textTertiary),
           ],
         ),
       ),

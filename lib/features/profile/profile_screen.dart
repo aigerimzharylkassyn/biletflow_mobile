@@ -4,6 +4,11 @@ import 'package:provider/provider.dart';
 import '../../app/theme.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../services/auth_service.dart';
+import '../../models/user.dart';
+import 'organizer_application_screen.dart';
+import 'account_screens.dart';
+import 'support_screen.dart';
+import '../operations/invitations_screen.dart';
 import '../../shared/widgets/app_avatar.dart';
 import '../../shared/widgets/language_selector.dart';
 
@@ -20,7 +25,22 @@ class ProfileScreen extends StatelessWidget {
     final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navProfile)),
+      appBar: AppBar(title: Text(l10n.navProfile), actions: [
+        if (user?.role == UserRole.staff)
+          IconButton(
+              tooltip: l10n.refreshStatus,
+              icon: const Icon(Icons.refresh),
+              onPressed: () async {
+                try {
+                  await context.read<AuthService>().refreshUser();
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(e.toString())));
+                  }
+                }
+              }),
+      ]),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -34,12 +54,16 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     Text(
                       user?.name ?? '',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                      style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       user?.email ?? '',
-                      style: const TextStyle(fontSize: 13, color: AppColors.textDark),
+                      style: const TextStyle(
+                          fontSize: 13, color: AppColors.textDark),
                     ),
                   ],
                 ),
@@ -51,32 +75,71 @@ class ProfileScreen extends StatelessWidget {
             _EmailVerificationCard(verified: user.emailVerified),
           ],
           const SizedBox(height: 24),
+          if (user?.role == UserRole.attendee) ...[
+            _ProfileRow(
+              icon: Icons.event_available_outlined,
+              label: l10n.becomeOrganizer,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => const OrganizerApplicationScreen(),
+              )),
+            ),
+            const Divider(),
+          ],
           _ProfileRow(
             icon: Icons.edit_outlined,
             label: l10n.profileEdit,
-            onTap: () => _showComingSoon(context),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const EditProfileScreen())),
           ),
           const Divider(),
           _ProfileRow(
             icon: Icons.notifications_outlined,
             label: l10n.profileNotifications,
-            onTap: () => _showComingSoon(context),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const NotificationsScreen())),
           ),
           const Divider(),
+          if (user?.role == UserRole.attendee) ...[
+            _ProfileRow(
+                icon: Icons.key_outlined,
+                label: l10n.opsPrivateEvents,
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const InvitedEventsScreen()))),
+            const Divider(),
+          ],
           const LanguageSettingsRow(),
           const Divider(),
-          _ProfileRow(
-            icon: Icons.help_outline_rounded,
-            label: l10n.profileFaq,
-            onTap: () => _showComingSoon(context),
-          ),
-          const Divider(),
-          _ProfileRow(
-            icon: Icons.mail_outline_rounded,
-            label: l10n.profileContactUs,
-            onTap: () => _showComingSoon(context),
-          ),
-          const Divider(),
+          if (user?.role == UserRole.attendee ||
+              user?.role == UserRole.organizer) ...[
+            _ProfileRow(
+              icon: Icons.help_outline_rounded,
+              label: l10n.profileFaq,
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const HelpScreen())),
+            ),
+            const Divider(),
+          ],
+          if (user?.role != UserRole.admin) ...[
+            _ProfileRow(
+              icon: Icons.chat_bubble_outline_rounded,
+              label: user?.role == UserRole.organizer ||
+                      user?.role == UserRole.staff
+                  ? l10n.supportContactPlatform
+                  : l10n.profileContactUs,
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => SupportScreen(
+                          flow: user?.role == UserRole.organizer ||
+                                  user?.role == UserRole.staff
+                              ? 'organizer_platform'
+                              : 'attendee',
+                          view: 'mine'))),
+            ),
+            const Divider(),
+          ],
           _ProfileRow(
             icon: Icons.logout_rounded,
             label: l10n.profileSignOut,
@@ -85,22 +148,29 @@ class ProfileScreen extends StatelessWidget {
             onTap: () => _confirmSignOut(context),
           ),
           const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              TextButton(onPressed: () => _showComingSoon(context), child: Text(l10n.profileTerms)),
+              TextButton(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              HelpScreen(policy: l10n.profileTerms))),
+                  child: Text(l10n.profileTerms)),
               const Text('|', style: TextStyle(color: AppColors.textTertiary)),
-              TextButton(onPressed: () => _showComingSoon(context), child: Text(l10n.profilePrivacy)),
+              TextButton(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              HelpScreen(policy: l10n.profilePrivacy))),
+                  child: Text(l10n.profilePrivacy)),
             ],
           ),
         ],
       ),
-    );
-  }
-
-  void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.commonComingSoon)),
     );
   }
 
@@ -109,6 +179,7 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        scrollable: true,
         title: Text(l10n.profileSignOutConfirmTitle),
         content: Text(l10n.profileSignOutConfirmBody),
         actions: [
@@ -120,9 +191,11 @@ class ProfileScreen extends StatelessWidget {
             onPressed: () {
               Navigator.of(dialogContext).pop();
               context.read<AuthService>().logout();
-              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/login', (route) => false);
             },
-            child: Text(l10n.profileSignOut, style: const TextStyle(color: AppColors.error)),
+            child: Text(l10n.profileSignOut,
+                style: const TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -189,7 +262,7 @@ class _EmailVerificationCardState extends State<_EmailVerificationCard> {
                   child: Text(l10n.profileResendVerification),
                 ),
                 TextButton(
-                  onPressed: _busy ? null : () => _run((auth) => auth.reloadUser(), null),
+                  onPressed: _busy ? null : () => _run((auth) => auth.refreshUser(), null),
                   child: Text(l10n.profileRefreshStatus),
                 ),
               ],
@@ -235,7 +308,8 @@ class _ProfileRow extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
+            const Icon(Icons.chevron_right_rounded,
+                color: AppColors.textTertiary),
           ],
         ),
       ),

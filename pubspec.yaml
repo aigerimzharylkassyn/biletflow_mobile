@@ -19,6 +19,10 @@ dependencies:
   google_fonts: ^6.2.1
   cupertino_icons: ^1.0.8
   mobile_scanner: ^7.4.2
+  qr_flutter: ^4.1.0
+  url_launcher: ^6.3.2
+  printing: ^5.14.2
+  share_plus: ^12.0.0
 
 dev_dependencies:
   flutter_test:
@@ -28,3 +32,14 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  fonts:
+    - family: NotoSans
+      fonts:
+        - asset: assets/fonts/noto_sans/NotoSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/noto_sans/NotoSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/noto_sans/NotoSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/noto_sans/NotoSans-Bold.ttf
+          weight: 700

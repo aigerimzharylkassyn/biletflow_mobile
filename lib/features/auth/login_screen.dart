@@ -42,7 +42,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(auth.errorMessage ?? l10n.authLoginErrorInvalid)),
+        SnackBar(
+            content: Text(auth.errorMessage ?? l10n.authLoginErrorInvalid)),
       );
       return;
     }
@@ -83,18 +84,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   ).createShader(bounds),
                   child: Text(
                     'BiletFlow',
-                    style: AppTheme.logoStyle.copyWith(fontSize: 32, color: Colors.white),
+                    style: AppTheme.logoStyle
+                        .copyWith(fontSize: 32, color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 28),
                 Text(
                   l10n.authWelcomeTitle,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                  style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   l10n.authWelcomeSubtitle,
-                  style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                  style: const TextStyle(
+                      fontSize: 14, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 32),
                 AppTextField(
@@ -103,8 +109,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) return l10n.authValidationEmailRequired;
-                    if (!value.contains('@') || !value.contains('.')) return l10n.authValidationEmailInvalid;
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.authValidationEmailRequired;
+                    }
+                    if (!value.contains('@') || !value.contains('.')) {
+                      return l10n.authValidationEmailInvalid;
+                    }
                     return null;
                   },
                 ),
@@ -117,7 +127,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _submit(),
                   validator: (value) {
-                    if (value == null || value.isEmpty) return l10n.authValidationPasswordRequired;
+                    if (value == null || value.isEmpty) {
+                      return l10n.authValidationPasswordRequired;
+                    }
                     return null;
                   },
                 ),
@@ -125,32 +137,39 @@ class _LoginScreenState extends State<LoginScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton(
-                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => ForgotPasswordScreen(initialEmail: _emailController.text.trim()),
-                    )),
+                    onPressed: isLoading
+                        ? null
+                        : () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => ForgotPasswordScreen(
+                                    initialEmail:
+                                        _emailController.text.trim()))),
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
                     child: Text(l10n.authForgotPassword),
                   ),
                 ),
                 const SizedBox(height: 20),
-                PrimaryButton(label: l10n.authLoginButton, onPressed: _submit, isLoading: isLoading),
+                PrimaryButton(
+                    label: l10n.authLoginButton,
+                    onPressed: _submit,
+                    isLoading: isLoading),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Text(l10n.authNoAccount, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                    Text(l10n.authNoAccount,
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 14)),
                     TextButton(
-                      onPressed: () => Navigator.of(context).pushNamed('/register'),
+                      onPressed: () =>
+                          Navigator.of(context).pushNamed('/register'),
                       child: Text(l10n.authRegisterButton),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Sign in with your backend account, or register a new account.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textTertiary, fontSize: 11),
-                ),
                 const SizedBox(height: 24),
               ],
             ),

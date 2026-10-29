@@ -32,7 +32,7 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Scan attendee ticket QR codes for event check-in.</string>
+	<string>Scan ticket QR codes to check attendees in to your events.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Connect to your local BiletFlow backend.</string>
 	<key>UIApplicationSceneManifest</key>
