@@ -20,6 +20,7 @@ class AppColors {
   static const Color divider = Color(0xFFE7E7E7);
   static const Color success = Color(0xFF2E9E5B);
   static const Color error = Color(0xFFD64545);
+  static const Color warning = Color(0xFFB7791F);
 }
 
 class AppRadius {

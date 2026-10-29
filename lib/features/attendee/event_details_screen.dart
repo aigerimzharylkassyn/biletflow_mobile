@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../app/theme.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../models/event.dart';
+import '../../services/api_client.dart';
 import '../../services/data_service.dart';
 import '../../shared/widgets/primary_button.dart';
 import 'my_tickets_screen.dart';
@@ -24,30 +25,41 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     final l10n = context.l10n;
     setState(() => _purchasing = true);
     final data = context.read<DataService>();
+    Map<String, dynamic> confirmed;
     try {
       final types = await data.ticketTypes(widget.event);
       if (!mounted) return;
-      if (types.isEmpty) throw Exception('No tickets are currently available.');
+      if (types.isEmpty) throw ApiException(l10n.checkoutNoTickets);
       final type = await showDialog<Map<String, dynamic>>(context: context, builder: (dialogContext) => SimpleDialog(
-        title: const Text('Choose a ticket'),
+        title: Text(l10n.checkoutChooseTicket),
         children: types.map((t) => SimpleDialogOption(
           onPressed: () => Navigator.pop(dialogContext, t),
-          child: Text('${t['name']} — ${(t['price_minor'] as num) / 100} ₸'),
+          child: Text('${t['name']} — ${kzt(t['price_minor'] as num)}'),
         )).toList(),
       ));
-      if (type == null) return;
-      final order = await data.checkout(widget.event, type['id']);
+      if (type == null || !mounted) return;
+      // Returns the applied promo code ('' for none), or null when the attendee backs out.
+      final promoCode = await showDialog<String>(
+        context: context,
+        builder: (_) => _QuoteDialog(event: widget.event, ticketType: type),
+      );
+      if (promoCode == null || !mounted) return;
+      final order = await data.checkout(widget.event, type['id'], promoCode: promoCode);
       if (!mounted) return;
       final confirm = await showDialog<bool>(context: context, builder: (dialogContext) => AlertDialog(
-        title: const Text('Confirm reservation'),
-        content: Text('Total: ${(order['total_minor'] as num) / 100} ₸\nIncludes fees. Payment is simulated; no card will be charged.'),
+        title: Text(l10n.checkoutConfirmTitle),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _Totals(totals: order),
+          const SizedBox(height: 12),
+          Text(l10n.checkoutSimulatedNote, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+        ]),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Confirm')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(l10n.checkoutConfirm)),
         ],
       ));
       if (confirm != true) { await data.cancelCheckout(order['id']); return; }
-      await data.completeCheckout(order['id']);
+      confirmed = await data.completeCheckout(order['id']);
     } catch (error) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
       return;
@@ -61,7 +73,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       builder: (dialogContext) => AlertDialog(
         icon: const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 40),
         title: Text(l10n.eventTicketConfirmedTitle, textAlign: TextAlign.center),
-        content: Text(l10n.eventTicketConfirmedBody, textAlign: TextAlign.center),
+        content: Text(
+          '${l10n.eventTicketConfirmedBody}\n\n${l10n.eventTicketsEmailed(confirmed['attendee_email'] as String)}',
+          textAlign: TextAlign.center,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
@@ -191,6 +206,129 @@ class _InfoRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+String kzt(num minor) => '${NumberFormat.decimalPattern().format(minor / 100)} ₸';
+
+/// Server-priced totals; the discount line appears only when a promo code applied.
+class _Totals extends StatelessWidget {
+  final Map<String, dynamic> totals;
+  const _Totals({required this.totals});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final discount = totals['discount_minor'] as num? ?? 0;
+    Widget line(String label, String value, {bool bold = false}) {
+      final style = TextStyle(fontSize: bold ? 16 : 14, fontWeight: bold ? FontWeight.w700 : FontWeight.w400);
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(children: [Expanded(child: Text(label, style: style)), Text(value, style: style)]),
+      );
+    }
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      line(l10n.checkoutSubtotal, kzt(totals['subtotal_minor'] as num)),
+      if (discount > 0) line(l10n.checkoutDiscount(totals['promo_code'] as String? ?? ''), '−${kzt(discount)}'),
+      line(l10n.checkoutFee, kzt(totals['processing_fee_minor'] as num)),
+      const Divider(),
+      line(l10n.checkoutTotal, kzt(totals['total_minor'] as num), bold: true),
+    ]);
+  }
+}
+
+class _QuoteDialog extends StatefulWidget {
+  final AppEvent event;
+  final Map<String, dynamic> ticketType;
+  const _QuoteDialog({required this.event, required this.ticketType});
+
+  @override
+  State<_QuoteDialog> createState() => _QuoteDialogState();
+}
+
+class _QuoteDialogState extends State<_QuoteDialog> {
+  final _code = TextEditingController();
+  Map<String, dynamic>? _quote;
+  String _applied = '';
+  String? _error;
+  bool _busy = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load('');
+  }
+
+  @override
+  void dispose() { _code.dispose(); super.dispose(); }
+
+  /// Keeps the last valid quote when a code is rejected, and shows the backend's reason.
+  Future<void> _load(String code) async {
+    setState(() { _busy = true; _error = null; });
+    try {
+      final quote = await context.read<DataService>().quote(widget.event, widget.ticketType['id'], promoCode: code);
+      if (!mounted) return;
+      setState(() { _quote = quote; _applied = code.trim().toUpperCase(); });
+    } on ApiException catch (error) {
+      if (mounted) setState(() => _error = error.message);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final quote = _quote;
+    return AlertDialog(
+      title: Text(widget.ticketType['name'] as String),
+      content: SingleChildScrollView(
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(
+              child: TextField(
+                controller: _code,
+                enabled: !_busy,
+                textCapitalization: TextCapitalization.characters,
+                decoration: InputDecoration(
+                  labelText: l10n.checkoutPromoLabel,
+                  errorText: quote == null ? null : _error,
+                  errorMaxLines: 3,
+                ),
+                onSubmitted: (value) => _load(value),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: TextButton(
+                onPressed: _busy ? null : () => _load(_code.text),
+                child: Text(l10n.checkoutPromoApply),
+              ),
+            ),
+          ]),
+          if (_applied.isNotEmpty)
+            TextButton(
+              onPressed: _busy ? null : () { _code.clear(); _load(''); },
+              child: Text(l10n.checkoutPromoRemove),
+            ),
+          if (quote == null && _error != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(_error!, style: const TextStyle(color: AppColors.error)),
+            ),
+          const SizedBox(height: 12),
+          if (quote != null) _Totals(totals: quote) else if (_busy) const Center(child: CircularProgressIndicator()),
+        ]),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
+        TextButton(
+          onPressed: _busy || quote == null ? null : () => Navigator.pop(context, _applied),
+          child: Text(l10n.checkoutContinue),
+        ),
+      ],
     );
   }
 }

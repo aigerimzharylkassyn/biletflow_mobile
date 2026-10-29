@@ -101,19 +101,32 @@ class DataService extends ChangeNotifier {
     return rows.where((t) => t['quantity'] > t['sold_count'] + t['reserved_count'] &&
       !now.isBefore(utc(t['sales_start'])) && now.isBefore(utc(t['sales_end']))).toList();
   }
-  Future<Map<String, dynamic>> checkout(AppEvent event, String typeId) async {
+  /// Server-calculated totals for a selection; throws the backend's message for unusable codes.
+  Future<Map<String, dynamic>> quote(AppEvent event, String typeId, {String? promoCode}) async {
+    return Map<String, dynamic>.from(await api.request('POST', '/promo-codes/validate', body: {
+      'event_id': event.id,
+      'items': [{'ticket_type_id': typeId, 'quantity': 1}],
+      'promo_code': _promo(promoCode),
+    }));
+  }
+  Future<Map<String, dynamic>> checkout(AppEvent event, String typeId, {String? promoCode}) async {
     final user = auth.currentUser!;
     return Map<String, dynamic>.from(await api.request('POST', '/checkout/sessions', body: {
       'event_id': event.id, 'attendee_name': user.name, 'attendee_email': user.email,
       'items': [{'ticket_type_id': typeId, 'quantity': 1}],
+      'promo_code': _promo(promoCode),
     }));
   }
+  String? _promo(String? code) => code == null || code.trim().isEmpty ? null : code.trim().toUpperCase();
+  /// Releases the reserved tickets (and promo hold) immediately.
   Future<void> cancelCheckout(String orderId) async {
-    await api.request('POST', '/checkout/sessions/$orderId/complete', body: {'outcome': 'failure'});
+    await api.request('POST', '/checkout/sessions/$orderId/cancel');
   }
-  Future<void> completeCheckout(String orderId) async {
-    await api.request('POST', '/checkout/sessions/$orderId/complete', body: {'outcome': 'success'});
+  Future<Map<String, dynamic>> completeCheckout(String orderId) async {
+    final order = Map<String, dynamic>.from(
+      await api.request('POST', '/checkout/sessions/$orderId/complete', body: {'outcome': 'success'}));
     await refresh();
+    return order;
   }
   Future<void> createEvent(AppEvent event, {required String address, required String city}) async {
     final start = DateTime(event.date.year, event.date.month, event.date.day, 18).toUtc();
@@ -146,9 +159,24 @@ class DataService extends ChangeNotifier {
     await api.request('POST', '/admin/users/$userId/suspend');
     await refresh();
   }
-  Future<String> admit(String eventId, String credential) async {
-    final result = await api.request('POST', '/check-in/events/$eventId/admit?qr_payload=${Uri.encodeQueryComponent(credential)}');
-    return result['attendee_name'];
+  String _payload(String credential) => Uri.encodeQueryComponent(credential);
+  /// Checks a scanned code without admitting; `result` is valid, already_used, cancelled,
+  /// refunded, wrong_event or invalid (campaign QR codes come back invalid with a message).
+  Future<Map<String, dynamic>> validateTicket(String eventId, String credential) async {
+    return Map<String, dynamic>.from(await api.request(
+      'POST', '/check-in/events/$eventId/validate?qr_payload=${_payload(credential)}'));
+  }
+  /// Returns `record_id` (for undo) and `attendee_name`.
+  Future<Map<String, dynamic>> admit(String eventId, String credential) async {
+    return Map<String, dynamic>.from(await api.request(
+      'POST', '/check-in/events/$eventId/admit?qr_payload=${_payload(credential)}'));
+  }
+  Future<void> reverseCheckIn(String recordId) async {
+    await api.request('POST', '/check-in/records/$recordId/reverse');
+  }
+  Future<({int registered, int checkedIn})> checkInSummary(String eventId) async {
+    final data = await api.request('GET', '/check-in/events/$eventId/summary');
+    return (registered: data['registered'] as int, checkedIn: data['checked_in'] as int);
   }
   @override
   void dispose() { auth.removeListener(_sessionChanged); super.dispose(); }

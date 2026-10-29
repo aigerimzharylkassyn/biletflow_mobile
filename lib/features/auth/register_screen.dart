@@ -39,6 +39,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(auth.errorMessage ?? "Registration failed")));
       return;
     }
+    // The root ScaffoldMessenger keeps this visible across the navigation below.
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(context.l10n.authVerificationSent(auth.currentUser!.email)),
+      duration: const Duration(seconds: 6),
+    ));
     Navigator.of(context).pushNamedAndRemoveUntil('/attendee', (r) => false);
   }
 

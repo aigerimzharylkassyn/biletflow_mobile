@@ -27,14 +27,41 @@ Local HTTP is intended for development. Use an HTTPS backend for release builds.
 Android debug builds allow local HTTP. iOS permits local networking and asks for LAN access.
 
 Connected flows: register/login/logout, role routing, events, ticket-type selection,
-checkout with a total including fees, simulated payment, owned tickets with real QR images,
-organizer event creation and revenue/registrations, manual credential check-in, admin users/events
-and suspension. Cancelling checkout releases the reserved inventory via the backend's failed
-payment simulation. Event creation currently uses 18:00–22:00 and capacity 100, shown in the form.
+checkout with server-priced totals, simulated payment, owned tickets with real QR images,
+organizer event creation and revenue/registrations, camera QR check-in, admin users/events
+and suspension. Event creation currently uses 18:00–22:00 and capacity 100, shown in the form.
 Paid ticket sales require organizer verification and paid-sales activation through the backend API.
 
-Check-in accepts the full signed credential shown in ticket details; camera scanning is not
-implemented. Profile edit, notification settings, FAQ and contact links retain their existing
+Account emails:
+- Registration sends a verification email; the app shows where it was sent. The Profile screen
+  shows whether the email is verified, can resend the link (`POST /auth/resend-verification`)
+  and refresh the status (`GET /users/me`). Organizers must verify before publishing events.
+- "Forgot your password?" on the login screen calls `POST /auth/forgot-password`. The emailed
+  link opens the web app's `/reset-password` page, where the new password is chosen.
+
+Checkout and promo codes:
+- After choosing a ticket, the attendee can enter a promo code. Totals come from
+  `POST /promo-codes/validate` (subtotal, discount with code, processing fee, total); the
+  backend's rejection message (expired, exhausted, disabled, not applicable…) is shown as-is.
+- The code is passed to `POST /checkout/sessions`. Backing out calls
+  `POST /checkout/sessions/{id}/cancel`, which releases the reserved ticket immediately.
+- After confirmation the app tells the attendee that the tickets were also emailed.
+
+Check-in (staff, organizers):
+- The camera scans ticket QR codes (`mobile_scanner`). Each scan calls
+  `POST /check-in/events/{id}/validate` and shows a full-width result with colour, icon and
+  text: valid, already used, cancelled, refunded, wrong event or invalid. Campaign (promo) QR
+  codes are rejected with the backend message "This is a promotional Campaign QR code, not an
+  admission ticket."
+- Valid tickets are admitted only after tapping Admit (`/admit`). Undo reverses the check-in
+  (`POST /check-in/records/{record_id}/reverse`). Registered/checked-in counts come from
+  `/check-in/events/{id}/summary` and refresh after each admission.
+- The same code is ignored for 3 seconds after a result is dismissed, so a ticket left in view
+  is not re-scanned. If camera permission is denied or no camera exists, the manual
+  credential field remains available.
+- Android requests the `CAMERA` permission; iOS uses `NSCameraUsageDescription`.
+
+Profile edit, notification settings, FAQ and contact links retain their existing
 Coming Soon behavior. The API has no user-reactivation endpoint, so suspended-user buttons are disabled.
 The backend starts empty. For an end-to-end local check, run
 `uv run python -m app.dev_seed` once. It idempotently creates multiple events,

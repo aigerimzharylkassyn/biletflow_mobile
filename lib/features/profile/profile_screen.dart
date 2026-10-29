@@ -46,6 +46,10 @@ class ProfileScreen extends StatelessWidget {
               ),
             ],
           ),
+          if (user != null) ...[
+            const SizedBox(height: 16),
+            _EmailVerificationCard(verified: user.emailVerified),
+          ],
           const SizedBox(height: 24),
           _ProfileRow(
             icon: Icons.edit_outlined,
@@ -120,6 +124,76 @@ class ProfileScreen extends StatelessWidget {
             },
             child: Text(l10n.profileSignOut, style: const TextStyle(color: AppColors.error)),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmailVerificationCard extends StatefulWidget {
+  final bool verified;
+  const _EmailVerificationCard({required this.verified});
+
+  @override
+  State<_EmailVerificationCard> createState() => _EmailVerificationCardState();
+}
+
+class _EmailVerificationCardState extends State<_EmailVerificationCard> {
+  bool _busy = false;
+
+  Future<void> _run(Future<void> Function(AuthService auth) action, String? success) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await action(context.read<AuthService>());
+      if (success != null) messenger.showSnackBar(SnackBar(content: Text(success)));
+    } catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.toString())));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final color = widget.verified ? AppColors.success : AppColors.warning;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppRadius.card),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(widget.verified ? Icons.verified_outlined : Icons.mark_email_unread_outlined, color: color),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  widget.verified ? l10n.profileEmailVerified : l10n.profileEmailNotVerified,
+                  style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                ),
+              ),
+            ],
+          ),
+          if (!widget.verified)
+            Wrap(
+              spacing: 8,
+              children: [
+                TextButton(
+                  onPressed: _busy ? null : () => _run((auth) => auth.resendVerification(), l10n.profileVerificationResent),
+                  child: Text(l10n.profileResendVerification),
+                ),
+                TextButton(
+                  onPressed: _busy ? null : () => _run((auth) => auth.reloadUser(), null),
+                  child: Text(l10n.profileRefreshStatus),
+                ),
+              ],
+            ),
         ],
       ),
     );

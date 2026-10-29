@@ -31,6 +31,8 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Scan attendee ticket QR codes for event check-in.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Connect to your local BiletFlow backend.</string>
 	<key>UIApplicationSceneManifest</key>

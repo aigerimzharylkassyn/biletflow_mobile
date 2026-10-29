@@ -5,12 +5,14 @@ class AppUser {
   final String name;
   final String email;
   final UserRole role;
+  final bool emailVerified;
 
   const AppUser({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
+    this.emailVerified = false,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
@@ -18,6 +20,7 @@ class AppUser {
     return AppUser(id: json['id'] as String,
       name: json['full_name'] as String? ?? json['email'] as String,
       email: json['email'] as String,
+      emailVerified: json['email_verified'] as bool? ?? false,
       role: roles.contains('platform_admin') ? UserRole.admin
           : roles.contains('organizer') ? UserRole.organizer
           : roles.contains('event_admin') ? UserRole.staff
