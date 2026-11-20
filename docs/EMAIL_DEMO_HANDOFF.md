@@ -1,58 +1,32 @@
-# Email UI demo and backend handoff
+# Mobile email integration and legacy demos
 
-This implementation changes only `biletflow_mobile`. It does not send email,
-change credentials, change `email_verified`, or call verification/recovery/email
-endpoints. Existing registration, login, checkout and PDF downloads still use the
-existing API and have not been replaced by fake accounts or orders.
+## Active email flows
 
-## Try the demo
+- Registration uses `/auth/register` and displays the backend verification-email message.
+- Profile shows the current verified state, requests `/auth/resend-verification`, and refreshes `/users/me`.
+- Forgot your password calls `/auth/forgot-password`; its localized acknowledgement does not reveal whether an account exists.
+- Open BiletFlow link accepts signed `/verify-email?token=...` and `/reset-password?token=...` URLs. Native `biletflow://open/...` paths use the same screen. Verification requires explicit confirmation. Reset validates 8–128 characters and matching confirmation, calls `/auth/reset-password`, clears the password fields and signs out the old session after success.
+- A confirmed order offers Request ticket email via `/orders/{id}/resend-confirmation`. In-flight and successful duplicate taps are disabled. Errors retain the action for retry. A successful request does not prove actual mailbox delivery.
+- Preview email remains local. It displays current order information but does not send a message or manufacture PDF files. Actual ticket export uses the authenticated backend PDF endpoint.
 
-- Sign in screen → Forgot your password → enter any syntactically valid email.
-- After registering, the verification preview opens; Skip lets you continue.
-- Profile → Try email verification reopens the verification preview.
-- Enter demo code **123456**. A code expires after 15 minutes, can be used once,
-  and locks after five incorrect attempts. Request another after 60 seconds.
-- Password reset validates 8–128 characters and matching confirmation. The sample
-  password is cleared on success and is never passed to the simulator or an API.
-  Continue signing in with the original real password.
-- Open a confirmed, non-cancelled order with valid/checked-in tickets. Ticket email
-  → Preview email shows recipient, event, attendee, total, order and attachment
-  names from that order. Simulate sending changes only the local demo message.
-  The PDF names are previews; actual PDF downloads remain in the ticket section.
+No SMTP credentials belong in Flutter. Configure delivery on the backend. Automatic
+opening of hosted HTTPS email links in the app requires deployment-domain association;
+users can also paste an existing email link into Open BiletFlow link. Never enter a
+signed token into the old six-digit-code demo.
 
-All demo states are local to the screen and reset when it is closed. There is no
-SMTP server, inbox process, persisted demo verification flag, or stored password.
-Labels and feedback are localized in English, Russian and Kazakh Cyrillic.
+## Legacy isolated demos
 
-## Integration points
-
-- `lib/services/demo_email_flow.dart`: isolated code/expiry/cooldown simulator;
-  `EmailAuthScreen.demo` permits injecting it in tests. Replace it with an API
-  adapter once the contract is agreed. Server-side expiry, attempt limits and
-  single-use checks must be authoritative; these current checks are a UI demo.
-- `lib/features/auth/email_auth_screen.dart`: email/code entry, sample password
-  validation, resend, errors and explicit demo success screens. Integrate returned
-  user state only after the server confirms real verification. Integrate real
-  credential changes only after server confirmation.
-- `lib/features/attendee/ticket_email_panel.dart`: local confirmation preview and
-  simulated delivery; connect actual delivery/status/resend to server-confirmed
-  outcomes. Never treat pressing Send as proof of delivery.
-- Registration and Profile launch the verification preview. Sign in launches
-  recovery. Order details conditionally includes the confirmation preview.
-
-The current backend uses signed `token` payloads for `/auth/verify-email` and
-`/auth/reset-password`, and demo response headers to expose those tokens. This UI
-uses a six-digit demonstration code, not those signed tokens. Do not simply post
-`123456` to the existing endpoints. Agree whether production uses code exchange or
-emailed links/tokens before replacing the simulator. SMTP credentials and email
-sending belong on the backend, never inside Flutter.
+`EmailAuthScreen` and `DemoEmailFlow` remain available for existing tests and explicit
+UI demonstrations. They use code `123456`, local cooldown/expiry/attempt limits, and
+clearly labeled previews. They do not change verification or passwords and are no
+longer the production sign-in/profile recovery path. They are not interchangeable
+with the backend's signed tokens.
 
 ## Validation
 
-`flutter analyze --no-pub`
-
-`flutter test --no-pub`
-
-The dedicated tests verify that demo verification, password reset and email
-preview/sending produce zero backend requests. Responsive tests cover the new
-screens, reset code-entry step and confirmation sheet in all three locales.
+`test/demo_email_flows_test.dart` verifies that the isolated code demos and preview
+make no API requests, while the real ticket email action calls the resend endpoint.
+`test/mobile_completion_flows_test.dart` covers email retry/duplicate prevention,
+verification confirmation, expired tokens and password-reset completion.
+The opt-in `test/live_backend_contract_test.dart` checks the actual API with a
+disposable database and an in-memory mailbox. SMTP receipt must be tested separately.

@@ -138,8 +138,9 @@ dart analyze lib test
 flutter test
 ```
 
-The automated tests use mocked server responses. They do not verify a running
-FastAPI server; exercise the app against your backend to validate the full flows.
+The default suite uses mocked server responses. The opt-in live contract check
+below verifies real HTTP integration against a disposable backend. Exercise the
+full app on the shared deployment for device and delivery acceptance.
 
 ## Current limitations
 
@@ -163,16 +164,17 @@ FastAPI server; exercise the app against your backend to validate the full flows
   policy, multiple free/paid ticket types, review and sandbox paid-sales activation.
   Choose Free event (the default) for zero-price tickets without paid activation,
   or Paid / mixed tickets to configure paid admission. Saved drafts can be reopened
-  from My Events; saved ticket types are read-only.
+  from My Events; eligible unsold draft ticket types can be edited through Ticket inventory.
 - Official terms/privacy documents have not been supplied; their screens explain
   how to request the current official documents through support.
-- The local backend currently lacks standalone promo quotes. Promo codes are
-  validated during reservation when quoting returns 404/405. Ticket responses now
-  include order IDs so booking details can display the correct tickets.
-- Checkout sends stable Idempotency-Key headers on retries, but duplicate-request
-  guarantees require backend enforcement of those keys.
-- Suspended accounts cannot be reactivated through the app because the API has no
-  reactivation endpoint.
+- Promo quotes use `POST /promo-codes/validate`; older servers returning 404/405
+  are supported by validating the promo during reservation instead.
+- Checkout sends stable Idempotency-Key headers on retries. The reviewed backend
+  enforces reservation retry keys; use the current API for those guarantees.
+- Administrators can suspend and restore accounts with a reason.
+- PDF font/layout defects and ticket-type financial allocation are backend issues.
+  The mobile app does not replace authoritative admission PDFs or financial records.
+  A notice is shown for ticket-type-filtered financial estimates.
 
 ## Version control
 
@@ -278,18 +280,37 @@ The link checks the event's current state: drafts open at Review, while publishe
 or cancelled events open their details. Missing/inaccessible events show an error;
 opening a notification never publishes or resubmits an event automatically.
 
-## Email UI demos
+## Email and incoming links
 
-Verification, password recovery, confirmation-email previews, and simulated ticket
-email delivery are available as **frontend-only demos**. Use code `123456` in the
-verification/reset screens. No email is sent and no real password or verification
-status changes. Existing account registration, login, booking and ticket PDF
-features continue to use the backend normally.
+Forgot your password requests a real reset email. Registration requests a real
+verification email; Profile shows verification state and supports resend/refresh.
+Profile and the sign-in screen provide Open BiletFlow link: paste a verification,
+password reset or campaign URL, or scan a Campaign QR. Signed verification/reset
+tokens are submitted only after explicit confirmation. The sample six-digit-code
+screens remain isolated demos and are not used by these real flows.
 
-Open Forgot your password, Profile → Try email verification, or a confirmed
-order's Ticket email section. For integration boundaries and backend handoff, see
-[Email UI demo](docs/EMAIL_DEMO_HANDOFF.md).
+On a confirmed order, Ticket email offers a local preview and Request ticket email.
+The latter calls the real resend endpoint; a successful request means the backend
+accepted it, not that a mailbox has received the message. Delivery depends on the
+backend email configuration. See [email integration](docs/EMAIL_DEMO_HANDOFF.md).
 
+The app registers `biletflow://open` links on iOS/Android, for example:
+
+```text
+biletflow://open/campaign/OPAQUE_TOKEN
+biletflow://open/verify-email?token=SIGNED_TOKEN
+biletflow://open/reset-password?token=SIGNED_TOKEN
+```
+
+Cold/warm routes use the same parser, and a campaign destination is retained through
+sign-in or registration. The validated promo is prefilled and quoted automatically
+when quantities are selected; checkout revalidates it. Admission scanning rejects
+campaign links. Email links and Campaign QR images still use the backend's configured
+web URL. Automatic HTTPS-to-app opening requires an owned deployment domain,
+Android assetlinks and iOS associated-domain configuration; it is not enabled for
+an invented domain. Pasting or scanning those URLs in the app works without that
+hosting setup. Configure `WEB_BASE_URL` in the Flutter build to include a public event
+URL in calendar exports; their UIDs now match the backend export.
 
 ## Event management and operations
 
@@ -328,7 +349,7 @@ failed payments and refunds, displays configured fees and shares filtered orders
 as CSV. User management supports suspension/restoration with reasons. These flows
 use the backend in the sibling `biletflow` folder; restart that server after updating
 its code. No new database columns are required for these management features.
-The separate email screens remain frontend-only demos.
+The separate six-digit-code email screens remain isolated demos; the active email flows use the backend.
 
 
 ## SRS completion: inventory, private access and operational workflows
@@ -354,7 +375,7 @@ The separate email screens remain frontend-only demos.
   invitation emails are not automatically sent.
 - **Administration (§4.12):** Dashboard links to Platform
   settings, and Simulated payouts. User search queries the server by name, email
-  or stored role. Attendees report an event from its details through Support Chat, using the Report event category. These conversations go directly to platform admins and remain private from the event organizer and staff. Separate reports/disputes pages are no longer exposed.
+  or stored role. Attendees report an event from its details through Support Chat, using the Report event category. These conversations go directly to platform admins and remain private from the event organizer and staff. Formal reports and payment disputes are also available as separate records: admins review them from Dashboard, attendees find their own histories in Profile, and a confirmed paid order offers Open payment dispute. Event details offers Submit formal event report. Support conversations and formal records are intentionally separate.
   Support replies and status changes notify requesters. Reports do not automatically
   suspend an event or refund an order: administrators use the existing explicit
   event/order controls for those actions.
@@ -373,15 +394,48 @@ invitation, moderation, payout, activation-fee and checkout-retry tables without
 removing existing data. Keep the ASGI lifespan enabled for scheduled cleanup;
 request-time cleanup also recovers expired inventory.
 
-### Remaining SRS work after these changes
+## Mobile campaigns and formal cases
 
-Email verification/password reset and confirmation/ticket emails remain UI demos
-with incomplete delivery/integration. Campaign authoring/disable controls,
-ticket-type discount restrictions, campaign QR opening/automatic promo application,
-full campaign financial breakdowns and the mobile promo-preview API integration
-remain incomplete. Printable PDF Cyrillic/font/layout support also needs work.
-Accessibility, PostgreSQL concurrent-load/latency tests, backup/restore and deployed
-transport/storage security require separate validation. Assigned seating, common
-calendar-service shortcuts, GA4, offline scanning and chat attachments are stretch
-features under §8. Real financial processing, production KYC and advanced disputes
-are outside the academic MVP; the simulated flows above are intentional.
+Organizer Event details → Promotional campaigns supports creation, editing dates,
+names, redemption limits and applicable ticket types, enable/disable, server QR
+preview/sharing, and the detailed lifetime campaign report. Promo codes and discount
+values are immutable after creation. Percentage and fixed-KZT discounts are validated;
+fixed amounts are sent as integer minor units. Backend rules remain authoritative.
+Event workspace also links to campaign management.
+
+Formal reports and disputes support requester histories and administrator review,
+resolve/dismiss decisions, reason notes, search and status filters. Closing a dispute
+never calls a refund or money-transfer endpoint. Closing a report never automatically
+suspends an event. Existing support-report conversations remain in the support inbox.
+Notifications link to the relevant formal history/review queue; organizer payout
+notifications retain their existing destination.
+
+### Optional live contract check
+
+The default suite uses mock HTTP responses; the live contract test is skipped unless
+explicitly enabled. The fixture below imports the unchanged sibling backend and
+creates a disposable SQLite database and synthetic accounts. Email stays in memory.
+Do not point this check at a real database.
+
+```sh
+../biletflow/.venv/bin/python scripts/run_mobile_contract_backend.py
+# In another terminal:
+flutter test test/live_backend_contract_test.dart \
+  --dart-define=RUN_LIVE_API_TESTS=true \
+  --dart-define=API_BASE_URL=http://127.0.0.1:18001/api/v1
+```
+
+Stop the fixture with Ctrl+C when finished; its temporary database is removed.
+This verifies API integration, not PostgreSQL locking, SMTP receipt or physical
+camera/printed-ticket performance.
+
+### Remaining validation and dependencies
+
+Use the backend revision containing the Unicode PDF and financial-allocation
+fixes. Shared HTTPS-domain association, SMTP receipt, physical
+camera/printed-QR scanning, native share/calendar handoff, PostgreSQL concurrency,
+load/latency, backup/restore and transport/storage encryption still need deployment
+or device evidence. Official terms/privacy content has not been supplied.
+Assigned seating, common calendar-service shortcuts, GA4, offline scanning and chat
+attachments remain stretch features under §8. Real financial processing and
+production KYC remain outside the academic MVP.
