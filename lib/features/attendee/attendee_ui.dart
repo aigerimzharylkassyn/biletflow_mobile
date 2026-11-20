@@ -120,25 +120,23 @@ String eventCalendar(AppEvent event) {
       .replaceAll(';', r'\;');
   String date(DateTime v) =>
       DateFormat("yyyyMMdd'T'HHmmss'Z'").format(v.toUtc());
-  final start = DateTime(
-      event.date.year,
-      event.date.month,
-      event.date.day,
-      int.tryParse(event.startTime.split(':').first) ?? 0,
-      int.tryParse(event.startTime.split(':').last) ?? 0);
+  // date retains the exact server instant, including seconds and UTC offset.
+  final start = event.date;
   final raw = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//BiletFlow//Mobile//EN',
     'BEGIN:VEVENT',
-    'UID:${escape(event.id)}@biletflow.kz',
+    'UID:event-${escape(event.id)}@biletflow.kz',
     'DTSTAMP:${date(DateTime.now())}',
     'DTSTART:${date(start)}',
     'DTEND:${date(event.endsAt ?? start.add(const Duration(hours: 2)))}',
     'SUMMARY:${escape(event.title)}',
     'DESCRIPTION:${escape(event.description)}',
     'LOCATION:${escape('${event.venue}, ${event.address}, ${event.city}')}',
-    if (event.eventStatus == 'cancelled') 'STATUS:CANCELLED',
+    if (const String.fromEnvironment('WEB_BASE_URL').isNotEmpty)
+      'URL:${const String.fromEnvironment('WEB_BASE_URL').replaceFirst(RegExp(r'/$'), '')}/events/${Uri.encodeComponent(event.id)}',
+    'STATUS:${event.eventStatus == 'cancelled' ? 'CANCELLED' : 'CONFIRMED'}',
     'END:VEVENT',
     'END:VCALENDAR'
   ];

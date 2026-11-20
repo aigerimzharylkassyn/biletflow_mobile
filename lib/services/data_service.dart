@@ -20,6 +20,7 @@ class DataService extends ChangeNotifier {
   String? _userId;
   UserRole? _userRole;
   int _generation = 0;
+  bool _disposed = false;
   bool isLoading = false;
   String? errorMessage;
   List<AppEvent> _events = [];
@@ -72,7 +73,7 @@ class DataService extends ChangeNotifier {
 
   Future<void> refresh() async {
     final user = auth.currentUser;
-    if (user == null) return;
+    if (user == null || _disposed) return;
     final generation = ++_generation;
     isLoading = true;
     errorMessage = null;
@@ -311,6 +312,8 @@ class DataService extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
+    _generation++;
     auth.removeListener(_sessionChanged);
     super.dispose();
   }

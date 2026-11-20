@@ -32,11 +32,17 @@ class ApiClient {
         if (token != null) 'Authorization': 'Bearer $token',
       };
   Future<Uint8List> download(String path) async {
+    final sessionToken = token;
     try {
       final response = await _client
           .get(Uri.parse('$baseUrl$path'), headers: headers)
           .timeout(const Duration(seconds: 20));
       if (response.statusCode >= 400) {
+        if (response.statusCode == 401 &&
+            sessionToken != null &&
+            token == sessionToken) {
+          onUnauthorized?.call();
+        }
         throw ApiException(
             'Download failed (${response.statusCode}).', response.statusCode);
       }
@@ -51,6 +57,7 @@ class ApiClient {
 
   Future<dynamic> request(String method, String path,
       {Object? body, String? idempotencyKey}) async {
+    final sessionToken = token;
     final request = http.Request(method, Uri.parse('$baseUrl$path'));
     request.headers.addAll(headers);
     if (idempotencyKey != null) {
@@ -61,11 +68,22 @@ class ApiClient {
       final response =
           await http.Response.fromStream(await _client.send(request))
               .timeout(const Duration(seconds: 20));
-      final dynamic data = response.body.isEmpty
-          ? null
-          : jsonDecode(utf8.decode(response.bodyBytes));
+      if (response.statusCode == 401 &&
+          sessionToken != null &&
+          token == sessionToken) {
+        onUnauthorized?.call();
+      }
+      dynamic data;
+      if (response.body.isNotEmpty) {
+        try {
+          data = jsonDecode(utf8.decode(response.bodyBytes));
+        } on FormatException {
+          throw ApiException(
+              'The server returned an unreadable response (${response.statusCode}). Please retry.',
+              response.statusCode);
+        }
+      }
       if (response.statusCode >= 400) {
-        if (response.statusCode == 401 && token != null) onUnauthorized?.call();
         final detail = data is Map ? data['detail'] : null;
         final message = detail is List
             ? detail
