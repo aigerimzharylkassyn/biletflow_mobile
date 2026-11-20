@@ -9,6 +9,8 @@ import 'organizer_application_screen.dart';
 import 'account_screens.dart';
 import 'support_screen.dart';
 import '../operations/invitations_screen.dart';
+import '../operations/open_link_screen.dart';
+import '../operations/formal_cases_screen.dart';
 import '../../shared/widgets/app_avatar.dart';
 import '../../shared/widgets/language_selector.dart';
 
@@ -111,6 +113,30 @@ class ProfileScreen extends StatelessWidget {
           ],
           const LanguageSettingsRow(),
           const Divider(),
+          _ProfileRow(
+              icon: Icons.link,
+              label: l10n.linkOpen,
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const OpenLinkScreen()))),
+          const Divider(),
+          if (user?.role == UserRole.attendee) ...[
+            _ProfileRow(
+                icon: Icons.flag_outlined,
+                label: l10n.formalReports,
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const FormalCasesScreen()))),
+            _ProfileRow(
+                icon: Icons.rule_outlined,
+                label: l10n.formalDisputes,
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            const FormalCasesScreen(disputes: true)))),
+            const Divider(),
+          ],
           if (user?.role == UserRole.attendee ||
               user?.role == UserRole.organizer) ...[
             _ProfileRow(
@@ -214,13 +240,16 @@ class _EmailVerificationCard extends StatefulWidget {
 class _EmailVerificationCardState extends State<_EmailVerificationCard> {
   bool _busy = false;
 
-  Future<void> _run(Future<void> Function(AuthService auth) action, String? success) async {
+  Future<void> _run(
+      Future<void> Function(AuthService auth) action, String? success) async {
     if (_busy) return;
     setState(() => _busy = true);
     final messenger = ScaffoldMessenger.of(context);
     try {
       await action(context.read<AuthService>());
-      if (success != null) messenger.showSnackBar(SnackBar(content: Text(success)));
+      if (success != null) {
+        messenger.showSnackBar(SnackBar(content: Text(success)));
+      }
     } catch (error) {
       messenger.showSnackBar(SnackBar(content: Text(error.toString())));
     } finally {
@@ -243,12 +272,20 @@ class _EmailVerificationCardState extends State<_EmailVerificationCard> {
         children: [
           Row(
             children: [
-              Icon(widget.verified ? Icons.verified_outlined : Icons.mark_email_unread_outlined, color: color),
+              Icon(
+                  widget.verified
+                      ? Icons.verified_outlined
+                      : Icons.mark_email_unread_outlined,
+                  color: color),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  widget.verified ? l10n.profileEmailVerified : l10n.profileEmailNotVerified,
-                  style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                  widget.verified
+                      ? l10n.profileEmailVerified
+                      : l10n.profileEmailNotVerified,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary),
                 ),
               ),
             ],
@@ -258,11 +295,16 @@ class _EmailVerificationCardState extends State<_EmailVerificationCard> {
               spacing: 8,
               children: [
                 TextButton(
-                  onPressed: _busy ? null : () => _run((auth) => auth.resendVerification(), l10n.profileVerificationResent),
+                  onPressed: _busy
+                      ? null
+                      : () => _run((auth) => auth.resendVerification(),
+                          l10n.profileVerificationResent),
                   child: Text(l10n.profileResendVerification),
                 ),
                 TextButton(
-                  onPressed: _busy ? null : () => _run((auth) => auth.refreshUser(), null),
+                  onPressed: _busy
+                      ? null
+                      : () => _run((auth) => auth.refreshUser(), null),
                   child: Text(l10n.profileRefreshStatus),
                 ),
               ],

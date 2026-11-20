@@ -9,9 +9,12 @@ import '../../shared/widgets/app_text_field.dart';
 import '../../shared/widgets/language_selector.dart';
 import '../../shared/widgets/primary_button.dart';
 import 'forgot_password_screen.dart';
+import '../operations/open_link_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.onAuthenticated});
+  final VoidCallback? onAuthenticated;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -48,6 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
+    if (widget.onAuthenticated != null) {
+      widget.onAuthenticated!();
+      return;
+    }
     final role = auth.currentUser!.role;
     final route = switch (role) {
       UserRole.attendee => '/attendee',
@@ -163,13 +170,32 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: const TextStyle(
                             color: AppColors.textSecondary, fontSize: 14)),
                     TextButton(
-                      onPressed: () =>
-                          Navigator.of(context).pushNamed('/register'),
+                      onPressed: () {
+                        final navigator = Navigator.of(context);
+                        final resume = widget.onAuthenticated;
+                        if (resume == null) {
+                          navigator.pushNamed('/register');
+                        } else {
+                          navigator.push(MaterialPageRoute(
+                              builder: (_) =>
+                                  RegisterScreen(onAuthenticated: () {
+                                    navigator.pop();
+                                    resume();
+                                  })));
+                        }
+                      },
                       child: Text(l10n.authRegisterButton),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
+                TextButton.icon(
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const OpenLinkScreen())),
+                    icon: const Icon(Icons.link),
+                    label: Text(l10n.linkOpen)),
                 const SizedBox(height: 24),
               ],
             ),

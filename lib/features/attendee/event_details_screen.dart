@@ -12,6 +12,7 @@ import '../../models/user.dart';
 import '../../services/auth_service.dart';
 import 'checkout_screen.dart';
 import 'ticket_support_actions.dart';
+import '../operations/formal_cases_screen.dart';
 
 int ticketLimit(AppEvent event, Map<String, dynamic> type, {DateTime? now}) {
   final clock = (now ?? DateTime.now()).toUtc();
@@ -34,8 +35,10 @@ int ticketLimit(AppEvent event, Map<String, dynamic> type, {DateTime? now}) {
 }
 
 class EventDetailsScreen extends StatefulWidget {
-  const EventDetailsScreen({super.key, required this.event});
+  const EventDetailsScreen(
+      {super.key, required this.event, this.initialPromo = ''});
   final AppEvent event;
+  final String initialPromo;
   @override
   State<EventDetailsScreen> createState() => _EventDetailsScreenState();
 }
@@ -56,6 +59,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   void initState() {
     super.initState();
     _event = widget.event;
+    _promo.text = widget.initialPromo;
     _load();
     _availabilityClock = Timer.periodic(const Duration(seconds: 30), (_) {
       if (mounted) setState(() {});
@@ -70,9 +74,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   Future<void> _load() async {
+    _quoteGeneration++;
     setState(() {
       _loading = true;
       _error = null;
+      _quoting = false;
+      _quoteUnavailable = false;
     });
     final data = context.read<DataService>();
     try {
@@ -116,6 +123,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       _quoteError = null;
       _quote = null;
       _appliedPromo = '';
+      _quoteUnavailable = false;
     });
     try {
       final code = _promo.text.trim().toUpperCase();
@@ -146,12 +154,16 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   void _changeQuantity(String id, int quantity) {
+    _quoteGeneration++;
     setState(() {
       _quantities[id] = quantity;
       _quote = null;
       _appliedPromo = '';
       _quoteError = null;
+      _quoting = false;
+      _quoteUnavailable = false;
     });
+    if (_valid && _promo.text.trim().isNotEmpty) _applyPromo();
   }
 
   Future<void> _checkout() async {
@@ -270,6 +282,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                                 view: 'mine'))),
                                     icon: const Icon(Icons.flag_outlined),
                                     label: Text(l.opsReportEvent)),
+                                if (['published', 'suspended']
+                                    .contains(event.eventStatus))
+                                  TextButton(
+                                      onPressed: () => submitFormalCase(context,
+                                          eventId: event.id),
+                                      child: Text(l.formalReportSubmit)),
                               ],
                             ]),
                             const SizedBox(height: 20),
@@ -293,14 +311,18 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                 AttendeePanel(children: [
                                   TextField(
                                       controller: _promo,
-                                      enabled: !_quoting,
                                       decoration: InputDecoration(
                                           labelText: l.promoCode),
-                                      onChanged: (_) => setState(() {
-                                            _quote = null;
-                                            _appliedPromo = '';
-                                            _quoteError = null;
-                                          })),
+                                      onChanged: (_) {
+                                        _quoteGeneration++;
+                                        setState(() {
+                                          _quote = null;
+                                          _appliedPromo = '';
+                                          _quoteError = null;
+                                          _quoteUnavailable = false;
+                                          _quoting = false;
+                                        });
+                                      }),
                                   const SizedBox(height: 12),
                                   OutlinedButton(
                                       onPressed: !_valid || _quoting
@@ -374,14 +396,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 Row(mainAxisSize: MainAxisSize.min, children: [
                   IconButton(
                       tooltip: '${l.commonCancel} ${type['name']}',
-                      onPressed: count > 0 && !_quoting
+                      onPressed: count > 0
                           ? () => _changeQuantity(id, count - 1)
                           : null,
                       icon: const Icon(Icons.remove_circle_outline)),
                   Semantics(liveRegion: true, child: Text('$count')),
                   IconButton(
                       tooltip: '${l.chooseTickets} ${type['name']}',
-                      onPressed: count < limit && !_quoting
+                      onPressed: count < limit
                           ? () => _changeQuantity(id, count + 1)
                           : null,
                       icon: const Icon(Icons.add_circle_outline)),

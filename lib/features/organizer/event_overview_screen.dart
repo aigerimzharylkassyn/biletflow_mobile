@@ -22,6 +22,7 @@ import 'create_event_screen.dart';
 import 'event_information_widgets.dart';
 import 'ticket_inventory_screen.dart';
 import '../operations/invitations_screen.dart';
+import '../operations/campaigns_screen.dart';
 
 class EventOverviewScreen extends StatefulWidget {
   final AppEvent event;
@@ -283,6 +284,18 @@ class _EventOverviewScreenState extends State<EventOverviewScreen> {
                               ],
                               if (currentUser?.isOrganizer == true ||
                                   currentUser?.isAdmin == true) ...[
+                                const SizedBox(height: 12),
+                                OutlinedAppButton(
+                                    label: l10n.campaignTitle,
+                                    icon: Icons.campaign_outlined,
+                                    onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => CampaignsScreen(
+                                                eventId: event.id,
+                                                title: event.title,
+                                                canCreate: event.eventStatus !=
+                                                    'cancelled')))),
                                 const SizedBox(height: 12),
                                 OutlinedAppButton(
                                     label: l10n.managementTitle,

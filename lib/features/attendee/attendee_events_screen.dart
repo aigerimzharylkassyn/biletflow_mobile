@@ -11,6 +11,7 @@ import '../../shared/widgets/error_message.dart';
 import '../../shared/widgets/event_card.dart';
 import 'event_details_screen.dart';
 import '../operations/invitations_screen.dart';
+import '../operations/open_link_screen.dart';
 
 class AttendeeEventsScreen extends StatefulWidget {
   final EventCategory? initialCategory;
@@ -67,6 +68,11 @@ class _AttendeeEventsScreenState extends State<AttendeeEventsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navEvents), actions: [
+        IconButton(
+            tooltip: l10n.linkOpen,
+            icon: const Icon(Icons.qr_code),
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const OpenLinkScreen()))),
         IconButton(
             tooltip: l10n.opsPrivateEvents,
             onPressed: () => Navigator.push(context,

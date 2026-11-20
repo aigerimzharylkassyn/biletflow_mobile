@@ -7,6 +7,8 @@ import '../features/auth/register_screen.dart';
 import '../features/organizer/organizer_shell.dart';
 import '../features/splash/splash_screen.dart';
 import '../features/staff/staff_shell.dart';
+import '../features/operations/open_link_screen.dart';
+import '../models/app_link.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -28,4 +30,12 @@ class AppRoutes {
         staff: (_) => const StaffShell(),
         admin: (_) => const AdminShell(),
       };
+
+  static Route<dynamic> generate(RouteSettings settings) {
+    final builder = table[settings.name];
+    final link = AppLink.parse(settings.name ?? '');
+    return MaterialPageRoute(
+        settings: settings,
+        builder: builder ?? (_) => OpenLinkScreen(link: link));
+  }
 }

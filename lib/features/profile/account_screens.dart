@@ -10,6 +10,7 @@ import '../organizer/event_overview_screen.dart';
 import 'support_screen.dart';
 import '../attendee/event_details_screen.dart';
 import '../operations/payouts_screen.dart';
+import '../operations/formal_cases_screen.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -294,6 +295,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                             icon: const Icon(
                                                 Icons.event_outlined),
                                             label: Text(l.creationDetails)),
+                                      if (['event_report', 'report_status'].contains(row['kind']) ||
+                                          ('${row['kind']}'.startsWith('dispute_') &&
+                                              context
+                                                      .read<AuthService>()
+                                                      .currentUser
+                                                      ?.isOrganizer !=
+                                                  true))
+                                        TextButton.icon(
+                                            onPressed: () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (_) => FormalCasesScreen(
+                                                        disputes: '${row['kind']}'
+                                                            .startsWith(
+                                                                'dispute_'),
+                                                        review: context
+                                                                .read<AuthService>()
+                                                                .currentUser
+                                                                ?.isAdmin ==
+                                                            true))),
+                                            icon: const Icon(Icons.rule_outlined),
+                                            label: Text('${row['kind']}'.startsWith('dispute_') ? l.formalDisputes : l.formalReports)),
                                       if (row['kind'] == 'payout_status' ||
                                           ('${row['kind']}'
                                                   .startsWith('dispute_') &&

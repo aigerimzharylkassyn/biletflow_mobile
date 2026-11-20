@@ -58,7 +58,8 @@ void main() {
         throwsA(DemoEmailFailure.expiredCode));
   });
 
-  testWidgets('forgot password opens the backend reset request screen', (tester) async {
+  testWidgets('forgot password opens the backend reset request screen',
+      (tester) async {
     viewport(tester);
     var requests = 0;
     final api = ApiClient(client: MockClient((_) async {
@@ -149,13 +150,15 @@ void main() {
   });
 
   testWidgets(
-      'confirmation previews real order details and simulated delivery makes no requests',
+      'confirmation preview is local and email request uses the real backend',
       (tester) async {
     viewport(tester);
     var requests = 0;
-    final api = ApiClient(client: MockClient((_) async {
+    final api = ApiClient(client: MockClient((request) async {
       requests++;
-      return http.Response('{}', 500);
+      expect(request.method, 'POST');
+      expect(request.url.path, '/api/v1/orders/order-123/resend-confirmation');
+      return http.Response('{}', 202);
     }));
     await tester.pumpWidget(fixtures.app(
         api,
@@ -179,10 +182,11 @@ void main() {
     await tester.ensureVisible(find.text('OK'));
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Simulate sending'));
-    await tester.pumpAndSettle();
-    expect(find.text('Demo sending complete. No email was delivered.'),
-        findsOneWidget);
     expect(requests, 0);
+    await tester.tap(find.text('Request ticket email'));
+    await tester.pumpAndSettle();
+    expect(find.text('Ticket email requested. Delivery may take a moment.'),
+        findsOneWidget);
+    expect(requests, 1);
   });
 }

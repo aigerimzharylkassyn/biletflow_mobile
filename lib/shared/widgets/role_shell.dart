@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/data_service.dart';
 import '../../services/auth_service.dart';
+import '../../l10n/loc_extensions.dart';
 
 class RoleNavItem {
   final String label;
@@ -44,7 +45,7 @@ class _RoleShellState extends State<RoleShell> {
               child: TextButton(
                   onPressed: () => Navigator.of(context)
                       .pushNamedAndRemoveUntil("/login", (_) => false),
-                  child: const Text("Session ended. Sign in again."))));
+                  child: Text(context.l10n.sessionEnded))));
     }
     return Scaffold(
       body: LayoutBuilder(
@@ -60,7 +61,7 @@ class _RoleShellState extends State<RoleShell> {
                               actions: [
                             TextButton(
                                 onPressed: data.refresh,
-                                child: const Text("Retry"))
+                                child: Text(context.l10n.commonRetry))
                           ]))),
                 Expanded(
                     child: IndexedStack(

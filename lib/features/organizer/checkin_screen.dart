@@ -50,7 +50,11 @@ class _CheckinScreenState extends State<CheckinScreen> {
     if (_busy || _eventId == null || credential.trim().isEmpty) return;
     final l = context.l10n;
     if (!credential.trim().startsWith('ticket.')) {
-      await _result(false, l.checkinInvalid);
+      await _result(
+          false,
+          credential.contains('/campaign/')
+              ? l.checkinCampaignRejected
+              : l.checkinInvalid);
       return;
     }
     setState(() => _busy = true);

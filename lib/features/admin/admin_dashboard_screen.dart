@@ -14,6 +14,7 @@ import '../operations/payouts_screen.dart';
 import 'platform_settings_screen.dart';
 import 'admin_users_screen.dart';
 import 'organizer_applications_screen.dart';
+import '../operations/formal_cases_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -65,6 +66,23 @@ class AdminDashboardScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
+          OutlinedAppButton(
+              label: l10n.formalReports,
+              icon: Icons.flag_outlined,
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const FormalCasesScreen(review: true)))),
+          const SizedBox(height: 12),
+          OutlinedAppButton(
+              label: l10n.formalDisputes,
+              icon: Icons.rule_outlined,
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const FormalCasesScreen(
+                          disputes: true, review: true)))),
+          const SizedBox(height: 12),
           OutlinedAppButton(
               label: l10n.managementMonitor,
               icon: Icons.monitor_heart_outlined,

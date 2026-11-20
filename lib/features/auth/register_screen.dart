@@ -8,7 +8,8 @@ import '../../shared/widgets/app_text_field.dart';
 import '../../shared/widgets/primary_button.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({super.key, this.onAuthenticated});
+  final VoidCallback? onAuthenticated;
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -48,7 +49,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       content: Text(context.l10n.authVerificationSent(auth.currentUser!.email)),
       duration: const Duration(seconds: 6),
     ));
-    Navigator.of(context).pushNamedAndRemoveUntil('/attendee', (r) => false);
+    if (widget.onAuthenticated != null) {
+      widget.onAuthenticated!();
+    } else {
+      Navigator.of(context).pushNamedAndRemoveUntil('/attendee', (r) => false);
+    }
   }
 
   @override

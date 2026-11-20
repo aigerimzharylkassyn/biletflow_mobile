@@ -4,7 +4,8 @@ import '../../l10n/loc_extensions.dart';
 
 /// A separate route keeps the camera off when the check-in tab is hidden.
 class TicketScannerScreen extends StatefulWidget {
-  const TicketScannerScreen({super.key});
+  const TicketScannerScreen({super.key, this.title, this.instruction});
+  final String? title, instruction;
 
   @override
   State<TicketScannerScreen> createState() => _TicketScannerScreenState();
@@ -32,7 +33,7 @@ class _TicketScannerScreenState extends State<TicketScannerScreen> {
   Widget build(BuildContext context) {
     final l = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: Text(l.checkinScan)),
+      appBar: AppBar(title: Text(widget.title ?? l.checkinScan)),
       body: Column(children: [
         Expanded(
             child: MobileScanner(
@@ -54,8 +55,8 @@ class _TicketScannerScreenState extends State<TicketScannerScreen> {
             top: false,
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child:
-                  Text(l.organizerScanInstruction, textAlign: TextAlign.center),
+              child: Text(widget.instruction ?? l.organizerScanInstruction,
+                  textAlign: TextAlign.center),
             )),
       ]),
     );

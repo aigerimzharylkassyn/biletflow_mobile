@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../app/theme.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../models/event.dart';
+import '../../services/data_service.dart';
 import '../auth/email_auth_screen.dart';
 import 'attendee_ui.dart';
 
-/// Confirmation/delivery preview only; never submits an email or alters an order.
+/// Preview is local; resend requests actual backend email delivery.
 class TicketEmailPanel extends StatefulWidget {
   const TicketEmailPanel(
       {super.key,
@@ -26,6 +28,26 @@ class TicketEmailPanel extends StatefulWidget {
 
 class _TicketEmailPanelState extends State<TicketEmailPanel> {
   bool _sent = false;
+  bool _sending = false;
+  String? _sendError;
+
+  Future<void> _resend() async {
+    if (_sending || _sent) return;
+    setState(() {
+      _sending = true;
+      _sendError = null;
+    });
+    try {
+      await context.read<DataService>().api.request('POST',
+          '/orders/${Uri.encodeComponent(widget.orderId)}/resend-confirmation');
+      if (mounted) setState(() => _sent = true);
+    } catch (error) {
+      if (mounted) setState(() => _sendError = error.toString());
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
   void _preview() {
     showModalBottomSheet<void>(
         context: context,
@@ -143,7 +165,7 @@ class _TicketEmailPanelState extends State<TicketEmailPanel> {
       const SizedBox(height: 8),
       Text(l.emailDeliveryHelp, style: const TextStyle(height: 1.5)),
       const SizedBox(height: 12),
-      Text(l.emailDemoNotice,
+      Text(l.emailRequestHelp,
           style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
       const SizedBox(height: 16),
       OutlinedButton.icon(
@@ -152,14 +174,20 @@ class _TicketEmailPanelState extends State<TicketEmailPanel> {
           label: Text(l.emailPreviewAction, textAlign: TextAlign.center)),
       const SizedBox(height: 8),
       TextButton.icon(
-          onPressed: _sent ? null : () => setState(() => _sent = true),
+          onPressed: _sent || _sending ? null : _resend,
           icon: const Icon(Icons.send_outlined),
-          label: Text(l.emailSimulateSend, textAlign: TextAlign.center)),
+          label: Text(_sending ? l.commonLoading : l.emailResend,
+              textAlign: TextAlign.center)),
+      if (_sendError != null)
+        Semantics(
+            liveRegion: true,
+            child: Text(_sendError!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error))),
       if (_sent) ...[
         const SizedBox(height: 8),
         Semantics(
             liveRegion: true,
-            child: Text(l.emailDemoSent,
+            child: Text(l.emailRequested,
                 style: const TextStyle(color: AppColors.primaryInk))),
       ],
     ]);

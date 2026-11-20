@@ -5,6 +5,7 @@ import '../../app/theme.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../services/api_client.dart';
 import '../../services/data_service.dart';
+import '../../services/auth_service.dart';
 import '../attendee/attendee_ui.dart';
 
 class OperationsPage extends StatefulWidget {
@@ -48,42 +49,52 @@ class OperationsPageState extends State<OperationsPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-      backgroundColor: AppColors.caseBackground,
-      appBar: AppBar(title: Text(widget.title), actions: [
-        IconButton(
-            tooltip: context.l10n.refreshStatus,
-            onPressed: busy ? null : refresh,
-            icon: const Icon(Icons.refresh))
-      ]),
-      body: RefreshIndicator(
-          onRefresh: refresh,
-          child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(20),
-              children: [
-                Center(
-                    child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 900),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (busy)
-                                const Padding(
-                                    padding: EdgeInsets.only(bottom: 16),
-                                    child: LinearProgressIndicator()),
-                              if (error != null)
-                                OperationsCard(children: [
-                                  const Icon(Icons.cloud_off_outlined,
-                                      color: AppColors.error),
-                                  Text(error!),
-                                  OutlinedButton(
-                                      onPressed: busy ? null : refresh,
-                                      child: Text(context.l10n.commonRetry))
-                                ]),
-                              if (data != null) ...widget.content(this, data),
-                            ])))
-              ])));
+  Widget build(BuildContext context) => !context
+          .watch<AuthService>()
+          .isAuthenticated
+      ? Scaffold(
+          body: Center(
+              child: TextButton(
+                  onPressed: () => Navigator.of(context)
+                      .pushNamedAndRemoveUntil('/login', (_) => false),
+                  child: Text(context.l10n.sessionEnded))))
+      : Scaffold(
+          backgroundColor: AppColors.caseBackground,
+          appBar: AppBar(title: Text(widget.title), actions: [
+            IconButton(
+                tooltip: context.l10n.refreshStatus,
+                onPressed: busy ? null : refresh,
+                icon: const Icon(Icons.refresh))
+          ]),
+          body: RefreshIndicator(
+              onRefresh: refresh,
+              child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    Center(
+                        child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 900),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (busy)
+                                    const Padding(
+                                        padding: EdgeInsets.only(bottom: 16),
+                                        child: LinearProgressIndicator()),
+                                  if (error != null)
+                                    OperationsCard(children: [
+                                      const Icon(Icons.cloud_off_outlined,
+                                          color: AppColors.error),
+                                      Text(error!),
+                                      OutlinedButton(
+                                          onPressed: busy ? null : refresh,
+                                          child: Text(context.l10n.commonRetry))
+                                    ]),
+                                  if (data != null)
+                                    ...widget.content(this, data),
+                                ])))
+                  ])));
 }
 
 class OperationsCard extends StatelessWidget {

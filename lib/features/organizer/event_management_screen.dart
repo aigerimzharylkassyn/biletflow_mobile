@@ -13,6 +13,7 @@ import 'event_attendees_screen.dart';
 import 'ticket_inventory_screen.dart';
 import '../operations/invitations_screen.dart';
 import 'management_confirmation.dart';
+import '../operations/campaigns_screen.dart';
 
 class EventManagementScreen extends StatefulWidget {
   const EventManagementScreen(
@@ -414,6 +415,8 @@ class _EventManagementScreenState extends State<EventManagementScreen> {
                                 ])
                               ]),
                               _section(l.managementNet, [
+                                if (_type != null)
+                                  Text(l.analyticsAllocationHelp),
                                 Text(l.managementSimulation),
                                 const SizedBox(height: 16),
                                 ResponsiveCards(children: [
@@ -485,6 +488,15 @@ class _EventManagementScreenState extends State<EventManagementScreen> {
                                           ]))
                               ]),
                               _section(l.managementCampaigns, [
+                                OutlinedButton.icon(
+                                    onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => CampaignsScreen(
+                                                eventId: widget.eventId,
+                                                title: widget.title))),
+                                    icon: const Icon(Icons.campaign_outlined),
+                                    label: Text(l.campaignTitle)),
                                 if ((a['campaigns'] as List).isEmpty)
                                   Text(l.managementNoData),
                                 for (final c in a['campaigns'] as List)

@@ -26,8 +26,11 @@ class BiletFlowApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      initialRoute: AppRoutes.splash,
-      routes: AppRoutes.table,
+      onGenerateRoute: AppRoutes.generate,
+      // One route preserves cold-start links without constructing intermediate
+      // splash/login routes that could replace the link while it is being read.
+      onGenerateInitialRoutes: (name) =>
+          [AppRoutes.generate(RouteSettings(name: name))],
     );
   }
 }

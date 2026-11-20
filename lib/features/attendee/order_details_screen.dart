@@ -9,6 +9,9 @@ import 'attendee_ui.dart';
 import 'ticket_email_panel.dart';
 import 'my_tickets_screen.dart';
 import 'ticket_support_actions.dart';
+import '../../services/auth_service.dart';
+import '../../models/user.dart';
+import '../operations/formal_cases_screen.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
   const OrderDetailsScreen({super.key, required this.orderId});
@@ -226,6 +229,19 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                 'confirmed' &&
                                             (order['total_minor'] as num) > 0),
                                     const SizedBox(height: 20),
+                                    if (context
+                                                .read<AuthService>()
+                                                .currentUser
+                                                ?.role ==
+                                            UserRole.attendee &&
+                                        order['status'] == 'confirmed' &&
+                                        (order['total_minor'] as num) > 0)
+                                      OutlinedButton.icon(
+                                          onPressed: () => submitFormalCase(
+                                              context,
+                                              orderId: widget.orderId),
+                                          icon: const Icon(Icons.rule_outlined),
+                                          label: Text(l.formalDisputeSubmit)),
                                     Text(l.digitalTickets,
                                         style: Theme.of(context)
                                             .textTheme
