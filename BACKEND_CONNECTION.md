@@ -13,8 +13,17 @@ flutter pub get
 flutter run
 ```
 
-Defaults: iOS Simulator uses `http://127.0.0.1:8000/api/v1`; Android Emulator uses
-`http://10.0.2.2:8000/api/v1`.
+By default the app uses the deployed backend, `https://biletflow-api.onrender.com/api/v1`
+(Render free tier: the first request after idle time can take up to a minute while it wakes).
+
+To use a backend running on this computer instead:
+
+```sh
+flutter run --dart-define=API_BASE_URL=local
+```
+
+`local` means `http://127.0.0.1:8000/api/v1` on the iOS Simulator and
+`http://10.0.2.2:8000/api/v1` on the Android Emulator.
 
 For a physical phone, connect it to the same Wi-Fi as the backend computer. Start the backend with
 `uv run uvicorn app.main:app --host 0.0.0.0 --port 8000`, and set the computer's LAN IP:
