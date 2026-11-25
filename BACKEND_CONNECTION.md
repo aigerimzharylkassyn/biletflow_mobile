@@ -13,10 +13,11 @@ flutter pub get
 flutter run
 ```
 
-By default the app uses the deployed backend, `https://biletflow-api.onrender.com/api/v1`
-(Render free tier: the first request after idle time can take up to a minute while it wakes).
+By default the app uses the local backend: `http://127.0.0.1:8000/api/v1` on
+the iOS Simulator and web, or `http://10.0.2.2:8000/api/v1` on the Android Emulator.
+Start the backend in the sibling `biletflow` folder before opening the app.
 
-To use a backend running on this computer instead:
+To explicitly select the same local backend:
 
 ```sh
 flutter run --dart-define=API_BASE_URL=local

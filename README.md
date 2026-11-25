@@ -25,7 +25,7 @@ project directory, with its dependencies and database configured:
 
 ```sh
 uv sync --all-extras --python 3.13
-uv run python -m app.dev_seed   # optional, creates rich demo data for every role
+uv run python -m app.dev_reset_seed --replace-local  # replaces local demo data; stop API first
 uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
@@ -55,7 +55,12 @@ must be provisioned on the backend. For local checks, the optional backend seed
 also creates events, users, registrations, revenue, and attendee tickets. It
 creates `attendee.demo@example.com`, `organizer.demo@example.com`,
 `staff.demo@example.com`, and `admin.demo@example.com`; each uses
-`DemoPass123!`.
+`DemoPass123!`. The fresh seed also creates `support.demo@example.com` for assigned
+attendee support, plus new, applicant, rejected, unverified and suspended accounts.
+The reset requires an existing development SQLite database, verifies a separate
+dataset and backs up the old database before replacement. Sign out and sign back
+in afterward. See the sibling backend's `docs/DEMO_WALKTHROUGH.md` for the full
+role-by-role demo and `demo_seed_manifest.json` for exact scenario IDs and codes.
 
 Sessions are held in memory. Sign in again after restarting the app or when the
 token expires.

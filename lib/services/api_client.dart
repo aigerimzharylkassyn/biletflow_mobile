@@ -16,27 +16,21 @@ class ApiClient {
   final http.Client _client;
   String? token;
   VoidCallback? onUnauthorized;
-  /// Deployed backend on Render (biletflow/render.yaml, service "biletflow-api").
-  /// Render's free tier sleeps when idle; waking it can take ~50 seconds.
+  /// Allow enough time for ticket exports and slower development devices.
   static const requestTimeout = Duration(seconds: 60);
 
-  static const productionBaseUrl = 'https://biletflow-api.onrender.com/api/v1';
-
-  /// Production by default. Override with --dart-define=API_BASE_URL=<url>, or use
-  /// --dart-define=API_BASE_URL=local for a backend on this computer
-  /// (127.0.0.1, or 10.0.2.2 from the Android emulator).
+  /// Local backend by default. Override with --dart-define=API_BASE_URL=<url>
+  /// for a physical phone or a separately configured server. The explicit value
+  /// `local` also selects 127.0.0.1 (10.0.2.2 from the Android emulator).
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
-    if (configured == 'local') {
+    if (configured.isEmpty || configured == 'local') {
       final host = !kIsWeb && defaultTargetPlatform == TargetPlatform.android
           ? '10.0.2.2'
           : '127.0.0.1';
       return 'http://$host:8000/api/v1';
     }
-    if (configured.isNotEmpty) {
-      return configured.replaceFirst(RegExp(r'/$'), '');
-    }
-    return productionBaseUrl;
+    return configured.replaceFirst(RegExp(r'/$'), '');
   }
 
   Map<String, String> get headers => {
