@@ -228,7 +228,7 @@
   "supportCreated": "Request sent",
   "supportCategory": "Category",
   "supportTicket": "Ticket delivery",
-  "supportPayment": "Payment",
+  "supportPayment": "Payment problem",
   "supportRefund": "Refund",
   "supportAccount": "Account",
   "supportTechnical": "Technical issue",
@@ -468,7 +468,7 @@
   "supportManageCase": "Manage case",
   "supportReply": "Your reply",
   "supportNewChat": "New chat",
-  "supportChatHint": "Get help with your tickets, bookings, or event.",
+  "supportChatHint": "Ask questions, request refunds, report events or get help with payment problems here.",
   "supportNoChats": "No conversations yet. Start a chat when you need help.",
   "supportWhoToContact": "Who do you need help from?",
   "supportEventHelp": "An event or booking",
@@ -723,7 +723,7 @@
   "linkCampaignInactive": "This campaign cannot currently be used.",
   "formalReports": "Event moderation reports",
   "formalReportSubmit": "Submit formal event report",
-  "formalReportsHelp": "Formal reports go to Platform Admin. Support conversations are listed separately in Support Chat.",
+  "formalReportsHelp": "Event reports are reviewed by Platform Admin. Attendees follow the review in Support Chat.",
   "formalDisputes": "Payment disputes",
   "formalDisputeSubmit": "Open payment dispute",
   "formalDisputesHelp": "Disputes concern confirmed paid orders. Payments are simulated. Closing a dispute does not refund an order or transfer money.",
@@ -764,5 +764,8 @@
   "campaignDatesInvalid": "Choose an end after the start.",
   "campaignAmountInvalid": "Enter a positive amount with at most two decimal places, or a whole percentage from 1 to 100.",
   "checkinCampaignRejected": "This is a campaign QR, not an admission ticket.",
-  "analyticsAllocationHelp": "Ticket-type financial amounts are estimates from the server. Check the order breakdown before financial decisions."
+  "analyticsAllocationHelp": "Ticket-type financial amounts are estimates from the server. Check the order breakdown before financial decisions.",
+  "supportPaymentDestination": "Payment problems go directly to Platform Admin.",
+  "supportPaymentHelp": "For a confirmed paid booking, this opens a payment review. To request a refund, choose Refund instead.",
+  "supportFormalClosedHelp": "This review is closed. Start a new conversation for another issue."
 }

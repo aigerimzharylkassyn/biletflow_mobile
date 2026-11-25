@@ -295,28 +295,25 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                             icon: const Icon(
                                                 Icons.event_outlined),
                                             label: Text(l.creationDetails)),
-                                      if (['event_report', 'report_status'].contains(row['kind']) ||
-                                          ('${row['kind']}'.startsWith('dispute_') &&
-                                              context
-                                                      .read<AuthService>()
-                                                      .currentUser
-                                                      ?.isOrganizer !=
-                                                  true))
+                                      if ((['event_report', 'report_status'].contains(row['kind']) ||
+                                              '${row['kind']}'
+                                                  .startsWith('dispute_')) &&
+                                          context.read<AuthService>().currentUser?.isOrganizer !=
+                                              true &&
+                                          (context.read<AuthService>().currentUser?.isAdmin == true ||
+                                              (row['data'] is! Map ||
+                                                  row['data']['case_id'] ==
+                                                      null)))
                                         TextButton.icon(
                                             onPressed: () => Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (_) => FormalCasesScreen(
-                                                        disputes: '${row['kind']}'
-                                                            .startsWith(
-                                                                'dispute_'),
-                                                        review: context
-                                                                .read<AuthService>()
-                                                                .currentUser
-                                                                ?.isAdmin ==
-                                                            true))),
-                                            icon: const Icon(Icons.rule_outlined),
-                                            label: Text('${row['kind']}'.startsWith('dispute_') ? l.formalDisputes : l.formalReports)),
+                                                    builder: (_) =>
+                                                        context.read<AuthService>().currentUser?.isAdmin == true
+                                                            ? FormalCasesScreen(disputes: '${row['kind']}'.startsWith('dispute_'), review: true)
+                                                            : const SupportScreen(view: 'mine'))),
+                                            icon: const Icon(Icons.chat_bubble_outline),
+                                            label: Text(context.read<AuthService>().currentUser?.isAdmin == true ? ('${row['kind']}'.startsWith('dispute_') ? l.formalDisputes : l.formalReports) : l.profileContactUs)),
                                       if (row['kind'] == 'payout_status' ||
                                           ('${row['kind']}'
                                                   .startsWith('dispute_') &&

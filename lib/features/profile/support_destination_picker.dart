@@ -6,7 +6,9 @@ import '../../services/auth_service.dart';
 
 /// Select context, never a recipient ID: the server owns support routing.
 class SupportDestinationPicker extends StatefulWidget {
-  const SupportDestinationPicker({super.key, required this.onChanged});
+  const SupportDestinationPicker(
+      {super.key, required this.onChanged, this.platformRoutingMessage});
+  final String? platformRoutingMessage;
   final void Function(String? eventId, String? orderId) onChanged;
   @override
   State<SupportDestinationPicker> createState() =>
@@ -125,9 +127,10 @@ class _SupportDestinationPickerState extends State<SupportDestinationPicker> {
       if (_destination != null) ...[
         const SizedBox(height: 12),
         Text(
-            _destination == 'general'
-                ? l.supportSentToPlatform
-                : l.supportSentToOrganizer,
+            widget.platformRoutingMessage ??
+                (_destination == 'general'
+                    ? l.supportSentToPlatform
+                    : l.supportSentToOrganizer),
             style: const TextStyle(color: AppColors.primaryInk)),
       ],
       const SizedBox(height: 16),

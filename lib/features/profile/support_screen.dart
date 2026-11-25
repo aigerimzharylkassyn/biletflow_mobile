@@ -2,6 +2,7 @@ import 'dart:async';
 import '../../app/theme.dart';
 import 'support_inbox_widgets.dart';
 import 'support_case_widgets.dart';
+import 'support_formal_review.dart';
 import 'support_destination_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -110,10 +111,7 @@ class _SupportScreenState extends State<SupportScreen>
               category != 'report_event' ||
               (context.read<AuthService>().currentUser?.role ==
                       UserRole.attendee &&
-                  (!_creating ||
-                      (widget.eventId != null &&
-                          widget.orderId == null &&
-                          widget.ticketId == null))))
+                  (!_creating || (_contextEvent != null))))
           .toList();
   bool _loading = true, _busy = false, _creating = false;
   String? _error;
@@ -669,6 +667,9 @@ class _SupportScreenState extends State<SupportScreen>
                             assignee:
                                 '${l.supportAssignee}: ${_case!['assignee_name'] ?? l.supportUnassigned}',
                           ),
+                          if (_case!['formal_id'] != null)
+                            SupportFormalReview(
+                                caseData: _case!, onChanged: _load),
                           if (_case!['event_title'] != null ||
                               _case!['order_id'] != null ||
                               _case!['ticket_id'] != null ||
@@ -700,7 +701,10 @@ class _SupportScreenState extends State<SupportScreen>
                                             Text(_case!['category'] ==
                                                     'report_event'
                                                 ? l.supportReportDestination
-                                                : l.supportFallback),
+                                                : _case!['category'] ==
+                                                        'payment'
+                                                    ? l.supportPaymentDestination
+                                                    : l.supportFallback),
                                           if (_case!['event_title'] != null)
                                             Text(_case!['event_title']),
                                           if (_case!['order_id'] != null)
@@ -789,6 +793,7 @@ class _SupportScreenState extends State<SupportScreen>
                                             : (id) => _assign(id!)),
                                   ],
                                   if (_case!['can_manage'] == true &&
+                                      _case!['can_change_status'] != false &&
                                       !(_case!['category'] == 'refund' &&
                                           _case!['order_status'] ==
                                               'refunded')) ...[
@@ -801,7 +806,10 @@ class _SupportScreenState extends State<SupportScreen>
                                         decoration: InputDecoration(
                                             labelText: l.supportStatusFilter),
                                         items: [
-                                          for (final s in supportStatuses)
+                                          for (final s in supportStatuses.where(
+                                              (s) =>
+                                                  _case!['formal_id'] == null ||
+                                                  s != 'resolved'))
                                             DropdownMenuItem(
                                                 value: s,
                                                 child: Text(supportStatusLabel(
@@ -853,7 +861,10 @@ class _SupportScreenState extends State<SupportScreen>
                                 const Icon(Icons.check_circle_outline,
                                     color: AppColors.primaryInk),
                                 const SizedBox(width: 12),
-                                Expanded(child: Text(l.supportResolvedHelp)),
+                                Expanded(
+                                    child: Text(_case?['formal_id'] != null
+                                        ? l.supportFormalClosedHelp
+                                        : l.supportResolvedHelp)),
                               ])),
                       ],
                       if ((widget.caseId != null && _case != null && !solved) ||
@@ -881,15 +892,33 @@ class _SupportScreenState extends State<SupportScreen>
                                             widget.orderId == null &&
                                             widget.ticketId == null)
                                           SupportDestinationPicker(
+                                              platformRoutingMessage: _category ==
+                                                      'report_event'
+                                                  ? l.supportReportDestination
+                                                  : _category == 'payment'
+                                                      ? l.supportPaymentDestination
+                                                      : null,
                                               onChanged: (eventId, orderId) {
-                                            _contextEvent = eventId;
-                                            _contextOrder = orderId;
-                                          })
+                                                setState(() {
+                                                  _contextEvent = eventId;
+                                                  _contextOrder = orderId;
+                                                  if (_category ==
+                                                          'report_event' &&
+                                                      eventId == null) {
+                                                    _category =
+                                                        'ticket_delivery';
+                                                  }
+                                                });
+                                              })
                                         else
                                           Text(attendeeChat
                                               ? (_category == 'report_event'
                                                   ? l.supportReportDestination
-                                                  : l.supportSentToOrganizer)
+                                                  : _category == 'payment'
+                                                      ? l
+                                                          .supportPaymentDestination
+                                                      : l
+                                                          .supportSentToOrganizer)
                                               : widget.flow ==
                                                       'organizer_platform'
                                                   ? l.supportPlatformFlow
@@ -931,6 +960,10 @@ class _SupportScreenState extends State<SupportScreen>
                                         if (widget.eventId != null)
                                           SelectableText(
                                               '${l.supportEventFilter}: ${_category == 'report_event' ? widget.subject ?? widget.eventId : widget.eventId}'),
+                                        if (_category == 'payment') ...[
+                                          Text(l.supportPaymentHelp),
+                                          const SizedBox(height: 12),
+                                        ],
                                         if (_category == 'refund') ...[
                                           Text(l.supportRefundRequestHelp),
                                           const SizedBox(height: 12)
@@ -951,6 +984,8 @@ class _SupportScreenState extends State<SupportScreen>
                                                   : null),
                                         const SizedBox(height: 12),
                                         DropdownButtonFormField<String>(
+                                            key: ValueKey(
+                                                'support-category-$_category'),
                                             initialValue: _category,
                                             isExpanded: true,
                                             decoration: InputDecoration(

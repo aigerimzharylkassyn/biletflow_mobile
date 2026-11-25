@@ -19,6 +19,7 @@ import 'package:biletflow_mobile/features/operations/campaign_form.dart';
 import 'package:biletflow_mobile/features/operations/campaigns_screen.dart';
 import 'package:biletflow_mobile/features/operations/campaign_analytics_screen.dart';
 import 'package:biletflow_mobile/features/operations/formal_cases_screen.dart';
+import 'package:biletflow_mobile/features/profile/support_screen.dart';
 import 'package:biletflow_mobile/features/operations/open_link_screen.dart';
 import 'package:biletflow_mobile/features/splash/splash_screen.dart';
 import 'package:biletflow_mobile/features/auth/login_screen.dart';
@@ -214,41 +215,54 @@ void main() {
         isNotNull);
   });
 
-  testWidgets(
-      'formal report submission requires a reason and opens requester history',
+  testWidgets('event reports are submitted and followed in Support Chat',
       (tester) async {
     viewport(tester);
     final requests = <http.Request>[];
+    final row = {
+      'id': 'support-case',
+      'subject': 'Report event',
+      'flow': 'attendee',
+      'category': 'report_event',
+      'routing': 'platform',
+      'status': 'open',
+      'event_id': 'event-id',
+      'event_title': 'Community concert',
+      'can_manage': false,
+      'can_refund': false,
+    };
     final api = ApiClient(client: MockClient((r) async {
       requests.add(r);
-      return r.method == 'POST'
-          ? response(caseRecord(), 201)
-          : response([caseRecord()]);
+      if (r.method == 'POST') return response(row, 201);
+      if (r.url.path.endsWith('/cases') ||
+          r.url.path.endsWith('/messages') ||
+          r.url.path.endsWith('/history')) {
+        return response([]);
+      }
+      return response(row);
     }));
     await tester.pumpWidget(app(
         api,
-        Builder(
-            builder: (context) => Scaffold(
-                body: FilledButton(
-                    onPressed: () =>
-                        submitFormalCase(context, eventId: 'event-id'),
-                    child: const Text('Open report'))))));
-    await tester.tap(find.text('Open report'));
+        const SupportScreen(
+            eventId: 'event-id',
+            initialCategory: 'report_event',
+            startNew: true,
+            view: 'mine')));
     await tester.pumpAndSettle();
-    await tester
-        .tap(find.widgetWithText(FilledButton, 'Submit formal event report'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Send message'));
     await tester.pumpAndSettle();
-    expect(requests, isEmpty);
-    await tester.enterText(
-        find.byType(TextFormField), 'Incorrect venue advertised');
-    await tester
-        .tap(find.widgetWithText(FilledButton, 'Submit formal event report'));
+    expect(requests.where((r) => r.method == 'POST'), isEmpty);
+    await tester.enterText(find.widgetWithText(TextFormField, 'Message'),
+        'Incorrect venue advertised');
+    await tester.tap(find.widgetWithText(FilledButton, 'Send message'));
     await tester.pumpAndSettle();
-    expect(requests.first.url.path, '/api/v1/events/event-id/reports');
-    expect(jsonDecode(requests.first.body),
-        {'reason': 'Incorrect venue advertised'});
-    expect(requests.last.url.path, '/api/v1/reports/mine');
-    expect(find.byType(FormalCasesScreen), findsOneWidget);
+    final submitted = requests.singleWhere((r) => r.method == 'POST');
+    expect(submitted.url.path, '/api/v1/support/cases');
+    expect(jsonDecode(submitted.body)['category'], 'report_event');
+    expect(jsonDecode(submitted.body)['event_id'], 'event-id');
+    expect(requests.any((r) => r.url.path.endsWith('/reports')), isFalse);
+    expect(find.byType(SupportScreen), findsOneWidget);
+    expect(find.byType(FormalCasesScreen), findsNothing);
   });
 
   testWidgets(

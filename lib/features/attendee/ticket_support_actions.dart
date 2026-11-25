@@ -17,11 +17,16 @@ class TicketSupportActions extends StatelessWidget {
   final String? orderId, ticketId;
   final bool canRequestRefund;
   final VoidCallback? beforeOpen;
-  Future<void> _open(BuildContext context, bool refund) async {
+  Future<void> _open(BuildContext context, String category) async {
     final navigator = Navigator.of(context);
     final data = context.read<DataService>();
     final l = context.l10n;
-    final subject = '${refund ? l.requestRefund : l.contactOrganizer}: $title';
+    final label = category == 'refund'
+        ? l.requestRefund
+        : category == 'payment'
+            ? l.supportPayment
+            : l.contactOrganizer;
+    final subject = '$label: $title';
     beforeOpen?.call();
     await navigator.push(MaterialPageRoute(
         builder: (_) => SupportScreen(
@@ -31,7 +36,7 @@ class TicketSupportActions extends StatelessWidget {
             startNew: true,
             flow: 'attendee',
             view: 'mine',
-            initialCategory: refund ? 'refund' : 'event_information',
+            initialCategory: category,
             subject:
                 subject.length > 200 ? subject.substring(0, 200) : subject)));
     await data.refresh();
@@ -42,13 +47,18 @@ class TicketSupportActions extends StatelessWidget {
       Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         if (canRequestRefund) ...[
           OutlinedButton.icon(
-              onPressed: () => _open(context, true),
+              onPressed: () => _open(context, 'refund'),
               icon: const Icon(Icons.currency_exchange),
               label: Text(context.l10n.requestRefund)),
           const SizedBox(height: 12),
+          OutlinedButton.icon(
+              onPressed: () => _open(context, 'payment'),
+              icon: const Icon(Icons.payments_outlined),
+              label: Text(context.l10n.supportPayment)),
+          const SizedBox(height: 12),
         ],
         OutlinedButton.icon(
-            onPressed: () => _open(context, false),
+            onPressed: () => _open(context, 'event_information'),
             icon: const Icon(Icons.chat_bubble_outline),
             label: Text(context.l10n.contactOrganizer)),
       ]);

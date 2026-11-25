@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:biletflow_mobile/features/profile/support_screen.dart';
+import 'package:biletflow_mobile/features/profile/support_formal_review.dart';
 import 'package:biletflow_mobile/features/profile/profile_screen.dart';
 import 'package:biletflow_mobile/features/staff/staff_shell.dart';
 import 'package:biletflow_mobile/models/user.dart';
@@ -15,6 +16,7 @@ import 'package:biletflow_mobile/services/support_service.dart';
 import 'event_attendees_test.dart' as fixtures;
 import 'attendee_flow_test.dart' as booking;
 import 'package:biletflow_mobile/features/attendee/event_details_screen.dart';
+import 'package:biletflow_mobile/features/attendee/order_details_screen.dart';
 import 'package:biletflow_mobile/models/event.dart';
 
 Map<String, dynamic> platformCase() => {
@@ -55,6 +57,195 @@ class SupportStaffAuth extends fixtures.ListAuth {
 }
 
 void main() {
+  testWidgets('new chat can report an event selected from its context picker',
+      (tester) async {
+    viewport(tester);
+    Map<String, dynamic>? submitted;
+    final row = {
+      ...platformCase(),
+      'flow': 'attendee',
+      'category': 'report_event'
+    };
+    final api = ApiClient(client: MockClient((r) async {
+      if (r.method == 'POST') {
+        submitted = jsonDecode(r.body);
+        return booking.response(row, 201);
+      }
+      if (r.url.path == '/api/v1/events') {
+        return booking.response([booking.eventJson]);
+      }
+      if (r.url.path.endsWith('/cases') ||
+          r.url.path.endsWith('/orders') ||
+          r.url.path.endsWith('/messages') ||
+          r.url.path.endsWith('/history')) {
+        return booking.response([]);
+      }
+      return booking.response(row);
+    }));
+    await tester.pumpWidget(supportApp(api, UserRole.attendee,
+        const SupportScreen(startNew: true, view: 'mine')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('support-destination')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('An event or booking').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('support-context-event')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Community concert').last);
+    await tester.pumpAndSettle();
+    await tester
+        .tap(find.byKey(const ValueKey('support-category-ticket_delivery')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Report event').last);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('This report goes directly to Platform Admin.'),
+        findsOneWidget);
+    expect(find.text('Sent to the organizer of the selected event or booking.'),
+        findsNothing);
+    await tester.enterText(find.widgetWithText(TextFormField, 'Message'),
+        'Please verify the venue information.');
+    await tester
+        .ensureVisible(find.widgetWithText(FilledButton, 'Send message'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Send message'));
+    await tester.pumpAndSettle();
+    expect(submitted?['category'], 'report_event');
+    expect(submitted?['event_id'], 'event-id');
+  });
+
+  testWidgets('admin makes an explicit platform decision from the conversation',
+      (tester) async {
+    viewport(tester);
+    final writes = <http.Request>[];
+    var refreshed = 0;
+    final api = ApiClient(client: MockClient((r) async {
+      writes.add(r);
+      return booking.response({});
+    }));
+    await tester.pumpWidget(supportApp(
+        api,
+        UserRole.admin,
+        Scaffold(
+            body: SupportFormalReview(
+          caseData: const {
+            'formal_id': 'dispute-id',
+            'formal_type': 'dispute',
+            'formal_status': 'open'
+          },
+          onChanged: () async {
+            refreshed++;
+          },
+        ))));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Review decision'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Save changes'));
+    await tester.pumpAndSettle();
+    expect(writes, isEmpty);
+    await tester.tap(find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(DropdownButtonFormField<String>)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Resolve').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Decision / progress note'),
+        'We checked the payment and receipt.');
+    await tester.tap(find.widgetWithText(FilledButton, 'Save changes'));
+    await tester.pumpAndSettle();
+    expect(writes.single.url.path, '/api/v1/admin/disputes/dispute-id');
+    expect(jsonDecode(writes.single.body), {
+      'status': 'resolved',
+      'resolution': 'We checked the payment and receipt.'
+    });
+    expect(refreshed, 1);
+    expect(writes.any((r) => r.url.path.contains('refund')), isFalse);
+  });
+
+  testWidgets(
+      'a paid booking opens its payment conversation with order context',
+      (tester) async {
+    viewport(tester);
+    Map<String, dynamic>? submitted;
+    final row = {
+      ...platformCase(),
+      'flow': 'attendee',
+      'category': 'payment',
+      'subject': 'Payment problem',
+      'event_id': 'event-id',
+      'order_id': 'order-id'
+    };
+    final api = ApiClient(client: MockClient((r) async {
+      if (r.method == 'POST') {
+        submitted = jsonDecode(r.body);
+        return booking.response(row, 201);
+      }
+      if (r.url.path == '/api/v1/orders/order-id') {
+        return booking.response(booking.order);
+      }
+      if (r.url.path == '/api/v1/events/event-id') {
+        return booking.response(booking.eventJson);
+      }
+      if (r.url.path.endsWith('/cases') ||
+          r.url.path.endsWith('/messages') ||
+          r.url.path.endsWith('/history') ||
+          r.url.path.endsWith('/tickets')) {
+        return booking.response([]);
+      }
+      return booking.response(row);
+    }));
+    await tester.pumpWidget(supportApp(
+        api, UserRole.attendee, const OrderDetailsScreen(orderId: 'order-id')));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Payment problem'), 250,
+        scrollable: find.byType(Scrollable).first);
+    await tester.tap(find.text('Payment problem'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SupportScreen), findsOneWidget);
+    expect(find.text('Payment problems go directly to Platform Admin.'),
+        findsOneWidget);
+    expect(find.text('Sent to the organizer of the selected event or booking.'),
+        findsNothing);
+    await tester.enterText(find.widgetWithText(TextFormField, 'Message'),
+        'The receipt amount looks incorrect.');
+    await tester
+        .ensureVisible(find.widgetWithText(FilledButton, 'Send message'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Send message'));
+    await tester.pumpAndSettle();
+    expect(submitted?['category'], 'payment');
+    expect(submitted?['order_id'], 'order-id');
+    expect(submitted?['event_id'], 'event-id');
+  });
+
+  testWidgets('closed platform decisions remain visible in the attendee chat',
+      (tester) async {
+    viewport(tester);
+    final row = {
+      ...platformCase(),
+      'flow': 'attendee',
+      'category': 'report_event',
+      'subject': 'Venue concern',
+      'status': 'resolved',
+      'formal_id': 'report-id',
+      'formal_type': 'report',
+      'formal_status': 'dismissed',
+      'formal_resolution': 'The venue details have been verified.'
+    };
+    final api = ApiClient(client: MockClient((r) async {
+      if (r.url.path.endsWith('/messages') || r.url.path.endsWith('/history')) {
+        return booking.response([]);
+      }
+      return booking.response(row);
+    }));
+    await tester.pumpWidget(supportApp(api, UserRole.attendee,
+        const SupportScreen(caseId: 'case-id', view: 'mine')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('The venue details have been verified.'),
+        findsOneWidget);
+    expect(find.textContaining('Dismissed'), findsOneWidget);
+    expect(find.byType(TextFormField), findsNothing);
+    expect(find.text('Review decision'), findsNothing);
+  });
+
   testWidgets('report event opens a prefilled private platform support request',
       (tester) async {
     viewport(tester);
@@ -114,6 +305,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('My reports & disputes'), findsNothing);
       expect(find.text('Moderation & disputes'), findsNothing);
+      expect(find.text('Event moderation reports'), findsNothing);
+      expect(find.text('Payment disputes'), findsNothing);
+      if (role == UserRole.attendee) {
+        expect(find.text('Support chat'), findsOneWidget);
+      }
     });
   }
 

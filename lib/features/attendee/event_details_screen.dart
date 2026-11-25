@@ -12,7 +12,6 @@ import '../../models/user.dart';
 import '../../services/auth_service.dart';
 import 'checkout_screen.dart';
 import 'ticket_support_actions.dart';
-import '../operations/formal_cases_screen.dart';
 
 int ticketLimit(AppEvent event, Map<String, dynamic> type, {DateTime? now}) {
   final clock = (now ?? DateTime.now()).toUtc();
@@ -282,12 +281,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                                 view: 'mine'))),
                                     icon: const Icon(Icons.flag_outlined),
                                     label: Text(l.opsReportEvent)),
-                                if (['published', 'suspended']
-                                    .contains(event.eventStatus))
-                                  TextButton(
-                                      onPressed: () => submitFormalCase(context,
-                                          eventId: event.id),
-                                      child: Text(l.formalReportSubmit)),
                               ],
                             ]),
                             const SizedBox(height: 20),

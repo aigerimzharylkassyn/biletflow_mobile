@@ -4,42 +4,11 @@ import 'package:provider/provider.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../models/event.dart';
 import '../../services/auth_service.dart';
-import '../../services/data_service.dart';
 import '../attendee/attendee_ui.dart';
 import '../organizer/event_management_screen.dart';
 import 'operations_ui.dart';
 
-Future<void> submitFormalCase(BuildContext context,
-    {String? eventId, String? orderId}) async {
-  assert((eventId == null) != (orderId == null));
-  final l = context.l10n;
-  final api = context.read<DataService>().api;
-  final result = await operationsForm(context,
-      title: orderId != null ? l.formalDisputeSubmit : l.formalReportSubmit,
-      help: orderId != null ? l.formalDisputesHelp : l.formalReportsHelp,
-      submitLabel:
-          orderId != null ? l.formalDisputeSubmit : l.formalReportSubmit,
-      fields: [
-        OperationField('reason', l.formalReason,
-            multiline: true,
-            validate: (v) => v.length >= 3 ? null : l.opsInvalid)
-      ],
-      save: (fields) => api.request(
-          'POST',
-          orderId != null
-              ? '/orders/${Uri.encodeComponent(orderId)}/disputes'
-              : '/events/${Uri.encodeComponent(eventId!)}/reports',
-          body: fields));
-  if (result == null || !context.mounted) return;
-  ScaffoldMessenger.of(context)
-      .showSnackBar(SnackBar(content: Text(l.formalSubmitted)));
-  await Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (_) => FormalCasesScreen(disputes: orderId != null)));
-}
-
-/// Formal records are intentionally separate from SupportCase conversations.
+/// Administrator review workspace; attendees use Support Chat.
 class FormalCasesScreen extends StatefulWidget {
   const FormalCasesScreen(
       {super.key, this.disputes = false, this.review = false});

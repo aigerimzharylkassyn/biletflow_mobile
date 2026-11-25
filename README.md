@@ -380,7 +380,14 @@ The separate six-digit-code email screens remain isolated demos; the active emai
   invitation emails are not automatically sent.
 - **Administration (§4.12):** Dashboard links to Platform
   settings, and Simulated payouts. User search queries the server by name, email
-  or stored role. Attendees report an event from its details through Support Chat, using the Report event category. These conversations go directly to platform admins and remain private from the event organizer and staff. Formal reports and payment disputes are also available as separate records: admins review them from Dashboard, attendees find their own histories in Profile, and a confirmed paid order offers Open payment dispute. Event details offers Submit formal event report. Support conversations and formal records are intentionally separate.
+  or stored role. Attendees use Profile → Support Chat for all help, reports and
+  payment problems. Event details → Report event and booking → Payment problem
+  open the same chat with context attached. Event reports and payment problems
+  go privately to Platform Admin; event questions and refunds go to the organizer
+  or authorized support staff. A payment problem on a confirmed paid order opens
+  a linked dispute. Failed-payment questions remain ordinary platform conversations.
+  Admins retain formal review queues; existing formal histories are imported into
+  Support Chat without deleting records. Attendee Profile has one support entry.
   Support replies and status changes notify requesters. Reports do not automatically
   suspend an event or refund an order: administrators use the existing explicit
   event/order controls for those actions.
@@ -408,12 +415,14 @@ values are immutable after creation. Percentage and fixed-KZT discounts are vali
 fixed amounts are sent as integer minor units. Backend rules remain authoritative.
 Event workspace also links to campaign management.
 
-Formal reports and disputes support requester histories and administrator review,
-resolve/dismiss decisions, reason notes, search and status filters. Closing a dispute
-never calls a refund or money-transfer endpoint. Closing a report never automatically
-suspends an event. Existing support-report conversations remain in the support inbox.
-Notifications link to the relevant formal history/review queue; organizer payout
-notifications retain their existing destination.
+Support Chat shows formal review outcomes and resolution notes alongside messages.
+Administrators can review reports and disputes from their existing queues or the
+linked support conversation. A formal case is closed through an explicit review
+with a resolution note. Closing a dispute never calls a refund or money-transfer
+endpoint; closing a report never suspends an event. Closed reviews remain readable.
+Attendee notifications open Support Chat; organizer payout notifications retain
+their existing destination. Restart the backend to apply the additive link columns
+and idempotent history import; existing data is preserved.
 
 ### Optional live contract check
 

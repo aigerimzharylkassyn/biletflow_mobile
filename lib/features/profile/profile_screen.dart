@@ -10,7 +10,6 @@ import 'account_screens.dart';
 import 'support_screen.dart';
 import '../operations/invitations_screen.dart';
 import '../operations/open_link_screen.dart';
-import '../operations/formal_cases_screen.dart';
 import '../../shared/widgets/app_avatar.dart';
 import '../../shared/widgets/language_selector.dart';
 
@@ -119,24 +118,6 @@ class ProfileScreen extends StatelessWidget {
               onTap: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const OpenLinkScreen()))),
           const Divider(),
-          if (user?.role == UserRole.attendee) ...[
-            _ProfileRow(
-                icon: Icons.flag_outlined,
-                label: l10n.formalReports,
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const FormalCasesScreen()))),
-            _ProfileRow(
-                icon: Icons.rule_outlined,
-                label: l10n.formalDisputes,
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) =>
-                            const FormalCasesScreen(disputes: true)))),
-            const Divider(),
-          ],
           if (user?.role == UserRole.attendee ||
               user?.role == UserRole.organizer) ...[
             _ProfileRow(
