@@ -16,15 +16,27 @@ class ApiClient {
   final http.Client _client;
   String? token;
   VoidCallback? onUnauthorized;
+  /// Deployed backend on Render (biletflow/render.yaml, service "biletflow-api").
+  /// Render's free tier sleeps when idle; waking it can take ~50 seconds.
+  static const requestTimeout = Duration(seconds: 60);
+
+  static const productionBaseUrl = 'https://biletflow-api.onrender.com/api/v1';
+
+  /// Production by default. Override with --dart-define=API_BASE_URL=<url>, or use
+  /// --dart-define=API_BASE_URL=local for a backend on this computer
+  /// (127.0.0.1, or 10.0.2.2 from the Android emulator).
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
+    if (configured == 'local') {
+      final host = !kIsWeb && defaultTargetPlatform == TargetPlatform.android
+          ? '10.0.2.2'
+          : '127.0.0.1';
+      return 'http://$host:8000/api/v1';
+    }
     if (configured.isNotEmpty) {
       return configured.replaceFirst(RegExp(r'/$'), '');
     }
-    final host = !kIsWeb && defaultTargetPlatform == TargetPlatform.android
-        ? '10.0.2.2'
-        : '127.0.0.1';
-    return 'http://$host:8000/api/v1';
+    return productionBaseUrl;
   }
 
   Map<String, String> get headers => {
@@ -36,7 +48,7 @@ class ApiClient {
     try {
       final response = await _client
           .get(Uri.parse('$baseUrl$path'), headers: headers)
-          .timeout(const Duration(seconds: 20));
+          .timeout(requestTimeout);
       if (response.statusCode >= 400) {
         if (response.statusCode == 401 &&
             sessionToken != null &&
@@ -67,7 +79,7 @@ class ApiClient {
     try {
       final response =
           await http.Response.fromStream(await _client.send(request))
-              .timeout(const Duration(seconds: 20));
+              .timeout(requestTimeout);
       if (response.statusCode == 401 &&
           sessionToken != null &&
           token == sessionToken) {
