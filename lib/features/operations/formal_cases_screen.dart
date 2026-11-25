@@ -100,9 +100,7 @@ class _FormalCasesScreenState extends State<FormalCasesScreen> {
               Text(DateFormat.yMMMd(Localizations.localeOf(context).toString())
                   .add_Hm()
                   .format(parseApiDate(row['created_at'] as String).toLocal())),
-              SelectableText('${row['id']}'),
               if (widget.disputes) ...[
-                SelectableText('${l.orderLabel}: ${row['order_id']}'),
                 Text(money(row['total_minor'] as num)),
                 StatusBadge(row['order_status'] as String),
               ],

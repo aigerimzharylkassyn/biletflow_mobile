@@ -63,6 +63,9 @@ void main() {
     await tester.tap(find.text('Test Concert'));
     await tester.pumpAndSettle();
     expect(find.byType(QrImageView), findsNWidgets(2));
+    expect(find.textContaining(ticket.id), findsNothing);
+    expect(find.textContaining('Ticket code:'), findsNothing);
+    expect(find.textContaining(credential), findsNothing);
     final expected = await tester.runAsync(() =>
         QrPainter(data: credential, version: QrVersions.auto, gapless: true)
             .toImageData(260));

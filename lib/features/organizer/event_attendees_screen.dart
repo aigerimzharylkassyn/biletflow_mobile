@@ -214,9 +214,6 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                                       Align(
                                           alignment: Alignment.centerLeft,
                                           child: StatusBadge(order['status'])),
-                                      const SizedBox(height: 12),
-                                      SelectableText(
-                                          '${l.orderLabel}: ${order['id']}'),
                                       if (quantity != null) ...[
                                         const SizedBox(height: 8),
                                         Text(

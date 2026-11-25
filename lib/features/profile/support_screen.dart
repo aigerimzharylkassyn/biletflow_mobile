@@ -11,6 +11,7 @@ import '../../models/user.dart';
 import '../../services/auth_service.dart';
 import '../../services/data_service.dart';
 import '../../services/support_service.dart';
+import '../../shared/user_facing_text.dart';
 import 'support_staff_dialog.dart';
 import 'package:intl/intl.dart';
 import '../attendee/attendee_ui.dart';
@@ -383,16 +384,18 @@ class _SupportScreenState extends State<SupportScreen>
       for (final r in _rows)
         if (r['event_id'] != null)
           r['event_id'] as String:
-              (r['event_title'] ?? r['event_id']) as String,
+              (r['event_title'] ?? l.supportEventFilter) as String,
     };
     final solved = _case?['status'] == 'resolved';
-    final screenTitle = widget.caseId != null
+    final screenTitle = withoutInternalIds(widget.caseId != null
         ? ((_case?['subject'] as String?) ??
             widget.subject ??
             l.profileContactUs)
         : (widget.flow == 'organizer_platform'
             ? l.supportPlatformFlow
-            : (_view == 'inbox' ? l.supportAttendeeInbox : l.profileContactUs));
+            : (_view == 'inbox'
+                ? l.supportAttendeeInbox
+                : l.profileContactUs)));
     final inboxRows = _rows
         .where((r) =>
             auth.currentUser?.role != UserRole.staff ||
@@ -658,8 +661,6 @@ class _SupportScreenState extends State<SupportScreen>
                             flow: _case!['flow'] == 'organizer_platform'
                                 ? l.supportPlatformFlow
                                 : l.supportAttendeeFlow,
-                            number:
-                                '${l.supportCaseNumber}: ${_case!['number'] ?? _case!['id']}',
                             status:
                                 supportStatusLabel(context, _case!['status']),
                             category: supportCategoryLabel(
@@ -671,8 +672,8 @@ class _SupportScreenState extends State<SupportScreen>
                             SupportFormalReview(
                                 caseData: _case!, onChanged: _load),
                           if (_case!['event_title'] != null ||
-                              _case!['order_id'] != null ||
-                              _case!['ticket_id'] != null ||
+                              _case!['order_status'] != null ||
+                              _case!['ticket_status'] != null ||
                               _case!['category'] == 'refund' ||
                               (_case!['routing'] == 'platform' &&
                                   _case!['flow'] != 'organizer_platform') ||
@@ -707,9 +708,6 @@ class _SupportScreenState extends State<SupportScreen>
                                                     : l.supportFallback),
                                           if (_case!['event_title'] != null)
                                             Text(_case!['event_title']),
-                                          if (_case!['order_id'] != null)
-                                            SelectableText(
-                                                '${l.orderLabel}: ${_case!['order_id']}'),
                                           if (_case!['category'] ==
                                               'refund') ...[
                                             Text(l.supportRefundSeparate),
@@ -720,9 +718,6 @@ class _SupportScreenState extends State<SupportScreen>
                                                 true)
                                               Text(l.supportDemoRefund),
                                           ],
-                                          if (_case!['ticket_id'] != null)
-                                            SelectableText(
-                                                '${l.attendanceTicketId}: ${_case!['ticket_id']}'),
                                           if (_case!['order_status'] != null)
                                             Text(
                                                 '${l.orderLabel}: ${statusLabel(context, _case!['order_status'])}'),
@@ -839,7 +834,9 @@ class _SupportScreenState extends State<SupportScreen>
                         for (final row in _rows)
                           SupportMessageBubble(
                             own: row['sender_id'] == own,
-                            sender: '${row['sender_name'] ?? row['sender_id']}',
+                            sender: withoutInternalIds(
+                                row['sender_name'] as String? ?? '',
+                                fallback: l.profileContactUs),
                             timestamp: _timestamp(row['created_at']),
                             body: row['body'] as String,
                           ),
@@ -852,7 +849,7 @@ class _SupportScreenState extends State<SupportScreen>
                                       title: Text(
                                           '${change['actor_name']} · ${_timestamp(change['created_at'])}'),
                                       subtitle: Text(
-                                          '${change['kind'] == 'status' ? l.supportStatusFilter : change['kind'] == 'assignment' ? l.supportAssignee : l.supportOpen}: ${change['kind'] == 'status' ? supportStatusLabel(context, change['new_value'] ?? '') : change['new_name'] ?? change['new_value'] ?? l.supportUnassigned}')),
+                                          '${change['kind'] == 'status' ? l.supportStatusFilter : change['kind'] == 'assignment' ? l.supportAssignee : l.supportOpen}: ${change['kind'] == 'status' ? supportStatusLabel(context, change['new_value'] ?? '') : change['new_name'] ?? l.supportUnassigned}')),
                               ]),
                         if (solved)
                           SupportCasePanel(
@@ -957,9 +954,12 @@ class _SupportScreenState extends State<SupportScreen>
                                                           : v)),
                                           const SizedBox(height: 12),
                                         ],
-                                        if (widget.eventId != null)
-                                          SelectableText(
-                                              '${l.supportEventFilter}: ${_category == 'report_event' ? widget.subject ?? widget.eventId : widget.eventId}'),
+                                        if (widget.eventId != null &&
+                                            (events[widget.eventId] ??
+                                                    widget.subject) !=
+                                                null)
+                                          Text(withoutInternalIds(
+                                              '${l.supportEventFilter}: ${events[widget.eventId] ?? widget.subject}')),
                                         if (_category == 'payment') ...[
                                           Text(l.supportPaymentHelp),
                                           const SizedBox(height: 12),

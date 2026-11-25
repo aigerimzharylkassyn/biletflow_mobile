@@ -659,12 +659,6 @@ class _EventManagementScreenState extends State<EventManagementScreen> {
                                                                   .parse(row[
                                                                       'created_at'])
                                                               .toLocal())),
-                                                      SelectableText(
-                                                          '${row['entity_type']} · ${row['entity_id']}',
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .bodySmall)
                                                     ])))),
                               ]),
                           ])))

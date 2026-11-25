@@ -177,8 +177,7 @@ Future<void> shareCalendar(BuildContext context, AppEvent event) async {
 
 Future<void> exportTicket(ApiClient api, String ticketId) async {
   final bytes = await api.download('/tickets/$ticketId/pdf');
-  await Printing.sharePdf(
-      bytes: bytes, filename: 'biletflow-ticket-$ticketId.pdf');
+  await Printing.sharePdf(bytes: bytes, filename: 'biletflow-ticket.pdf');
 }
 
 class CancelledEventNotice extends StatelessWidget {

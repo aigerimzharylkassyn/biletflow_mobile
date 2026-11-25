@@ -232,10 +232,6 @@ class _AdminOperationsScreenState extends State<AdminOperationsScreen> {
               title: Text(l.operationsDetails,
                   style: Theme.of(context).textTheme.titleSmall),
               children: [
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: SelectableText('${l.orderLabel}: ${r['id']}',
-                        style: Theme.of(context).textTheme.bodySmall)),
                 for (final p in r['payments'] as List) _transaction(p as Map),
                 for (final f in r['refunds'] as List)
                   _transaction(f as Map, refund: true),

@@ -422,7 +422,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(target == 'event'
           ? find.text('Jazz Night').last
-          : find.textContaining('Order #booking-').last);
+          : find.text('Jazz Night · Order').last);
       await tester.pumpAndSettle();
       expect(
           find.text('Sent to the organizer of the selected event or booking.'),
@@ -648,7 +648,7 @@ void main() {
     expect(body!['category'], 'activation');
     expect(body!['event_id'], 'event-id');
     expect(key, isNotEmpty);
-    expect(find.textContaining('BF-12345'), findsOneWidget);
+    expect(find.textContaining('BF-12345'), findsNothing);
     expect(find.textContaining('Admin One'), findsOneWidget);
     expect(find.text('Activation failed'), findsOneWidget);
     expect(find.text('Platform support'), findsWidgets);

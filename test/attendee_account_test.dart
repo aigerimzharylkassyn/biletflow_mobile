@@ -46,27 +46,33 @@ void main() {
   });
   testWidgets('notifications mark an owned message as read and reload',
       (tester) async {
+    const noticeId = '53a99965-741a-4250-a074-02b9974c1652';
     var read = false;
     final api = ApiClient(client: MockClient((r) async {
       if (r.method == 'POST') {
-        expect(r.url.path, '/api/v1/notifications/notice-id/read');
+        expect(r.url.path, '/api/v1/notifications/$noticeId/read');
         read = true;
         return http.Response('', 204);
       }
       return response([
         {
-          'id': 'notice-id',
-          'title': 'Tickets ready',
-          'message': 'Your booking is confirmed',
+          'id': noticeId,
+          'title': 'Tickets ready ($noticeId)',
+          'message': 'Your booking $noticeId is confirmed for 2 tickets at 18:00',
           'is_read': read
         }
       ]);
     }));
     await tester.pumpWidget(app(const NotificationsScreen(), api));
     await tester.pumpAndSettle();
+    expect(find.text('Tickets ready'), findsOneWidget);
+    expect(find.text('Your booking is confirmed for 2 tickets at 18:00'),
+        findsOneWidget);
+    expect(find.textContaining(noticeId), findsNothing);
     await tester.tap(find.text('Mark as read'));
     await tester.pumpAndSettle();
     expect(read, isTrue);
+    expect(find.textContaining(noticeId), findsNothing);
     expect(find.text('Mark as read'), findsNothing);
   });
   testWidgets('support includes the booking context in a new request',

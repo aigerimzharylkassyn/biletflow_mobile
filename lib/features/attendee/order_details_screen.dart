@@ -150,9 +150,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                             .titleLarge),
                                     if (event.eventStatus == 'cancelled')
                                       const CancelledEventNotice(),
-                                    const SizedBox(height: 8),
-                                    SelectableText(
-                                        '${l.orderLabel}: ${order['id']}'),
                                     if (order['status'] == 'pending') ...[
                                       const SizedBox(height: 16),
                                       Text(l.pendingOrderHelp)
@@ -288,9 +285,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                 ticket['row'],
                                                 ticket['seat']
                                               ].whereType<String>().join(' / ')}'),
-                                            const SizedBox(height: 8),
-                                            SelectableText(
-                                                '${l.ticketsCode}: ${ticket['id']}'),
                                             const SizedBox(height: 12),
                                             if (event.eventStatus !=
                                                     'cancelled' &&

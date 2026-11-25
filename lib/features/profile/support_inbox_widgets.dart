@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../app/theme.dart';
+import '../../shared/user_facing_text.dart';
 
 Color supportStatusColor(String status) => switch (status) {
       'open' => AppColors.primary,
@@ -139,7 +140,8 @@ class SupportCaseCard extends StatelessWidget {
                             const SizedBox(height: 12),
                             Row(children: [
                               Expanded(
-                                  child: Text(row['subject'] as String,
+                                  child: Text(
+                                      withoutInternalIds(row['subject'] as String),
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleSmall

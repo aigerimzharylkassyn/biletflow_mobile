@@ -69,6 +69,6 @@ void main() {
     expect(find.byType(QrImageView), findsNothing);
     expect(find.byIcon(Icons.ios_share), findsNothing);
     expect(find.text('Request refund'), findsOneWidget);
-    expect(find.textContaining('order-id'), findsWidgets);
+    expect(find.textContaining('order-id'), findsNothing);
   });
 }

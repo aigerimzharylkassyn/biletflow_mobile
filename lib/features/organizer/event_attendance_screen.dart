@@ -237,7 +237,6 @@ class _AttendancePanelState extends State<AttendancePanel> {
                         SelectableText(row['attendee_email'] as String),
                         const SizedBox(height: 8),
                         Text(row['ticket_type'] as String),
-                        SelectableText('${l.attendanceTicketId}: ${row['id']}'),
                         const SizedBox(height: 8),
                         if (row['status'] != 'checked_in')
                           Text(_label(context, row['status'] as String)),

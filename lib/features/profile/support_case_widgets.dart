@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../app/theme.dart';
+import '../../shared/user_facing_text.dart';
 
 /// A shared surface for case information, actions and the reply composer.
 class SupportCasePanel extends StatelessWidget {
@@ -28,12 +29,11 @@ class SupportCaseHeading extends StatelessWidget {
   const SupportCaseHeading(
       {super.key,
       required this.flow,
-      required this.number,
       required this.status,
       required this.category,
       required this.assignee,
       this.compact = false});
-  final String flow, number, status, category, assignee;
+  final String flow, status, category, assignee;
   final bool compact;
 
   @override
@@ -58,9 +58,6 @@ class SupportCaseHeading extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: AppColors.primaryInk,
                           fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 6),
-                  SelectableText(number,
-                      style: Theme.of(context).textTheme.bodySmall),
                 ])),
           ]),
         if (!compact) const SizedBox(height: 18),
@@ -144,7 +141,7 @@ class SupportMessageBubble extends StatelessWidget {
                                         : AppColors.textPrimary,
                                     fontWeight: FontWeight.w700)),
                         const SizedBox(height: 8),
-                        SelectableText(body,
+                        SelectableText(withoutInternalIds(body),
                             style: const TextStyle(
                                 color: AppColors.textPrimary, height: 1.5)),
                         if (timestamp.isNotEmpty) ...[

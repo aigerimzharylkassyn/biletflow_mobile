@@ -177,8 +177,11 @@ void main() {
     await tester.tap(find.text('Preview email'));
     await tester.pumpAndSettle();
     expect(find.text('To: demo@example.com'), findsOneWidget);
-    expect(find.text('ticket-ticket-one.pdf'), findsOneWidget);
-    expect(find.text('ticket-ticket-two.pdf'), findsOneWidget);
+    expect(find.text('biletflow-ticket-1.pdf'), findsOneWidget);
+    expect(find.text('biletflow-ticket-2.pdf'), findsOneWidget);
+    expect(find.textContaining('ticket-one'), findsNothing);
+    expect(find.textContaining('ticket-two'), findsNothing);
+    expect(find.textContaining('order-123'), findsNothing);
     await tester.ensureVisible(find.text('OK'));
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();

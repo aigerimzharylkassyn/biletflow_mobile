@@ -82,7 +82,7 @@ class MyTicketsScreen extends StatelessWidget {
                                                         order['event_id'])
                                                     .firstOrNull
                                                     ?.title ??
-                                                '${l.orderLabel} ${order['id']}',
+                                                l.orderLabel,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .titleLarge),

@@ -100,8 +100,6 @@ class _TicketEmailPanelState extends State<TicketEmailPanel> {
                                     const SizedBox(height: 16),
                                     Text(widget.attendeeName),
                                     const SizedBox(height: 8),
-                                    Text('${l.orderLabel}: ${widget.orderId}'),
-                                    const SizedBox(height: 8),
                                     Text(
                                         '${l.totalLabel}: ${money(widget.totalMinor)}',
                                         style: const TextStyle(
@@ -115,7 +113,9 @@ class _TicketEmailPanelState extends State<TicketEmailPanel> {
                                     Text(l.emailPreviewAttachmentHelp,
                                         style: const TextStyle(
                                             color: AppColors.textSecondary)),
-                                    for (final id in widget.ticketIds)
+                                    for (var index = 0;
+                                        index < widget.ticketIds.length;
+                                        index++)
                                       Padding(
                                           padding:
                                               const EdgeInsets.only(top: 12),
@@ -136,7 +136,7 @@ class _TicketEmailPanelState extends State<TicketEmailPanel> {
                                                 const SizedBox(width: 12),
                                                 Expanded(
                                                     child: Text(
-                                                        'ticket-$id.pdf',
+                                                        'biletflow-ticket-${index + 1}.pdf',
                                                         style: const TextStyle(
                                                             fontSize: 13))),
                                               ]))),

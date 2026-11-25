@@ -62,8 +62,6 @@ class TicketCard extends StatelessWidget {
                                                         Colors.white)),
                                         const SizedBox(height: 12),
                                         Text(context.l10n.ticketQrHelp),
-                                        const SizedBox(height: 12),
-                                        SelectableText(ticket.ticketCode),
                                       ]))),
                         )),
         borderRadius: BorderRadius.circular(AppRadius.card),
@@ -105,12 +103,6 @@ class TicketCard extends StatelessWidget {
                         '${ticket.event.venue}, ${ticket.event.city}',
                         style: const TextStyle(
                             fontSize: 13, color: AppColors.textSecondary),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${context.l10n.ticketsCode}: ${ticket.id.substring(0, 8)}',
-                        style: const TextStyle(
-                            fontSize: 12, color: AppColors.textTertiary),
                       ),
                     ],
                   ),

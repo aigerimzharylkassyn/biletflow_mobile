@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../app/theme.dart';
 import '../../l10n/loc_extensions.dart';
 import '../../services/auth_service.dart';
+import '../attendee/attendee_ui.dart';
 
 /// Select context, never a recipient ID: the server owns support routing.
 class SupportDestinationPicker extends StatefulWidget {
@@ -94,7 +96,7 @@ class _SupportDestinationPickerState extends State<SupportDestinationPicker> {
                 DropdownMenuItem(
                     value: 'order:${o['id']}',
                     child: Text(
-                        '${titles[o['event_id']] ?? l.orderLabel} · ${l.orderLabel} #${(o['id'] as String).substring(0, (o['id'] as String).length.clamp(0, 8))}',
+                        _bookingLabel(context, o, titles[o['event_id']]),
                         overflow: TextOverflow.ellipsis)),
               for (final e in _events)
                 DropdownMenuItem(
@@ -135,5 +137,18 @@ class _SupportDestinationPickerState extends State<SupportDestinationPicker> {
       ],
       const SizedBox(height: 16),
     ]);
+  }
+
+  String _bookingLabel(BuildContext context, Map order, String? eventTitle) {
+    final createdAt = DateTime.tryParse('${order['created_at'] ?? ''}');
+    return [
+      if (eventTitle != null) eventTitle,
+      context.l10n.orderLabel,
+      if (createdAt != null)
+        DateFormat.yMMMd(Localizations.localeOf(context).toString())
+            .add_Hm()
+            .format(createdAt.toLocal()),
+      if (order['total_minor'] is num) money(order['total_minor']),
+    ].join(' · ');
   }
 }

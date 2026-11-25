@@ -690,8 +690,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                           ]),
                                       const SizedBox(height: 16),
                                       if (_session.saved != null) ...[
-                                        SelectableText(
-                                            '${l.creationSavedDraft}: ${_session.id}'),
+                                        Text(l.creationSavedDraft),
                                         const SizedBox(height: 16)
                                       ],
                                       if (_error != null) ...[

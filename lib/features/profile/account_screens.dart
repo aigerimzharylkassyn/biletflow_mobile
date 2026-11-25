@@ -5,6 +5,7 @@ import '../../services/auth_service.dart';
 import '../../models/user.dart';
 import '../../models/event.dart';
 import '../../services/api_client.dart';
+import '../../shared/user_facing_text.dart';
 import '../organizer/create_event_screen.dart';
 import '../organizer/event_overview_screen.dart';
 import 'support_screen.dart';
@@ -251,12 +252,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(row['title'],
+                                      Text(
+                                          withoutInternalIds(row['title'],
+                                              fallback: l.profileNotifications),
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleMedium),
                                       const SizedBox(height: 8),
-                                      Text(row['message']),
+                                      Text(withoutInternalIds(row['message'],
+                                          fallback: l.supportMessage)),
                                       if (row['data'] is Map &&
                                           row['data']['case_id'] != null)
                                         TextButton(

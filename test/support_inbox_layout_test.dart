@@ -12,6 +12,7 @@ import 'package:biletflow_mobile/services/api_client.dart';
 import 'event_attendees_test.dart' as fixtures;
 
 void main() {
+  const internalId = '53a99965-741a-4250-a074-02b9974c1652';
   for (final scale in [1.0, 1.6]) {
     testWidgets(
         'case conversation and reply fit a narrow phone at text scale $scale',
@@ -25,10 +26,9 @@ void main() {
           return http.Response(
               jsonEncode([
                 {
-                  'sender_id': 'staff',
-                  'sender_name': 'Demo Support Staff',
+                  'sender_id': internalId,
                   'body':
-                      'We are checking your ticket email. You can access your ticket in My Tickets.',
+                      'We are checking your ticket ($internalId) email. You can access your ticket in My Tickets.',
                   'created_at': '2026-10-26T09:00:00Z'
                 },
                 {
@@ -50,7 +50,7 @@ void main() {
               'category': 'ticket_delivery',
               'assignee_name': 'Demo Support Staff',
               'event_title': 'Almaty Jazz Night',
-              'order_id': '12345678-abcd-1234-abcd-123456789012',
+              'order_id': internalId,
               'can_manage': false,
               'can_refund': false
             }),
@@ -66,6 +66,11 @@ void main() {
               child: const SupportScreen(caseId: 'demo', view: 'mine'))));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
+      expect(find.textContaining(internalId), findsNothing);
+      expect(find.textContaining('BF-DEMO'), findsNothing);
+      expect(
+          find.text('We are checking your ticket email. You can access your ticket in My Tickets.'),
+          findsOneWidget);
       await tester.scrollUntilVisible(
           find.widgetWithText(TextFormField, 'Message'), 250,
           scrollable: find.byType(Scrollable).first);
