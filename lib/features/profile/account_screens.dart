@@ -244,6 +244,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       if (_rows.isEmpty) Text(l.notificationsEmpty),
                       for (final row in _rows)
                         Card(
+                            margin: const EdgeInsets.only(bottom: 16),
                             child: Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Column(
